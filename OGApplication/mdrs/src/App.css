@@ -1,0 +1,91 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ALEX'S STYLING */
+.hero{
+  padding: auto;
+  padding: 30px 30px;
+}
+.hero h1{
+  text-align: left;
+}
+
+section.metric {
+  text-align: left;
+}
+
+section.search {
+  text-align: left;
+
+}
+
+.search-result {
+  padding-top: 10px;
+}
+
+section.data-table {
+  text-align: left;
+}
+
+.table-header-wrapper{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.table-header{
+  align-items: start;
+}
+
+.table-bin-count-wrapper{
+  align-items: end;
+  text-align: end;
+  display: flex;
+}
+
+.table-bin-count-wrapper h1{
+  padding-left: 10px;
+}
+
+.login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 35px;
+}
