@@ -1,3 +1,6 @@
+# Note from TheKodaPops Dev Chris
+Please See the original ReadMe Below. Original Appication has been added for future use.
+
 # Cane-Consignment-Application
 This is an automated cane consignment appliocation, designed by Team PowerDown for a Queensland University of Technology Capstone Project
 
