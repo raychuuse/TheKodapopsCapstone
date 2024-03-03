@@ -7,6 +7,7 @@ import Button from "../components/button";
 import CustomModal from "../components/modal";
 import BinItem from "../components/binItem";
 import SelectedSiding from "../components/selectedSiding";
+import AddBinCamera from "../components/addBinCamera";
 
 //Import Functions
 import { FinishedAlert } from "../lib/alerts";
@@ -33,14 +34,17 @@ const MainPage = () => {
     { isFull: 0, binNum: 2334 },
     { isFull: 0, binNum: 4632 },
   ];
-  const [addBinVisable, setSddBinVisable] = useState(false);
+  const [addBinVisable, setAddBinVisable] = useState(false);
   return (
     <View style={styles.body}>
       {/* Add Bin Modal */}
       <CustomModal
         isVisible={addBinVisable}
-        onClose={() => setSddBinVisable(false)}
-        buttonIcon="check-circle-outline"></CustomModal>
+        onClose={() => setAddBinVisable(false)}
+        buttonIcon="close-circle-outline"
+        style={{ height: "60%", marginTop: 56 }}>
+        <AddBinCamera modalCloser={() => setAddBinVisable(false)} />
+      </CustomModal>
       {/* Page Headings */}
       <View style={styles.page_heading}>
         <LargeTitle>
@@ -70,7 +74,7 @@ const MainPage = () => {
             }}>
             <Feather name={"download"} size={24} />
             <Title3 style={{ flex: 1 }}>{BinData.length} Bins</Title3>
-            <TouchableOpacity onPress={() => setSddBinVisable(true)}>
+            <TouchableOpacity onPress={() => setAddBinVisable(true)}>
               <MaterialCommunityIcons name={"line-scan"} size={24} />
             </TouchableOpacity>
           </View>

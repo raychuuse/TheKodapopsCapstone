@@ -8,6 +8,7 @@ const CustomModal = ({
   onClose,
   children,
   buttonIcon = "close-circle-outline",
+  style,
 }) => {
   return (
     <Modal
@@ -23,7 +24,7 @@ const CustomModal = ({
         <BlurView intensity={100} style={styles.blurView} tint="dark">
           <TouchableOpacity
             activeOpacity={1} // Prevents the press from triggering the BlurView's onPressOut
-            style={styles.modalContent}>
+            style={[styles.modalContent, style]}>
             {children}
             <TouchableOpacity style={styles.closeButton} onPress={onClose}>
               <MaterialCommunityIcons
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
   modalContent: {
     width: "80%",
     backgroundColor: "white",
-    borderRadius: 10,
+    borderRadius: 32,
     padding: 20,
     alignItems: "center",
     shadowColor: "#000",
