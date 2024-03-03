@@ -3,7 +3,7 @@ import { AutoFocus, Camera, CameraType, FlashMode } from "expo-camera";
 import { useRef, useState } from "react";
 
 // Import Components
-import Button from "../components/button";
+import Button from "./button";
 import { LargeTitle } from "./typography";
 
 const AddBinCamera = ({ modalCloser }) => {
@@ -11,10 +11,21 @@ const AddBinCamera = ({ modalCloser }) => {
   const [flashMode, setFlashMode] = useState(FlashMode.off);
   const [flash, setFlash] = useState(false);
   const [permission, requestPermission] = Camera.useCameraPermissions();
+  const cameraRef = useRef(null);
+  const [imageUri, setImageUri] = useState(null);
 
   const [binNumber, setBinNumber] = useState();
   const inputRef = useRef(null);
   const MAX_LENGTH = 6;
+
+  const takePicture = async () => {
+    if (cameraRef.current) {
+      const options = { quality: 0.5, skipProcessing: true };
+      const data = await cameraRef.current.takePictureAsync(options);
+      setImageUri(data.uri);
+      console.log(data.uri);
+    }
+  };
 
   const handleChange = (text) => {
     setBinNumber(text);
@@ -73,6 +84,7 @@ const AddBinCamera = ({ modalCloser }) => {
         />
       </View>
       <Camera
+        ref={cameraRef}
         style={{
           borderRadius: 16,
           overflow: "hidden",
@@ -121,7 +133,7 @@ const AddBinCamera = ({ modalCloser }) => {
             paddingBottom: 32,
           }}>
           <TouchableOpacity
-            onPress={() => Alert.alert("Capture Button Pressed")}
+            onPress={takePicture}
             style={{
               backgroundColor: "rgba(255,255,255,0.4)",
               width: 64,
