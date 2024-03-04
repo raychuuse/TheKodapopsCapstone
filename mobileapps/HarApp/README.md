@@ -1,8 +1,8 @@
-# Sugar Kane Harvester Consignment App
+# Sugarcane Harvester Consignment App
 
 ## Introduction
 
-The Sugar Kane Harvester Consignment App, a part of The Kodapops Capstone project at Queensland University of Technology (QUT), is designed to revolutionize the harvester consignment process for sugar cane farmers and contractors. Developed with the Expo framework, this app delivers a seamless experience across both iOS and Android platforms.
+The Sugarcane Harvester Consignment App, a part of The Kodapops Capstone project at Queensland University of Technology (QUT), is designed to revolutionize the harvester consignment process for sugar cane farmers and contractors. Developed with the Expo framework, this app delivers a seamless experience across both iOS and Android platforms.
 
 ## Prerequisites
 
