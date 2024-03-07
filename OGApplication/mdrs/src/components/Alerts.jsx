@@ -16,3 +16,16 @@ export const ErrorAlert = ({ message }) => {
     )
 }
 
+export const SuccessAlert = ({message}) => {
+  return (
+        <section >
+            <div className="mt-2">
+                <div className="alert alert-success d-flex align-items-center" role="alert">
+                    <h4 className="alert-heading">
+                        {message}
+                    </h4>
+                </div>
+            </div>
+        </section>
+    )
+}

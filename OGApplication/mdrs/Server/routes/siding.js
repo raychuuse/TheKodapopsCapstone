@@ -139,4 +139,38 @@ router.get("/harvester_breakdown", validateID, (req, res) => {
       res.json({ Error: true, Message: err.message });
     });
 });
+
+router.post('/', (req, res) => {
+  console.info(req.body);
+  req.db.insert({sidingName: req.body.name}).into('siding')
+      .then((result) => {
+        res.json({Error: false, Message: 'Success', data: result})
+      })
+      .catch(error => {
+        console.error(error);
+        res.json({Error: true, Message: error.message})
+      });
+});
+
+router.put('/:id/name', (req, res) => {
+  req.db('siding').update({sidingName: req.body.name}).where({sidingID: req.params.id})
+      .then(result => {
+        res.json({Error: false, Message: 'Success'});
+      })
+      .catch(error => {
+        console.error(error);
+        res.json({Error: true, Message: error.message});
+      })
+});
+
+router.delete('/:id', (req, res) => {
+  req.db('siding').where({sidingID: req.params.id}).del()
+      .then(result => {
+        res.json({Error: false, Message: 'Success'});
+      })
+      .catch(error => {
+        res.json({Error: true, Message: error.message})
+      });
+});
+
 module.exports = router;

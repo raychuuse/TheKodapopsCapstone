@@ -25,8 +25,9 @@ export const Search = ({ keyword, onChange }) => {
 }
 
 //Searchable List
-export const List = ({ data = [], onClick, loading }) => {
+export const List = ({ data = [], onClick, onEdit, onDelete, loading }) => {
     const navigate = useNavigate();
+
     return (
       < div className="search-result" >
         <ul id="items" className="list-group">
@@ -46,6 +47,13 @@ export const List = ({ data = [], onClick, loading }) => {
               }}
             >
               {name}
+              {/* Only render the edit and delete buttons if onEdit and onDelete have been provided */}
+              {onEdit != null &&
+                <button type='button' className={'btn btn-danger'} onClick={() => onDelete(id)} style={{float: 'right'}}>Delete</button>
+              }
+              { onDelete != null &&
+                <button type='button' className={'btn btn-primary'} onClick={() => onEdit(id)} style={{float: 'right', marginRight: '1rem'}}>Edit</button>
+              }
             </button>
           ))}
         </ul >
