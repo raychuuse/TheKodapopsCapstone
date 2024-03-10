@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import {apiUrl, postConfig, putConfig} from "./utils";
 
 export async function getAllSidings() {
-    const res = await fetch("http://localhost:8080/sidings");
-    const res_1 = await res.json();
-    // console.log(res_1);
+    const res = await fetch(`${apiUrl}/sidings`);
+    const body = await res.json();
+
     // check for db error
-    if (res_1.Error) {
-        console.log(res_1.Message);
-        throw Error(`${res_1.Message}`);
+    if (body.Error) {
+        console.log(body.Message);
+        throw Error(`${body.Message}`);
     }
-    return res_1.Sidings.map((siding, index) => {
+
+    return body.Sidings.map((siding, index) => {
         return {
             id: siding.sidingID,
             name: `${siding.sidingName}`,
@@ -20,64 +20,33 @@ export async function getAllSidings() {
     });
 }
 
-export function useAllSidings() {
-    const [error, setError] = useState(null);
-    const [sidingsData, setSidingsData] = useState([]);
-
-    useEffect(
-        () => {
-            getAllSidings()
-                .then((sidings) => {
-                    setSidingsData(sidings);
-                    setError(null)
-                    // console.log(sidings)
-                })
-                .catch((e) => {
-                    setError(e)
-                })
-        },
-        []
-    );
-
-    return {
-        sidingsData,
-        error
-    };
-}
-
 export async function getSiding(id) {
-
-    const url = `http://localhost:8080/sidings/siding?id=${id}`
-    console.log(url)
-
-    const res = await fetch(url);
-    const res_1 = await res.json();
-    console.log(res_1);
+    const res = await fetch(`${apiUrl}/sidings/siding?id=${id}`);
+    const body = await res.json();
+    console.log(body);
     // check for db error
-    if (res_1.Error) {
-        throw Error(`${res_1.Message}`);
+    if (body.Error) {
+        throw Error(`${body.Message}`);
     }
 
     return {
         id: id,
-        name: res_1.name[0].sidingName,
-        data: res_1.data
+        name: body.name[0].sidingName,
+        data: body.data
     };
 }
 
 
 
 export async function getSidingBreakdown(id) {
-    const url = `http://localhost:8080/sidings/harvester_breakdown?id=${id}`
+    const res = await fetch(`${apiUrl}/sidings/harvester_breakdown?id=${id}`);
+    const body = await res.json();
 
-    const res = await fetch(url);
-    const res_1 = await res.json();
-
-    if (res_1.Error) {
-        console.log(res_1.Message);
-        throw Error(`${res_1.Message}`);
+    if (body.Error) {
+        console.log(body.Message);
+        throw Error(`${body.Message}`);
     }
-    return res_1.data.map((harvester, index) => {
+    return body.data.map((harvester, index) => {
         return {
             id: harvester.harvesterID,
             name: harvester.harvesterName,
@@ -89,28 +58,17 @@ export async function getSidingBreakdown(id) {
     });
 }
 
+export async function createSiding(sidingName) {
+    const response = await fetch(`${apiUrl}/siding`, postConfig({name: sidingName}));
+    return response.json();
+}
 
-export function useSiding(search) {
-    const [error, setError] = useState(null);
-    const [sidingData, setSidingData] = useState([]);
+export async function updateSiding(id, sidingName) {
+    const response = await fetch(`${apiUrl}/siding/${id}/name`, putConfig({name: sidingName}));
+    return response.json();
+}
 
-    useEffect(
-        () => {
-            getSiding(search)
-                .then((siding) => {
-                    setSidingData(siding);
-                    setError(null)
-                })
-                .catch((e) => {
-
-                    setError(e)
-                })
-        },
-        [search]
-    );
-
-    return {
-        sidingData,
-        error
-    };
+export async function deleteSiding(id) {
+    const response = await fetch(`${apiUrl}/siding/${id}`, {method: 'DELETE'});
+    return response.json();
 }

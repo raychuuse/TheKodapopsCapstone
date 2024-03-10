@@ -89,3 +89,11 @@ section.data-table {
   align-items: center;
   padding: 60px 35px;
 }
+
+.list-group-item:hover .btn {
+  display: block;
+}
+
+.list-group-item .btn {
+  display: none;
+}
