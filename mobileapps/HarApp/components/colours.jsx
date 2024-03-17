@@ -9,6 +9,11 @@ export const Colours = {
   bgLevel3: "rgba(255, 255, 255, 0.3)", // 30% opacity
   bgLevel5: "rgba(255, 255, 255, 0.5)", // 50% opacity
   bgLevel6: "rgba(235, 235, 235, 0.8)", // 80% opacity
+  binItemBg: "rgb(150, 150, 150)",
+  binItemGreenText: "#FFFFFF",
+  binItemGreen: "#4CAF50",
+  binItemBurntText: "#FFEB3B",
+  binItemBurnt: "#6D4C41",
   textLevel3: "#404040",
   textLevel2: "#595959",
   textLevel1: "#9747FF",
