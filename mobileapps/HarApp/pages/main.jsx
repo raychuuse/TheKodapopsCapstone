@@ -5,7 +5,7 @@ import { View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 import GreetingMessage from "../components/greetingMessage";
 import Button from "../components/button";
 import CustomModal from "../components/modal";
-import BinItem from "../components/binItem";
+import SwipeableBinItem from "../components/swipeableBinItem";
 import SelectedSiding from "../components/selectedSiding";
 import AddBinCamera from "../components/addBinCamera";
 
@@ -15,25 +15,26 @@ import { FinishedAlert } from "../lib/alerts";
 // Import Styling Components
 import { LargeTitle, Title1, Headline, Title3 } from "../components/typography";
 import { Colours } from "../components/colours";
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const MainPage = () => {
   // Test Bin data
-  const BinData = [
-    { isFull: 1, binNum: 1224 },
-    { isFull: 1, binNum: 2123 },
-    { isFull: 0, binNum: 1232 },
-    { isFull: 1, binNum: 1234 },
-    { isFull: 1, binNum: 5637 },
-    { isFull: 0, binNum: 5633 },
-    { isFull: 0, binNum: 654 },
-    { isFull: 0, binNum: 12 },
-    { isFull: 0, binNum: 2345 },
-    { isFull: 0, binNum: 7545 },
-    { isFull: 0, binNum: 8765 },
-    { isFull: 0, binNum: 2334 },
-    { isFull: 0, binNum: 4632 },
+  let BinData = [
+    { isFull: false, binNum: 2141, isBurnt: false },
+    { isFull: true, binNum: 2123, isBurnt: true },
+    { isFull: false, binNum: 1232, isBurnt: false },
+    { isFull: true, binNum: 1234, isBurnt: false },
+    { isFull: true, binNum: 5637, isBurnt: false },
+    { isFull: false, binNum: 5633, isBurnt: false },
+    { isFull: false, binNum: 654, isBurnt: false },
+    { isFull: false, binNum: 12, isBurnt: false },
+    { isFull: false, binNum: 2345, isBurnt: false },
+    { isFull: false, binNum: 7545, isBurnt: false },
+    { isFull: false, binNum: 8765, isBurnt: false },
+    { isFull: false, binNum: 2334, isBurnt: false },
+    { isFull: false, binNum: 4632, isBurnt: false },
   ];
+
   const [addBinVisable, setAddBinVisable] = useState(false);
   return (
     <View style={styles.body}>
@@ -63,43 +64,50 @@ const MainPage = () => {
             style={{
               width: "100%",
               position: "absolute",
-              paddingHorizontal: 24,
               paddingVertical: 12,
+              paddingLeft: 24,
+              paddingRight: 12,
               alignItems: "center",
               flexDirection: "row",
-              gap: 16,
+              gap: 12,
               backgroundColor: "rgb(235, 235, 235)",
               zIndex: 100,
               borderRadius: 12,
             }}>
-            <Feather name={"download"} size={24} />
-            <Title3 style={{ flex: 1 }}>{BinData.length} Bins</Title3>
-            <TouchableOpacity onPress={() => setAddBinVisable(true)}>
-              <MaterialCommunityIcons name={"line-scan"} size={24} />
+            <View style={{ flex: 1, flexDirection: "row", gap: 16, alignItems: "center" }}>
+              <Title3>{BinData.length}</Title3>
+              <Headline>{BinData.length > 1 ? "Bins" : "Bin"} at Siding</Headline>
+            </View>
+            <TouchableOpacity
+              onPress={() => alert("Locked")}
+              style={{ backgroundColor: "#4F12FA42", padding: 8, borderRadius: 8 }}>
+              <MaterialCommunityIcons name={"lock-open-outline"} size={24} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => setAddBinVisable(true)}
+              style={{ backgroundColor: "#4F12FA42", padding: 8, borderRadius: 8 }}>
+              <MaterialCommunityIcons name={"plus-circle-outline"} size={24} />
             </TouchableOpacity>
           </View>
           {/* Bin List Body */}
           <FlatList
             data={BinData}
             renderItem={({ item }) => (
-              <BinItem
+              <SwipeableBinItem
                 checked={item.isFull}
                 binNumber={item.binNum}
                 style={styles.binList}
+                burnt={item.isBurnt}
               />
             )}
             style={styles.binList}
             ItemSeparatorComponent={<View style={styles.binListSeparator} />}
-            ListFooterComponent={<View style={{ marginVertical: 32 }} />}
+            ListFooterComponent={<View style={{ marginVertical: 40 }} />}
             showsVerticalScrollIndicator={false}
           />
         </View>
       </View>
-      <Button
-        title="Finished"
-        style={StyleSheet.create({ width: "100%" })}
-        onPress={FinishedAlert}
-      />
+      <Button title="Finished at Siding" style={StyleSheet.create({ width: "100%" })} onPress={FinishedAlert} />
     </View>
   );
 };
@@ -117,7 +125,7 @@ const styles = StyleSheet.create({
   binList: {
     position: "relative",
     paddingHorizontal: 8,
-    paddingTop: 58,
+    paddingTop: 72,
     borderRadius: 16,
     backgroundColor: Colours.bgOverlay,
     zIndex: 0,
