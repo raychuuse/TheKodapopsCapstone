@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {apiUrl} from "./utils";
 
 export async function getAllLocos() {
-    const res = await fetch("http://localhost:8080/locos");
-    const res_1 = await res.json();
-    // console.log(res_1);
+    const res = await fetch(`${apiUrl}/locos`);
+    const body = await res.json();
+    // console.log(body);
     // check for db error
-    if (res_1.Error) {
-        console.log(res_1.Message);
-        throw Error(`${res_1.Message}`);
+    if (body.Error) {
+        console.log(body.Message);
+        throw Error(`${body.Message}`);
     }
-    return res_1.data.map((loco, index) => {
+    return body.data.map((loco, index) => {
         return {
             id: loco.locoID,
             name: loco.locoName,
@@ -45,20 +46,20 @@ export function useAllLocos() {
 }
 
 export async function getLoco(id) {
-    const url = `http://localhost:8080/locos/loco?id=${id}`;
+    const url = `${apiUrl}/locos/loco?id=${id}`;
     console.log(url);
 
     const res = await fetch(url);
-    const res_1 = await res.json();
-    console.log(res_1);
+    const body = await res.json();
+    console.log(body);
     // Check for db error
-    if (res_1.Error) {
-        throw Error(`${res_1.Message}`);
+    if (body.Error) {
+        throw Error(`${body.Message}`);
     }
     return {
         id: id,
-        name: res_1.name[0].locoName,
-        data: res_1.data
+        name: body.name[0].locoName,
+        data: body.data
     };
 }
 

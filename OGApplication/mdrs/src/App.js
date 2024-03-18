@@ -19,6 +19,7 @@ import { LoginForm } from './components/Login';
 
 // Login Functionality
 import useToken from './useToken';
+import AlertPopup from './utiljs/AlertPopup';
 
 function setToken(userToken) {
   sessionStorage.setItem('token', JSON.stringify(userToken));
@@ -52,6 +53,7 @@ export default function App() {
       <div className="App">
         <Header onLogout={handleLogout} />
         {/*content */}
+        <AlertPopup/>
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/loco' element={<Loco />} />

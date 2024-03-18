@@ -23,6 +23,9 @@ router.get("/", (req, res) => {
 });
 
 
+// For Friday, transform siding routes here for Andrew usage, incorporate JWT also.
+
+
 //path for getting all bin data for relevant siding i.e full bins at siding, empty bins at siding and allocated bins on route
 router.get("/siding", validateID, (req, res) => {
   const id = req.query.id;

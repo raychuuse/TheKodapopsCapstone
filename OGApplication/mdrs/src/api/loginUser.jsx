@@ -1,7 +1,8 @@
 import React, { useState } from "react";
+import {apiUrl} from "./utils";
 
 export default async function loginUser(user) {
-    const response = await fetch('http://localhost:8080/user/login', {
+    const res = await fetch(`${apiUrl}/user/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -9,10 +10,10 @@ export default async function loginUser(user) {
         body: JSON.stringify({ id: `${user.id}`, password: `${user.password}` })
     });
 
-    const res = await response.json();
-    if (res.Error) {
+    const body = await res.json();
+    if (body.Error) {
         // console.log(res.Message)
-        throw Error(`${res.Message}`);
+        throw Error(`${body.Message}`);
     }
-    return res;
+    return body;
 }

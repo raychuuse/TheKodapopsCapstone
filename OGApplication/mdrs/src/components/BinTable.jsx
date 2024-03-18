@@ -7,10 +7,16 @@ import 'ag-grid-community/styles/ag-theme-balham.css'; // Optional theme CSS
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { ErrorAlert } from "./Alerts";
+import {createBin, updateBin, deleteBin} from "../api/bins";
+
+
+import {Input} from "reactstrap";
+
+import { ErrorAlert} from "./Alerts";
 import LoadingSpinner from "./LoadingSpinner";
 
 import { getAllBins } from "../api/bins";
+import UseAlert from "../utiljs/UseAlert";
 
 
 const Table = ({ data, columns }) => {
@@ -43,10 +49,15 @@ const Table = ({ data, columns }) => {
             sortable: true,
             floatingFilter: true,
             suppressMenu: true,
-            filterParams:{buttons: ['clear', 'reset'],}
+            filterParams:{buttons: ['clear', 'reset'],},
         };
     }, []);
 
+    
+
+    
+
+    
     return (
         <div className="table">
             <div className="row">
@@ -85,6 +96,7 @@ const Table = ({ data, columns }) => {
                                         pagination={true}
                                         paginationPageSize={20}
                                         domLayout={'autoHeight'}
+                                        rowSelection={'single'}
                                         onGridReady={onGridReady}
                                     ></AgGridReact>
                                 </div>
@@ -104,6 +116,10 @@ export const BinAllocationTable = () => {
         error: null,
     });
 
+    
+    const { setAlert } = UseAlert();
+    const [formInput, setFormInput] = useState('');
+
     const [loading, setLoading] = useState(true);
 
     const loadData = async () => {
@@ -119,21 +135,90 @@ export const BinAllocationTable = () => {
 
     useEffect(() => { loadData(); }, []);
 
+    const binCreateName = (event) => {
+        setFormInput(event.target.value);
+    };
+
+    const onCreateClick = () => {
+        if (formInput === '') {
+            setAlert("Please enter a binID", 'error')
+            return;
+        }
+        createBin(formInput).then(response => {
+            if (response["Error"] === true) {
+                setAlert(response["Message"], 'warning');
+            }
+            else {
+                setAlert("Bin Created Successfully", 'success')
+                loadData();
+            }
+          }).catch(err => {
+            setAlert(err.message, 'error');
+        });
+    };
+    /*Code to update bins, disabled currently in mind of db
+      Changes which will rework data reading entirely*/
+    
+    const onUpdateClick = () => {
+        updateBin(bins.binID, bins).then(response => {
+            if (response["Error"] === true) {
+                setAlert(response["Message"], 'warning');
+            }
+            else {
+                setAlert("Updated Successfully", 'success')
+            }
+        }).catch(err => {
+            setAlert(err.message, 'error');
+        });
+    }
+    
+   
+
+    const onDeleteClick = () => {
+        if (formInput === '') {
+            setAlert("Please enter a binID", 'error')
+            return;
+        }
+        deleteBin(formInput).then(response => {
+            if (response["Error"] === true) {
+                setAlert(response["Message"], 'warning');
+            }
+            else {
+                setAlert("Bin Removed", 'success')
+                loadData();
+            }
+          }).catch(err => {
+            setAlert(err.message, 'error');
+        });
+    }
+
+    // Enabled manual editing for specific rows, can be changed in future
     const columns = [
         { headerName: "Bin ID", field: "binsID", width: 90, maxWidth: 200, filter: 'agNumberColumnFilter', },
-        { headerName: "Status", field: "status", filter: 'agTextColumnFilter', },
-        { headerName: "Loco", field: "locoName", minWidth: 100, filter: 'agTextColumnFilter', },
-        { headerName: "Harvester", field: "harvesterName", minWidth: 100, filter: 'agTextColumnFilter', },
-        { headerName: "Siding", field: "sidingName", minWidth: 100, filter: 'agTextColumnFilter', },
+        { headerName: "Status", field: "status", editable: true, filter: 'agTextColumnFilter', },
+        { headerName: "Loco", field: "locoName", editable: true, minWidth: 100, filter: 'agTextColumnFilter', },
+        { headerName: "Harvester", field: "harvesterName", editable: true, minWidth: 100, filter: 'agTextColumnFilter', },
+        { headerName: "Siding", field: "sidingName", editable: true, minWidth: 100, filter: 'agTextColumnFilter', },
     ]
 
     return (
         <>
             {loading && <LoadingSpinner />}
+            
             {error && <ErrorAlert message={error.message} />}
+
             {!loading && !error && (
-                <div className="row">
-                    <Table data={bins} columns={columns} />
+                <div>
+                    <div className="row">
+                    <h2>{"Input Bin Number"}</h2>
+                            <Input type='text' value={formInput} onChange={binCreateName} classname={'list-group-item'}></Input>
+                            <button className={`w-100 btn-md btn btn-primary mt-1`} onClick={onCreateClick}>Create Bin</button>
+                            <button className={`w-100 btn-md btn btn-primary mt-1`} onClick={onUpdateClick}>Submit Bin Edit</button>
+                            <button className={`w-100 btn-md btn btn-primary mt-1`} onClick={onDeleteClick}>Delete Selected Bin</button>
+                    </div>
+                    <div className="row">
+                        <Table data={bins} columns={columns} />
+                    </div>
                 </div>
             )}
         </>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, ListInlineItem } from 'reactstrap';
-
+import {apiUrl, postConfig, putConfig} from "./utils";
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -14,17 +14,18 @@ const Status = {
     6: 'Full At Mill'
 }
 
-
+// Original group attempted to transition to functions seemingly, switching to async funcs in api gets etc
+/** 
 export function getAllBins(){
-    return fetch("http://localhost:8080/bins")
-        .then((res) => res.json())
-        .then((res) => {
+    return fetch(`${apiUrl}/bins`)
+        .then((body) => body.json())
+        .then((body) => {
             //check for db error
-            if(res.Error){
-                console.log(res.Message)
-                throw Error(`${res.Message}`)
+            if(body.Error){
+                console.log(body.Message)
+                throw Error(`${body.Message}`)
             }
-            return res.data
+            return body.data
         })
         .then((data) =>{
             return data.map((bin) => ({
@@ -43,32 +44,6 @@ export function getAllBins(){
             }))
         })
 }
-
-// export async function getAllBins(){
-//     const res = await fetch("http://localhost:8080/bins");
-//     const res_1 = await res.json();
-//     //check for db error
-//     if (res_1.Error) {
-//         console.log(res_1.Message);
-//         throw Error(`${res_1.Message}`);
-//     }
-//     const data = res_1.data;
-//     return data.map((bin) => ({
-//         binsID: bin.binsID,
-//         transactionTime: bin.transactionTime,
-//         transactionNumber: bin.transactionNumber,
-//         statusID: bin.statusID,
-//         status: (Status[parseInt(bin.statusID)]),
-//         sidingID: bin.sidingID,
-//         locoID: bin.locoID,
-//         harvesterID: bin.harvesterID,
-//         sidingName: bin.sidingName,
-//         harvesterName: bin.harvesterName,
-//         locoName: bin.locoName,
-//     }));
-// }
-
-
 
 export function useAllBins(){
     const [error, setError] = useState(null);
@@ -93,4 +68,45 @@ export function useAllBins(){
         binData: binData,
         error
     };
+}
+*/
+
+export async function getAllBins(){
+    const res = await fetch(`${apiUrl}/bins`);
+    const body = await res.json();
+    //check for db error
+    if (body.Error) {
+       console.log(body.Message);
+       throw Error(`${body.Message}`);
+   }
+   const data = body.data;
+   return data.map((bin) => ({
+       binsID: bin.binsID,
+       transactionTime: bin.transactionTime,
+       transactionNumber: bin.transactionNumber,
+       statusID: bin.statusID,
+        status: (Status[parseInt(bin.statusID)]),
+        sidingID: bin.sidingID,
+       locoID: bin.locoID,
+       harvesterID: bin.harvesterID,
+       sidingName: bin.sidingName,
+       harvesterName: bin.harvesterName,
+       locoName: bin.locoName,
+   }));
+}
+
+export async function createBin(binID) {
+    const response = await fetch(`${apiUrl}/bins`, postConfig({id: binID}));
+    return response.json();
+}
+
+export async function updateBin(binID, binData) {
+    // With reworked database, alter binData contents
+    const response = await fetch(`${apiUrl}/bins/${binID}`, putConfig({id: binID, data: binData}));
+    return response.json();
+}
+
+export async function deleteBin(binID) {
+    const response = await fetch(`${apiUrl}/bins/${binID}`, {method: 'DELETE'});
+    return response.json();
 }
