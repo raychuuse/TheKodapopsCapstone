@@ -1,27 +1,22 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
-////GET all records from the bin table 
+// GET
 router.get("/", (req, res) => {
-  //all bins from db
-  const allBins = req.db
-    .from("bins")
-    .leftOuterJoin("siding", "bins.sidingID", "siding.sidingID")
-    .leftOuterJoin("harvester", "bins.harvesterID", "=", "harvester.harvesterID")
-    .leftOuterJoin("locomotive", "bins.locoID", "=", "locomotive.locoID")
-    .select("*");
-  allBins
-    .then((bins) => {
-      if(bins.length === 0){
-        throw Error("Database Error: No Data")
-      }
-      res.json({ Error: false, Message: "Success", data: bins });
-    })
-    //Error Handling
-    .catch((err) => {
-      console.log(err);
-      res.json({ Error: true, Message: err.message });
-    });
+  req.db
+      .from("bin")
+      .leftOuterJoin("siding", "bins.sidingID", "siding.sidingID")
+      .leftOuterJoin("harvester", "bins.harvesterID", "=", "harvester.harvesterID")
+      .leftOuterJoin("locomotive", "bins.locoID", "=", "locomotive.locoID")
+      .select("*")
+      .then((bins) => {
+        res.status(200).json(bins);
+      })
+      .catch((err) => {
+        console.error(err);
+        // TODO Error codes
+        res.status(500).json({message: err.message});
+      });
 });
 
 router.post('/', (req, res) => {

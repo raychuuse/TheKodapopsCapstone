@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {apiUrl} from "./utils";
+import {serverUrl} from "./utils";
 
 export async function getDashboard() {
-    const res = await fetch(`${apiUrl}/dashboard`);
+    const res = await fetch(`${serverUrl}/dashboard`);
     const body = await res.json();
 
     //check for db error
@@ -19,7 +19,7 @@ export function filterByStatus(bins, query) {
 }
 
 export async function getDashboardMetrics() {
-    const res = await fetch(`${apiUrl}/bins`);
+    const res = await fetch(`${serverUrl}/bins`);
     const body = await res.json();
 
     //check for db error

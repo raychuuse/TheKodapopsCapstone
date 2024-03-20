@@ -28,13 +28,19 @@ export const Search = ({ keyword, onChange }) => {
 export const List = ({ data = [], onClick, onEdit, onDelete, loading }) => {
     const navigate = useNavigate();
 
+    const normalized = data.map(obj => {
+        return {
+            id: obj.harvesterID || obj.sidingID || obj.locoID,
+            name: obj.harvesterName || obj.sidingName || obj.locoName
+        };
+    })
+
     return (
       < div className="search-result" >
         <ul id="items" className="list-group">
           {/* Search Result Error  */}
           {data.length === 0 && !loading ? <ErrorAlert message={"No Results Found"} /> : null}
-  
-          {data.map(({ id, name }) => (
+          {normalized.map(({ id, name }) => (
             <button
               key={id}
               type="button"

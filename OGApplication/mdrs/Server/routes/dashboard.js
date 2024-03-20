@@ -1,5 +1,5 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
 //helper function for filtering Status
 const filter = require("../filter");
@@ -9,7 +9,7 @@ router.get("/", (req, res) => {
   const data = {}
   const locoData = req.db
     .from("locomotive")
-    .join("bins", "bins.locoID", "=", "locomotive.locoID")
+    .join("bin", "bins.locoID", "=", "locomotive.locoID")
     .select(
       "locomotive.locoID",
       "locomotive.locoName",
@@ -18,7 +18,7 @@ router.get("/", (req, res) => {
     );
   const sidingData = req.db
     .from("siding")
-    .join("bins", "bins.sidingID", "=", "siding.sidingID")
+    .join("bin", "bins.sidingID", "=", "siding.sidingID")
     .select(
       "siding.sidingID",
       "siding.sidingName",
@@ -28,7 +28,7 @@ router.get("/", (req, res) => {
 
   const harvestData = req.db
     .from("harvester")
-    .join("bins", "bins.harvesterID", "=", "harvester.harvesterID")
+    .join("bin", "bins.harvesterID", "=", "harvester.harvesterID")
     .select(
       "harvester.harvesterID",
       "harvester.harvesterName",
