@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import {ErrorAlert} from "./Alerts";
+import {standardiseData} from "../utils";
 
 // Search Bar 
 export const Search = ({ keyword, onChange }) => {
@@ -28,12 +29,7 @@ export const Search = ({ keyword, onChange }) => {
 export const List = ({ data = [], onClick, onEdit, onDelete, loading }) => {
     const navigate = useNavigate();
 
-    const normalized = data.map(obj => {
-        return {
-            id: obj.harvesterID || obj.sidingID || obj.locoID,
-            name: obj.harvesterName || obj.sidingName || obj.locoName
-        };
-    })
+    const normalized = standardiseData(data);
 
     return (
       < div className="search-result" >

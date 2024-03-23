@@ -23,6 +23,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 
 import Table from "../components/Table";
 import {Input} from "reactstrap";
+import ItemList from "../components/ItemList";
 
 
 export default function Siding() {
@@ -30,10 +31,7 @@ export default function Siding() {
     const search = useLocation().search;
     const id = new URLSearchParams(search).get("id");
 
-    const [searchResult, setSearchResult] = useState([]);
-
     const changeState = (siding) => {
-        setSearchResult(siding);
         navigate(`?id=${siding}`);
     };
 
@@ -42,7 +40,9 @@ export default function Siding() {
             <div className="row">
                 <div className="col-sm-3">
                     <div className="container-fluid">
-                        <SidingListWithSearch sidingData={changeState}/>
+                        <ItemList onItemSelected={changeState} itemName={'Siding'} getAllItemApi={getAllSidings}
+                                  createItemApi={createSiding} updateItemApi={updateSiding}
+                                  deleteItemApi={deleteSiding}/>
                     </div>
                 </div>
                 <div className="col-sm-9">
@@ -52,180 +52,6 @@ export default function Siding() {
             </div>
         </div>
     </main>);
-}
-
-{/* Search Bar
-    get the list of items from the database
-    map that list of items to the list group buttons
-    make the id of the button the name from the database
-    then the onClick event is what will send that id
-    to fetch the details of specific item from the database
-    and then populate the datatable
-*/
-}
-const SidingListWithSearch = ({sidingData}) => {
-    const navigate = useNavigate();
-    const [sidings, setSidings] = useState([]);
-    const [allSidings, setAllSidings] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
-    const [keyword, setKeyword] = useState('');
-    const [state, setState] = useState('CREATE')
-    const [formInput, setFormInput] = useState('');
-    const [formTitle, setFormTitle] = useState('Create New Siding');
-    const [formButtonText, setFormButtonText] = useState('Create Siding');
-    const [formButtonStyle, setFormButtonStyle] = useState('btn-primary')
-    const [formSelectedId, setFormSelectedId] = useState(-1);
-
-    useEffect(() => {
-        fetchSidings()
-    }, []);
-
-    const fetchSidings = () => {
-        getAllSidings()
-            .then(data => {
-                setAllSidings(data)
-                setSidings(data)
-                setLoading(false)
-            })
-            .catch(err => {
-                setError(err)
-                setSidings(null)
-                setAllSidings(null)
-                setLoading(false)
-            });
-        setFormInput('');
-        setState('CREATE');
-    };
-
-    const updateSearch = (siding) => {
-        sidingData(siding)
-    }
-
-    const updateKeyword = (keyword) => {
-        const filtered = allSidings.filter((siding) => siding.name.toLowerCase().includes(keyword.toLowerCase()));
-        setKeyword(keyword);
-        setSidings(filtered);
-    };
-
-    const onEditSiding = (sidingId) => {
-        for (const siding of sidings) {
-            if (siding.id === sidingId) {
-                setState('EDIT');
-                setFormTitle("Update Siding's Name");
-                setFormInput(siding.name);
-                setFormButtonText("Update Siding");
-                setFormButtonStyle('btn-primary');
-                setFormSelectedId(sidingId);
-            }
-        }
-    }
-
-    const onDeleteSiding = (sidingId) => {
-        for (const siding of sidings) {
-            if (sidingId === siding.id) {
-                setState('DELETE');
-                setFormTitle("Delete Siding");
-                setFormInput(siding.name);
-                setFormButtonText("Confirm Delete");
-                setFormButtonStyle('btn-danger');
-                setFormSelectedId(sidingId);
-            }
-        }
-    }
-
-    const updateSidingName = (event) => {
-        setFormInput(event.target.value);
-    };
-
-    const setStateCreate = () => {
-        setState('CREATE');
-        setFormTitle('Create New Siding');
-        setFormButtonText("Create Siding");
-        setFormInput('');
-        setFormButtonStyle('btn-primary');
-    }
-
-    const onFormButtonClick = () => {
-        if ((state === 'CREATE' || state === 'EDIT') && formInput === '') {
-            setError({message: "Please enter a name to submit"})
-            return;
-        }
-        setError(null);
-
-        if (state === 'CREATE') {
-            createSiding(formInput).then(response => {
-                fetchSidings();
-                setSuccess({message: 'Siding Successfully Created'});
-                setInterval(() => setSuccess(null), 2500);
-                setStateCreate();
-            }).catch(err => {
-                console.error(err);
-                setError(err);
-            });
-        } else if (state === 'EDIT') {
-            updateSiding(formSelectedId, formInput).then(result => {
-                fetchSidings();
-                setSuccess({message: 'Siding Successfully Updated'});
-                setInterval(() => setSuccess(null), 2500);
-                navigate(`?id=${formSelectedId}`);
-                setStateCreate();
-            }).catch(error => {
-                setError(error);
-            });
-        } else {
-            deleteSiding(formSelectedId).then(result => {
-                fetchSidings();
-                setSuccess({message: 'Siding Successfully Deleted'});
-                setInterval(() => setSuccess(null), 2500);
-                setStateCreate();
-                navigate('/siding')
-            }).catch(error => {
-                setError(error);
-            });
-        }
-    };
-
-    return (<section className="search">
-        <div className="search-wrapper">
-            <div className="search-header-wrapper">
-                <h2 className="search-header">
-                    Sidings
-                </h2>
-                <hr></hr>
-            </div>
-            {/* Search Bar Form */}
-            <div className="search-bar-wrapper">
-                <Search keyword={keyword} onChange={updateKeyword}/>
-
-                {/* Loading component */}
-                {loading && <LoadingSpinner/>}
-
-                {/* Error Component */}
-                {error && <ErrorAlert message={error.message}/>}
-
-                {success && <SuccessAlert message={success.message}/>}
-
-                {/* sidings List */}
-                {!loading && !error && (
-                    <List data={sidings} onClick={updateSearch} onEdit={onEditSiding} onDelete={onDeleteSiding}
-                          loading={loading}/>)}
-
-            </div>
-            <button style={{display: state === 'CREATE' ? 'none' : 'block'}}
-                    className={`w-100 btn-md btn btn-primary mt-1`} onClick={setStateCreate}>Create Siding
-            </button>
-            <hr/>
-            <div>
-                <h3>{formTitle}</h3>
-                <Input type='text' value={formInput} onChange={updateSidingName}
-                       classname={'list-group-item'}></Input>
-                <button style={{marginTop: '1rem'}} className={`w-100 btn-md btn ${formButtonStyle}`}
-                        onClick={onFormButtonClick}>{formButtonText}</button>
-            </div>
-        </div>
-    </section>)
 }
 
 //Displays data of a single siding

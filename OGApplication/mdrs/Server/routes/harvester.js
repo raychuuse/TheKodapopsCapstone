@@ -41,5 +41,43 @@ router.get("/:harvesterId/siding_breakdown", (req, res) => {
       })
 });
 
+router.post('/', (req, res) => {
+    req.db.insert({harvesterName: req.body.name}).into('harvester')
+        .then((result) => {
+            res.status(201).send();
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error)
+        });
+});
+
+router.put('/:id/name', (req, res) => {
+    const id = req.params.id;
+    if (!isValidId(id)) return;
+    req.db('harvester').update({harvesterName: req.body.name}).where({harvesterID: id})
+        .then(result => {
+            res.status(204).send();
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
+        })
+});
+
+router.delete('/:id', (req, res) => {
+    const id = req.params.id;
+    if (!isValidId(id)) return;
+
+    req.db('harvester').where({harvesterID: id}).del()
+        .then(result => {
+            res.status(204).send();
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
+        });
+});
+
 
 module.exports = router;

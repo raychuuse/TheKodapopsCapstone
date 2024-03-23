@@ -90,7 +90,7 @@ router.get("/:sidingId/harvester_breakdown", (req, res) => {
 router.post('/', (req, res) => {
   req.db.insert({sidingName: req.body.name}).into('siding')
       .then((result) => {
-        res.status(204);
+        res.status(201).send();
       })
       .catch(error => {
         console.error(error);
@@ -103,7 +103,7 @@ router.put('/:id/name', (req, res) => {
   if (!isValidId(id)) return;
   req.db('siding').update({sidingName: req.body.name}).where({sidingID: id})
       .then(result => {
-        res.status(204);
+        res.status(204).send();
       })
       .catch(error => {
         console.error(error);
@@ -117,7 +117,7 @@ router.delete('/:id', (req, res) => {
 
   req.db('siding').where({sidingID: id}).del()
       .then(result => {
-        res.status(204);
+        res.status(204).send();
       })
       .catch(error => {
         console.error(error);

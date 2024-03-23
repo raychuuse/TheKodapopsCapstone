@@ -9,6 +9,16 @@ function calculateDifference(a, b) {
     }
 }
 
+function standardiseData(data) {
+    return data.map(obj => {
+        return {
+            id: obj.harvesterID || obj.sidingID || obj.locoID || obj.id,
+            name: obj.harvesterName || obj.sidingName || obj.locoName || obj.name
+        };
+    })
+}
+
 module.exports = {
-    calculateDifference
+    calculateDifference,
+    standardiseData
 }

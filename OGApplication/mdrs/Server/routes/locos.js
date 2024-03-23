@@ -59,4 +59,42 @@ router.get('/:locoId/load', (req, res) => {
       })
 });
 
+router.post('/', (req, res) => {
+    req.db.insert({locoName: req.body.name}).into('locomotive')
+        .then((result) => {
+            res.status(201).send();
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error)
+        });
+});
+
+router.put('/:id/name', (req, res) => {
+    const id = req.params.id;
+    if (!isValidId(id)) return;
+    req.db('locomotive').update({locoName: req.body.name}).where({locoID: id})
+        .then(result => {
+            res.status(204).send();
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
+        })
+});
+
+router.delete('/:id', (req, res) => {
+    const id = req.params.id;
+    if (!isValidId(id)) return;
+
+    req.db('locomotive').where({locoID: id}).del()
+        .then(result => {
+            res.status(204).send();
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
+        });
+});
+
 module.exports = router;

@@ -60,7 +60,7 @@ export function updateSiding(id, sidingName) {
     return fetch(`${apiUrl}/${id}/name`, putConfig({name: sidingName}))
         .then(response => {
             if (response.ok)
-                return response.json();
+                return response;
             throw new Error();
         });
 }
@@ -69,7 +69,7 @@ export function deleteSiding(id) {
     return fetch(`${apiUrl}/${id}`, {method: 'DELETE'})
         .then(response => {
             if (response.ok)
-                return response.json();
+                return response;
             throw new Error();
         });
 }

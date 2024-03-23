@@ -7,8 +7,17 @@ import {List, Search} from "../components/Search";
 import {ErrorAlert} from "../components/Alerts";
 import LoadingSpinner from "../components/LoadingSpinner";
 
-import {getAllLocos, getCurrentLoad, getLoco, getSidingBreakdown} from "../api/locos";
+import {
+    createLoco,
+    deleteLoco,
+    getAllLocos,
+    getCurrentLoad,
+    getLoco,
+    getSidingBreakdown,
+    updateLoco
+} from "../api/locos";
 import Table from "../components/Table";
+import ItemList from "../components/ItemList";
 
 export default function Loco() {
     const navigate = useNavigate();
@@ -28,7 +37,8 @@ export default function Loco() {
                 <div className="row">
                     <div className="col-sm-3">
                         <div className="container-fluid">
-                            <LocoListWithSearch locoData={changeState}/>
+                            <ItemList onItemSelected={changeState} itemName={'Locomotive'} getAllItemApi={getAllLocos}
+                                      createItemApi={createLoco} updateItemApi={updateLoco} deleteItemApi={deleteLoco}/>
                         </div>
                     </div>
                     <div className="col-sm-9">
@@ -40,79 +50,6 @@ export default function Loco() {
         </main>
     );
 }
-
-{/* Search Bar
-    get the list of items from the database
-    map that list of items to the list group buttons
-    make the id of the button the name from the database
-    then the onClick event is what will send that id
-    to fetch the details of specific item from the database
-    and then populate the datatable
-*/
-}
-const LocoListWithSearch = ({locoData}) => {
-    const [locos, setLocos] = useState([]);
-    const [allLocos, setAllLocos] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [keyword, setKeyword] = useState('');
-
-    const fetchLocos = () => {
-        getAllLocos()
-            .then(data => {
-                setAllLocos(data);
-                setLocos(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                setError(err);
-                setLocos(null);
-                setAllLocos(null)
-                setLoading(false);
-            });
-    };
-
-    const updateSearch = (loco) => {
-        locoData(loco);
-    };
-
-    const updateKeyword = (keyword) => {
-        const filtered = allLocos.filter((loco) =>
-            loco.name.toLowerCase().includes(keyword.toLowerCase())
-        );
-        setKeyword(keyword);
-        setLocos(filtered);
-    };
-
-    useEffect(() => {
-        fetchLocos();
-    }, []);
-
-
-    return (
-        <section className="search">
-            <div className="search-wrapper">
-                <div className="search-header-wrapper">
-                    <h2 className="search-header">Locos</h2>
-                    <hr></hr>
-                </div>
-                {/* Search Bar Form */}
-                <div className="search-bar-wrapper">
-                    <Search keyword={keyword} onChange={updateKeyword}/>
-
-                    {/* Loading component */}
-                    {loading && <LoadingSpinner/>}
-
-                    {/* Error Component */}
-                    {error && <ErrorAlert message={error.message}/>}
-
-                    {/* Locos List */}
-                    {!loading && !error && (<List data={locos} onClick={updateSearch} loading={loading}/>)}
-                </div>
-            </div>
-        </section>
-    );
-};
 
 //Displays data of a single loco
 const LocoDetails = ({id}) => {
@@ -154,11 +91,11 @@ const LocoDetails = ({id}) => {
                         </div>
                         <hr/>
                         <div className="row">
-                            <LocoCurrentLoad id={id} />
+                            <LocoCurrentLoad id={id}/>
                         </div>
                         <hr/>
                         <div className="row">
-                            <LocoSidingBreakdown id={id} />
+                            <LocoSidingBreakdown id={id}/>
                         </div>
                         <br/>
                         <hr/>

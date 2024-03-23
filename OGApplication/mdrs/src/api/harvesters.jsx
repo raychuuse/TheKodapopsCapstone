@@ -1,4 +1,4 @@
-import {serverUrl} from "./utils"
+import {postConfig, putConfig, serverUrl} from "./utils"
 
 const apiUrl = `${serverUrl}/harvesters`;
 
@@ -26,6 +26,33 @@ export function getSidingBreakdown(id) {
         .then(response => {
             if (response.ok)
                 return response.json();
+            throw new Error();
+        });
+}
+
+export function createHarvester(name) {
+    return fetch(`${apiUrl}`, postConfig({name: name}))
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
+}
+
+export function updateHarvester(id, name) {
+    return fetch(`${apiUrl}/${id}/name`, putConfig({name: name}))
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
+}
+
+export function deleteHarvester(id) {
+    return fetch(`${apiUrl}/${id}`, {method: 'DELETE'})
+        .then(response => {
+            if (response.ok)
+                return response;
             throw new Error();
         });
 }
