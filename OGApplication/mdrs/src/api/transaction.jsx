@@ -14,14 +14,6 @@ const Status = {
 export function getAllTransactions(){
     return fetch(`${serverUrl}/log`)
         .then((body) => body.json())
-        .then((body) => {
-            //check for db error
-            if(body.Error){
-                console.log(body.Message)
-                throw Error(`${body.Message}`)
-            }
-            return body.data
-        })
         .then((data) =>{
             // Data formatted
             return data.map((bin) => ({

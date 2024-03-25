@@ -2,6 +2,7 @@ import './App.css';
 
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import AuthProvider from "./AuthProvider";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -20,6 +21,8 @@ import { LoginForm } from './components/Login';
 // Login Functionality
 import useToken from './useToken';
 import AlertPopup from './utiljs/AlertPopup';
+import AuthRoute from "./pages/AuthRoute";
+
 
 function setToken(userToken) {
   sessionStorage.setItem('token', JSON.stringify(userToken));
@@ -33,35 +36,25 @@ function getToken() {
 
 
 export default function App() {
-  const { token, setToken } = useToken();
-
-  //check for token to see if logged in
-  if (!token) {
-    return (
-      <div className="App">
-        <LoginForm setToken={setToken} />
-      </div>
-    )
-  }
-
-  const handleLogout = () => {
-    sessionStorage.clear();
-  }
-
   return (
     <Router>
       <div className="App">
-        <Header onLogout={handleLogout} />
-        {/*content */}
-        <AlertPopup/>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/loco' element={<Loco />} />
-          <Route path='/harvester' element={<Harvester />} />
-          <Route path='/siding' element={<Siding />} />
-          <Route path='/bins' element={<BinAllocation />} />
-          <Route path='/log' element={<TransactionLog />} />
-        </Routes>
+        <AuthProvider>
+            <Header />
+            {/*content */}
+            <AlertPopup/>
+            <Routes>
+              <Route path='/login' element={<LoginForm />} />
+              <Route element={<AuthRoute />}>
+                <Route path='/' element={<Home />} />
+                <Route path='/loco' element={<Loco />} />
+                <Route path='/harvester' element={<Harvester />} />
+                <Route path='/siding' element={<Siding />} />
+                <Route path='/bins' element={<BinAllocation />} />
+                <Route path='/log' element={<TransactionLog />} />
+              </Route>
+            </Routes>
+        </AuthProvider>
       </div>
     </Router>
   );
