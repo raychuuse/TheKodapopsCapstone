@@ -1,74 +1,75 @@
-import {apiUrl, postConfig, putConfig} from "./utils";
+import {serverUrl, postConfig, putConfig} from "./utils";
 
-export async function getAllSidings() {
-    const res = await fetch(`${apiUrl}/sidings`);
-    const body = await res.json();
+const apiUrl = `${serverUrl}/sidings`;
 
-    // check for db error
-    if (body.Error) {
-        console.log(body.Message);
-        throw Error(`${body.Message}`);
-    }
-
-    return body.Sidings.map((siding, index) => {
-        return {
-            id: siding.sidingID,
-            name: `${siding.sidingName}`,
-            abbreviation: `${siding.Abbreviation}`,
-            key: index
-        };
-    });
+export function getAllSidings() {
+    return fetch(`${apiUrl}`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
-export async function getSiding(id) {
-    const res = await fetch(`${apiUrl}/sidings/siding?id=${id}`);
-    const body = await res.json();
-    console.log(body);
-    // check for db error
-    if (body.Error) {
-        throw Error(`${body.Message}`);
-    }
-
-    return {
-        id: id,
-        name: body.name[0].sidingName,
-        data: body.data
-    };
+export function getSiding(id) {
+    return fetch(`${apiUrl}/${id}`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
-
-
-export async function getSidingBreakdown(id) {
-    const res = await fetch(`${apiUrl}/sidings/harvester_breakdown?id=${id}`);
-    const body = await res.json();
-
-    if (body.Error) {
-        console.log(body.Message);
-        throw Error(`${body.Message}`);
-    }
-    return body.data.map((harvester, index) => {
-        return {
-            id: harvester.harvesterID,
-            name: harvester.harvesterName,
-            total: harvester.total,
-            full: harvester.full,
-            empty: harvester.empty,
-            route: harvester.route
-        };
-    });
+export function getHarvesterBreakdown(id) {
+    return fetch(`${apiUrl}/${id}/harvester_breakdown`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
-export async function createSiding(sidingName) {
-    const response = await fetch(`${apiUrl}/siding`, postConfig({name: sidingName}));
-    return response.json();
+export function getSidingBreakdown(id) {
+    return fetch(`${apiUrl}/${id}/breakdown`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
-export async function updateSiding(id, sidingName) {
-    const response = await fetch(`${apiUrl}/siding/${id}/name`, putConfig({name: sidingName}));
-    return response.json();
+export function getLocoBreakdown(id) {
+    return fetch(`${apiUrl}/${id}/loco_breakdown`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
-export async function deleteSiding(id) {
-    const response = await fetch(`${apiUrl}/siding/${id}`, {method: 'DELETE'});
-    return response.json();
+export function createSiding(sidingName) {
+    return fetch(`${apiUrl}`, postConfig({name: sidingName}))
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
+}
+
+export function updateSiding(id, sidingName) {
+    return fetch(`${apiUrl}/${id}/name`, putConfig({name: sidingName}))
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
+}
+
+export function deleteSiding(id) {
+    return fetch(`${apiUrl}/${id}`, {method: 'DELETE'})
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
 }

@@ -1,24 +1,24 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const {processQueryResult} = require("../utils");
+const router = express.Router();
 
 //GET all records from the transaction log
 router.get("/", function (req, res, next) {
-  req.db
-    .from("transactionlog")
-    .leftOuterJoin("siding", "transactionlog.sidingID", "siding.sidingID")
-    .leftOuterJoin("harvester", "transactionlog.harvesterID", "=", "harvester.harvesterID")
-    .leftOuterJoin("locomotive", "transactionlog.locoID", "=", "locomotive.locoID")
-    .select("*")
-    .then((rows) => {
-      res.json({ Error: false, Message: "Success", data: rows });
-    })
-
-    //Error Handling
-    .catch((err) => {
-      console.log(err);
-      res.json({ Error: true, Message: err.message });
-    });
+  req.db.raw(`
+      SELECT *
+      FROM transactionlog t
+               LEFT JOIN siding s ON t.sidingID = s.sidingID
+               LEFT JOIN harvester h ON t.harvesterID = h.harvesterID
+               LEFT JOIN locomotive l ON t.locoID = l.locoID
+  `)
+      .then(processQueryResult)
+      .then((rows) => {
+        res.status(200).json(rows);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json(err);
+      });
 });
-
 
 module.exports = router;

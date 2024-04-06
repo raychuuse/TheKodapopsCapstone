@@ -7,6 +7,7 @@ import { DashboardLogTables } from "../components/DashboardLogTable";
 import { DashboardTables } from "../components/DashboardTable";
 
 import { ErrorAlert } from "../components/Alerts";
+import {useAuth} from "../AuthProvider";
 
 export default function Home() {
     return (

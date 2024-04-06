@@ -1,90 +1,66 @@
-import React, { useEffect, useState } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import {postConfig, putConfig, serverUrl} from "./utils";
 
-export async function getAllLocos() {
-    const res = await fetch("http://localhost:8080/locos");
-    const res_1 = await res.json();
-    // console.log(res_1);
-    // check for db error
-    if (res_1.Error) {
-        console.log(res_1.Message);
-        throw Error(`${res_1.Message}`);
-    }
-    return res_1.data.map((loco, index) => {
-        return {
-            id: loco.locoID,
-            name: loco.locoName,
-            key: index
-        };
-    });
+const apiUrl = `${serverUrl}/locos`;
+
+export function getAllLocos() {
+    return fetch(`${apiUrl}`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
-export function useAllLocos() {
-    const [error, setError] = useState(null);
-    const [locosData, setLocosData] = useState([]);
-
-    useEffect(
-        () => {
-            getAllLocos()
-                .then((locos) => {
-                    setLocosData(locos);
-                    setError(null)
-                    // console.log(locos)
-                })
-                .catch((e) => {
-                    setError(e)
-                })
-        },
-        []
-    );
-
-    return {
-        locosData,
-        error
-    };
+export function getLoco(id) {
+    return fetch(`${apiUrl}`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        })
 }
 
-export async function getLoco(id) {
-    const url = `http://localhost:8080/locos/loco?id=${id}`;
-    console.log(url);
-
-    const res = await fetch(url);
-    const res_1 = await res.json();
-    console.log(res_1);
-    // Check for db error
-    if (res_1.Error) {
-        throw Error(`${res_1.Message}`);
-    }
-    return {
-        id: id,
-        name: res_1.name[0].locoName,
-        data: res_1.data
-    };
+export function getCurrentLoad(id) {
+    return fetch(`${apiUrl}/${id}/load`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
+export function getSidingBreakdown(id) {
+    return fetch(`${apiUrl}/${id}/siding_breakdown`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
+}
 
-export function useLoco(search) {
-    //console.log(search.id);
-    const [error, setError] = useState(null);
-    const [locoData, setLocoData] = useState([]);
+export function createLoco(name) {
+    return fetch(`${apiUrl}`, postConfig({name: name}))
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
+}
 
-    useEffect(
-        () => {
-            getLoco(search)
-                .then((locos) => {
-                    setLocoData(locos);
-                    setError(null)
-                    // console.log(locos)
-                })
-                .catch((e) => {
-                    setError(e)
-                })
-        },
-        [search]
-    );
+export function updateLoco(id, name) {
+    return fetch(`${apiUrl}/${id}/name`, putConfig({name: name}))
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
+}
 
-    return {
-        locoData,
-        error
-    };
+export function deleteLoco(id) {
+    return fetch(`${apiUrl}/${id}`, {method: 'DELETE'})
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
 }
