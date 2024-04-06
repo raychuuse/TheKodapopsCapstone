@@ -2,6 +2,7 @@ import React from "react";
 import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colours } from "./colours";
+import * as Haptics from "expo-haptics";
 
 const Button = ({
   title = "",
@@ -24,43 +25,20 @@ const Button = ({
   // Function to render the icon component with adjusted style based on title presence
   const renderIcon = () =>
     shouldRenderIcon ? (
-      <MaterialIcons
-        name={iconName}
-        size={iconSize}
-        color={iconColor}
-        style={[
-          shouldRenderTitle
-            ? iconPosition === "left"
-              ? styles.iconLeft
-              : styles.iconRight
-            : styles.iconNoMargin,
-        ]}
-      />
+      <MaterialIcons name={iconName} size={iconSize} color={iconColor} style={[shouldRenderTitle ? (iconPosition === "left" ? styles.iconLeft : styles.iconRight) : styles.iconNoMargin]} />
     ) : null;
 
   return (
     <TouchableOpacity
-      onPress={onPress}
-      style={[
-        styles.button,
-        { backgroundColor },
-        { borderColor: textColor },
-        border ? { borderStyle: "solid" } : { borderStyle: "none" },
-        border ? { borderWidth } : { borderWidth: 0 },
-        style,
-      ]}
+      onPress={() => {
+        onPress();
+        Haptics.selectionAsync();
+      }}
+      style={[styles.button, { backgroundColor }, { borderColor: textColor }, border ? { borderStyle: "solid" } : null, border ? { borderWidth } : { borderWidth: 0 }, style]}
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-      <View
-        style={[
-          styles.buttonContent,
-          !shouldRenderIcon && styles.buttonContentNoIcon,
-        ]}>
+      <View style={[styles.buttonContent, !shouldRenderIcon && styles.buttonContentNoIcon]}>
         {iconPosition === "left" && renderIcon()}
-        {shouldRenderTitle && (
-          <Text style={[styles.button_text, { color: textColor }, textStyle]}>
-            {title}
-          </Text>
-        )}
+        {shouldRenderTitle && <Text style={[styles.button_text, { color: textColor }, textStyle]}>{title}</Text>}
         {iconPosition === "right" && renderIcon()}
       </View>
     </TouchableOpacity>
