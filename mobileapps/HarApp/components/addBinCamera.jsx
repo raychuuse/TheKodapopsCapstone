@@ -1,6 +1,7 @@
 import { Alert, TextInput, TouchableOpacity, View } from "react-native";
 import { AutoFocus, Camera, CameraType, FlashMode } from "expo-camera";
 import { useRef, useState } from "react";
+import * as Haptics from "expo-haptics";
 
 // Import Components
 import Button from "./button";
@@ -22,6 +23,7 @@ const AddBinCamera = ({ modalCloser }) => {
     if (cameraRef.current) {
       const options = { quality: 0.5, skipProcessing: true };
       const data = await cameraRef.current.takePictureAsync(options);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setImageUri(data.uri);
       console.log(data.uri);
     }
@@ -36,15 +38,11 @@ const AddBinCamera = ({ modalCloser }) => {
   };
 
   function toggleCameraType() {
-    setType((current) =>
-      current === CameraType.back ? CameraType.front : CameraType.back
-    );
+    setType((current) => (current === CameraType.back ? CameraType.front : CameraType.back));
   }
 
   function toggleFlash() {
-    setFlashMode((current) =>
-      current === FlashMode.off ? FlashMode.torch : FlashMode.off
-    );
+    setFlashMode((current) => (current === FlashMode.off ? FlashMode.torch : FlashMode.off));
     setFlash(!flash);
   }
 
@@ -105,22 +103,8 @@ const AddBinCamera = ({ modalCloser }) => {
             flexDirection: "row",
             padding: 16,
           }}>
-          <Button
-            onPress={toggleCameraType}
-            iconName="cameraswitch"
-            iconColor="white"
-            backgroundColor="rgba(255,255,255,0.4)"
-            iconSize={24}
-            style={{ paddingVertical: 18 }}
-          />
-          <Button
-            onPress={toggleFlash}
-            iconName={flash ? "flash-on" : "flash-off"}
-            iconColor="white"
-            backgroundColor="rgba(255,255,255,0.4)"
-            iconSize={24}
-            style={{ paddingVertical: 18 }}
-          />
+          <Button onPress={toggleCameraType} iconName="cameraswitch" iconColor="white" backgroundColor="rgba(255,255,255,0.4)" iconSize={24} style={{ paddingVertical: 18 }} />
+          <Button onPress={toggleFlash} iconName={flash ? "flash-on" : "flash-off"} iconColor="white" backgroundColor="rgba(255,255,255,0.4)" iconSize={24} style={{ paddingVertical: 18 }} />
         </View>
         {/* Capture Button */}
         <View
@@ -138,7 +122,7 @@ const AddBinCamera = ({ modalCloser }) => {
               backgroundColor: "rgba(255,255,255,0.4)",
               width: 64,
               height: 64,
-              borderRadius: "100%",
+              borderRadius: 999,
               borderColor: "white",
               borderWidth: 2,
               borderStyle: "solid",
