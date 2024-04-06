@@ -2,36 +2,31 @@ import React from "react";
 import { Modal, StyleSheet, View, TouchableOpacity } from "react-native";
 import { BlurView } from "expo-blur";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { selectionAsync } from "expo-haptics";
 
-const CustomModal = ({
-  isVisible,
-  onClose,
-  children,
-  buttonIcon = "close-circle-outline",
-  style,
-}) => {
+const CustomModal = ({ isVisible, onClose, children, buttonIcon = "close-circle-outline", style }) => {
   return (
-    <Modal
-      transparent={true}
-      visible={isVisible}
-      animationType="fade"
-      onRequestClose={onClose}>
+    <Modal transparent={true} visible={isVisible} animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity
         style={styles.container}
         activeOpacity={1}
-        onPressOut={onClose} // When the user taps outside the modal content, it will close
+        onPressOut={() => {
+          onClose();
+          selectionAsync();
+        }} // When the user taps outside the modal content, it will close
       >
         <BlurView intensity={100} style={styles.blurView} tint="dark">
           <TouchableOpacity
             activeOpacity={1} // Prevents the press from triggering the BlurView's onPressOut
             style={[styles.modalContent, style]}>
             {children}
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <MaterialCommunityIcons
-                name={buttonIcon}
-                size={56}
-                color="white"
-              />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => {
+                onClose();
+                selectionAsync();
+              }}>
+              <MaterialCommunityIcons name={buttonIcon} size={56} color="white" />
             </TouchableOpacity>
           </TouchableOpacity>
         </BlurView>
