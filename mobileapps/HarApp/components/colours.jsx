@@ -22,4 +22,6 @@ export const Colours = {
   spAtSidingBg: "rgba(255, 173, 221, 0.95)", // 95% opacity
   spAtSidingEdge: "rgba(255, 247, 176, 0.7)", // 70% opacity
   spAtSidingText: "rgba(255, 255, 255, 0.9)", // 90% opacity
+  dangerBg: "#D32F2F",
+  warningBg: "#FFA000",
 };
