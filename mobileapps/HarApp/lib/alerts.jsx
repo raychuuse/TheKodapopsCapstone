@@ -15,3 +15,11 @@ export const RemoveBinAlert = (message) => {
     [{ text: "No, It's Here!" }, { text: 'Yes, Report' }]
   );
 };
+
+export const RepairBinAlert = (message) => {
+  Alert.alert(
+    'Confirm Bin Repair?',
+    `\nAre you sure you want to request a repair for Bin #${message}?`,
+    [{ text: "No, It's Fine!" }, { text: 'Yes, Request' }]
+  );
+};
