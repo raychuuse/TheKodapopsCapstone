@@ -1,5 +1,5 @@
 import { Slot } from 'expo-router';
-import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, FlatList, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -116,6 +116,7 @@ const notificationsData = [
 const Layout = () => {
   const [settingsVisable, setSettingsVisable] = useState(false);
   const [notificationVisable, setNotificationVisable] = useState(false);
+  const [tutorialVisable, setTutorialVisable] = useState(false);
 
   const [notifications, setNotifications] = useState(notificationsData);
 
@@ -221,17 +222,58 @@ const Layout = () => {
           </View>
         </View>
       </CustomModal>
+      {/* Help Modal */}
+      <CustomModal
+        isVisible={tutorialVisable}
+        onClose={() => setTutorialVisable(false)}
+      >
+        <View
+          style={{
+            width: '100%',
+            gap: 16,
+          }}
+        >
+          <Title1>Master The App</Title1>
+          <Subhead>Essential Tips for Seamless Navigation and Use</Subhead>
+          <View
+            style={{
+              borderRadius: 10,
+              aspectRatio: '3/4',
+              overflow: 'hidden',
+            }}
+          >
+            <Image
+              source={require('../../assets/tutorial_1.gif')}
+              style={{
+                resizeMode: 'contain',
+                width: '100%',
+                height: '100%',
+              }}
+            />
+          </View>
+        </View>
+      </CustomModal>
       {/* Page */}
       <Slot />
       {/* Navigation */}
       <View style={styles.nav}>
-        <Button
-          iconName='settings'
-          backgroundColor='transparent'
-          iconSize={48}
-          iconColor='#fff'
-          onPress={() => setSettingsVisable(true)}
-        />
+        <View style={{ flexDirection: 'row' }}>
+          <Button
+            iconName='settings'
+            backgroundColor='transparent'
+            iconSize={48}
+            iconColor='#fff'
+            onPress={() => setSettingsVisable(true)}
+          />
+
+          <Button
+            iconName='help-outline'
+            backgroundColor='transparent'
+            iconSize={48}
+            iconColor='#fff'
+            onPress={() => setTutorialVisable(true)}
+          />
+        </View>
         <NotificationBell
           backgroundColor='transparent'
           iconSize={48}
