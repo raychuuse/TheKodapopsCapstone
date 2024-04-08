@@ -9,7 +9,7 @@ import SettingsItem from "../components/settingsItem";
 import Divider from "../components/divider";
 
 // Import Styling Components
-import { LargeTitle, Title1 } from "../components/typography";
+import { Footnote, LargeTitle, Strong, Title1 } from "../components/typography";
 import { Colours } from "../components/colours";
 
 const farmOptions = [
@@ -84,6 +84,9 @@ const SetupPage = () => {
         <SettingsItem type="select" label="Burnt" options={burntOptions} />
         <Divider />
       </View>
+      <Footnote style={{ color: "#fff", textAlign: "center", backgroundColor: `${Colours.dangerBg}80`, padding: 8, borderRadius: 16, overflow: "hidden" }}>
+        <Strong>Warning: </Strong>Ensure accurate settings for smooth operations at the rail siding bins.
+      </Footnote>
       {/* Actions */}
       <View style={styles.actions}>
         <Link href="/" asChild>

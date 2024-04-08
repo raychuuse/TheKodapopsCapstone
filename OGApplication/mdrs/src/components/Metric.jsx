@@ -27,29 +27,6 @@ const Metrics = ({ bins: { mill, empty, route, full, bins } }) => {
     )
 }
 
-const SidingMetrics = ({ bins: { mill, empty, route, full, bins } }) => {
-    const metrics = [
-        // { headerName: "Full Bins On Route to Mill", field: "binsID", data: route, count: route.length },
-        { headerName: "Full Bins", field: "binsID", data: full, count: full.length },
-        { headerName: "Empty Bins", field: "binsID", data: empty, count: empty.length },
-        { headerName: "Delivered to Mill", field: "binsID", data: mill, count: mill.length },
-    ];
-
-    return (
-        <div className="row">
-            {metrics.map(({ headerName, field, data, count }, i) => (
-                <BinsMetric
-                    key={i}
-                    count={count}
-                    text={headerName}
-                    data={data}
-                    columns={{ headerName, field }}
-                />
-            ))}
-        </div>
-    )
-}
-
 const HarvesterMetrics = ({ bins: { mill, empty, route, full, bins } }) => {
     const metrics = [
         { headerName: "Delivered to Mill", field: "binsID", data: mill, count: mill.length },
@@ -168,4 +145,4 @@ const BinsMetric = ({ columns, count, text, data }) => {
     );
 };
 
-export { Metrics, BinsMetric, SidingMetrics, HarvesterMetrics, LocoMetrics };
+export { Metrics, BinsMetric, HarvesterMetrics, LocoMetrics };

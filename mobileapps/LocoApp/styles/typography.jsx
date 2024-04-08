@@ -3,78 +3,44 @@ import { Text, StyleSheet } from "react-native";
 import { Colours } from "./colours";
 
 // H1 Component
-export const H1 = ({ children, style }) => (
-  <Text style={[styles.h1, style]}>{children}</Text>
-);
+export const H1 = ({ children, style }) => <Text style={[styles.h1, style]}>{children}</Text>;
 
 // H2 Component
-export const H2 = ({ children, style }) => (
-  <Text style={[styles.h2, style]}>{children}</Text>
-);
+export const H2 = ({ children, style }) => <Text style={[styles.h2, style]}>{children}</Text>;
 
 // H3 Component
-export const H3 = ({ children, style }) => (
-  <Text style={[styles.h3, style]}>{children}</Text>
-);
+export const H3 = ({ children, style }) => <Text style={[styles.h3, style]}>{children}</Text>;
 
 // H4 Component
-export const H4 = ({ children, style }) => (
-  <Text style={[styles.h4, style]}>{children}</Text>
-);
+export const H4 = ({ children, style }) => <Text style={[styles.h4, style]}>{children}</Text>;
 
 // H5 Component
-export const H5 = ({ children, style }) => (
-  <Text style={[styles.h5, style]}>{children}</Text>
-);
+export const H5 = ({ children, style }) => <Text style={[styles.h5, style]}>{children}</Text>;
 
 // H6 Component
-export const H6 = ({ children, style }) => (
-  <Text style={[styles.h6, style]}>{children}</Text>
-);
+export const H6 = ({ children, style }) => <Text style={[styles.h6, style]}>{children}</Text>;
 
-export const LargeTitle = ({ children, style }) => (
-  <Text style={[styles.largeTitle, style]}>{children}</Text>
-);
+export const LargeTitle = ({ children, style }) => <Text style={[styles.largeTitle, style]}>{children}</Text>;
 
-export const Title1 = ({ children, style }) => (
-  <Text style={[styles.title1, style]}>{children}</Text>
-);
+export const Title1 = ({ children, style }) => <Text style={[styles.title1, style]}>{children}</Text>;
 
-export const Title2 = ({ children, style }) => (
-  <Text style={[styles.title3, style]}>{children}</Text>
-);
+export const Title2 = ({ children, style }) => <Text style={[styles.title3, style]}>{children}</Text>;
 
-export const Title3 = ({ children, style }) => (
-  <Text style={[styles.title3, style]}>{children}</Text>
-);
+export const Title3 = ({ children, style }) => <Text style={[styles.title3, style]}>{children}</Text>;
 
-export const Headline = ({ children, style }) => (
-  <Text style={[styles.headline, style]}>{children}</Text>
-);
+export const Headline = ({ children, style }) => <Text style={[styles.headline, style]}>{children}</Text>;
 
-export const Body = ({ children, style }) => (
-  <Text style={[styles.body, style]}>{children}</Text>
-);
+export const Body = ({ children, style }) => <Text style={[styles.body, style]}>{children}</Text>;
 
-export const Callout = ({ children, style }) => (
-  <Text style={[styles.callout, style]}>{children}</Text>
-);
+export const Callout = ({ children, style }) => <Text style={[styles.callout, style]}>{children}</Text>;
 
-export const Subhead = ({ children, style }) => (
-  <Text style={[styles.subhead, style]}>{children}</Text>
-);
+export const Subhead = ({ children, style }) => <Text style={[styles.subhead, style]}>{children}</Text>;
 
-export const Footnote = ({ children, style }) => (
-  <Text style={[styles.footnote, style]}>{children}</Text>
-);
+export const Footnote = ({ children, style }) => <Text style={[styles.footnote, style]}>{children}</Text>;
 
-export const Caption1 = ({ children, style }) => (
-  <Text style={[styles.caption1, style]}>{children}</Text>
-);
+export const Caption1 = ({ children, style }) => <Text style={[styles.caption1, style]}>{children}</Text>;
 
-export const Caption2 = ({ children, style }) => (
-  <Text style={[styles.caption2, style]}>{children}</Text>
-);
+export const Caption2 = ({ children, style }) => <Text style={[styles.caption2, style]}>{children}</Text>;
 
 // Styles
 export const styles = StyleSheet.create({

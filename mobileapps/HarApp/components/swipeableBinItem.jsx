@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 
 // Import Styling Components
 import { Headline } from "./typography";
@@ -26,21 +27,28 @@ const SwipeableBinItem = ({ checked = false, burnt = false, binNumber = "Bin Num
           overflow: "hidden",
         }}>
         <TouchableOpacity
-          onPress={() => alert("Maintenance action for " + binNumber)}
+          onPress={() => {
+            alert("Maintenance action for " + binNumber);
+            Haptics.selectionAsync();
+          }}
           style={[styles.actionButton, { backgroundColor: "#FFA000" }]}>
           <Feather name="tool" size={24} color="#fff" />
           <Headline style={styles.binText}>Repair</Headline>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: "#D32F2F" }]}
-          onPress={() => RemoveBinAlert(`Bin #${binNumber}`)}>
-          <Feather name="trash-2" size={24} color="#fff" />
+          onPress={() => {
+            RemoveBinAlert(`Bin #${binNumber}`);
+            Haptics.selectionAsync();
+          }}>
+          <Feather name="help-circle" size={24} color="#fff" />
           <Headline style={styles.binText}>Missing</Headline>
         </TouchableOpacity>
       </View>
     );
   };
 
+  // Define the left actions for swipe
   const renderLeftActions = () => {
     return (
       <View
@@ -51,14 +59,24 @@ const SwipeableBinItem = ({ checked = false, burnt = false, binNumber = "Bin Num
           borderBottomLeftRadius: 8,
           overflow: "hidden",
         }}>
-        <TouchableOpacity
-          style={[styles.actionButton, isBurnt ? styles.actionButtonGreen : styles.actionButtonBurnt, { width: 180 }]}
-          onPress={() => setIsBurnt(!isBurnt)}>
+        <View style={[styles.actionButton, isBurnt ? styles.actionButtonGreen : styles.actionButtonBurnt, { width: 180 }]} onPress={() => setIsBurnt(!isBurnt)}>
           <MaterialCommunityIcons name={!isBurnt ? "fire" : "leaf"} size={24} color="#fff" />
           <Headline style={styles.binText}>Mark as {isBurnt ? "Green" : "Burnt"}</Headline>
-        </TouchableOpacity>
+        </View>
       </View>
     );
+  };
+
+  // Swipeable Reference
+  const swipeableRef = useRef(null);
+
+  // OnSwipeOpen Handler
+  const onSwipeOpen = (direction) => {
+    if (direction == "left") {
+      setIsBurnt(!isBurnt);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      swipeableRef.current.close();
+    }
   };
 
   return (
@@ -66,35 +84,21 @@ const SwipeableBinItem = ({ checked = false, burnt = false, binNumber = "Bin Num
       renderRightActions={renderRightActions}
       renderLeftActions={renderLeftActions}
       overshootLeft={false}
-      overshootRight={false}>
+      overshootRight={false}
+      ref={swipeableRef}
+      onSwipeableOpen={("left", (direction) => onSwipeOpen(direction))}>
       <View style={[styles.binItem, isChecked ? (isBurnt ? styles.binItemCaneBurnt : styles.binItemCaneGreen) : null]}>
         <TouchableOpacity
           style={styles.binPressable}
           onPress={() => {
             setIsChecked(!isChecked);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }}>
-          <Feather
-            style={[
-              styles.binCheckBox,
-              isChecked ? (isBurnt ? styles.binItemCaneBurnt : styles.binItemCaneGreen) : null,
-            ]}
-            name={isChecked ? "check-circle" : "circle"}
-            size={24}
-          />
-          <Headline
-            style={[styles.binText, isChecked ? (isBurnt ? styles.binItemCaneBurnt : styles.binItemCaneGreen) : null]}>
-            Bin #{binNumber}
-          </Headline>
+          <Feather style={[styles.binCheckBox, isChecked ? (isBurnt ? styles.binItemCaneBurnt : styles.binItemCaneGreen) : null]} name={isChecked ? "check-circle" : "circle"} size={24} />
+          <Headline style={[styles.binText, isChecked ? (isBurnt ? styles.binItemCaneBurnt : styles.binItemCaneGreen) : null]}>Bin #{binNumber}</Headline>
         </TouchableOpacity>
         {/* Edit Btn / Full Indicator */}
-        {isChecked ? (
-          <Headline
-            style={[styles.binText, isChecked ? (isBurnt ? styles.binItemCaneBurnt : styles.binItemCaneGreen) : null]}>
-            Full{isBurnt ? " | Burnt" : ""}
-          </Headline>
-        ) : (
-          <></>
-        )}
+        {isChecked ? <Headline style={[styles.binText, isChecked ? (isBurnt ? styles.binItemCaneBurnt : styles.binItemCaneGreen) : null]}>Full{isBurnt ? " | Burnt" : ""}</Headline> : null}
       </View>
     </Swipeable>
   );

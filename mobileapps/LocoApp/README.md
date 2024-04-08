@@ -1,8 +1,8 @@
-# Sugarcane Harvester Consignment App
+# Sugarcane Locomotive Consignment App
 
 ## Introduction
 
-The Sugarcane Harvester Consignment App, a part of The Kodapops Capstone project at Queensland University of Technology (QUT), is designed to revolutionise the harvester consignment process for sugar cane farmers and contractors. Developed with the Expo framework, this app delivers a seamless experience across both iOS and Android platforms.
+The Sugarcane Locomotive Consignment App, a part of The Kodapops Capstone project at Queensland University of Technology (QUT), is designed to revolutionise the Locomotive consignment process for sugar cane farmers and contractors. Developed with the Expo framework, this app delivers a seamless experience across both iOS and Android platforms.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ Before starting, ensure you have installed:
    Change into the directory where the Sugar Kane Harvester Consignment App is located:
 
    ```sh
-   cd TheKodapopsCapstone/mobileapps/HarApp
+   cd TheKodapopsCapstone/mobileapps/LocoApp
    ```
 
 3. **Install Dependencies**

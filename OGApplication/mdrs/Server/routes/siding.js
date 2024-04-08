@@ -1,175 +1,127 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
-//helper functions
-const filter = require("../filter");
-
-//Middleware
-const { validateID } = require("../middleware/validateID")
+const {processQueryResult, isValidId} = require("../utils");
 
 //path for getting all current Sidings in db
 router.get("/", (req, res) => {
-  //all sidings from db
-  const allSidings = req.db.from("siding").select("*");
-
-  allSidings
-    .then((sidings) => {
-      res.json({ Error: false, Message: "Success", Sidings: sidings });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ Error: true, Message: err.message });
-    });
+  req.db.raw(`SELECT *
+              FROM siding`)
+      .then(processQueryResult)
+      .then((sidings) => {
+        res.status(200).json(sidings);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json(err);
+      });
 });
 
+// Returns the status of a siding, including how many, and which, bins are full and empty, as well as when the bin
+// was filled or dropped off, telling the user how long the bin has been sitting at the siding in its current state,
+// potentially pointing out data entry errors.
+router.get("/:sidingId/breakdown", (req, res) => {
+  const id = req.params.sidingId;
+  if (!isValidId(id)) return;
 
-//path for getting all bin data for relevant siding i.e full bins at siding, empty bins at siding and allocated bins on route
-router.get("/siding", validateID, (req, res) => {
-  const id = req.query.id;
-
-  const sidingData = req.db
-    .from("bins")
-    .leftOuterJoin("siding", "bins.sidingID", "siding.sidingID")
-    .leftOuterJoin("harvester", "bins.harvesterID", "=", "harvester.harvesterID")
-    .leftOuterJoin("locomotive", "bins.locoID", "=", "locomotive.locoID")
-    .select("*")
-    .where("bins.sidingID", "=", id);
-
-  const sidingName = req.db.from("siding").select("sidingName").where("sidingID", "=", id);
-
-  const Status = {
-    1: 'Empty At Mill',
-    2: 'Empty',
-    3: 'Empty',
-    4: 'Full',
-    5: 'Full - On Route to Mill',
-    6: 'Delivered to Mill'
-  }
-
-  sidingData
-    .then((rows) => {
-      const bins = rows.map((bin) => ({
-        binsID: bin.binsID,
-        statusID: bin.statusID,
-        status: (Status[parseInt(bin.statusID)]),
-        sidingID: bin.sidingID,
-        locoID: bin.locoID,
-        harvesterID: bin.harvesterID,
-        sidingName: bin.sidingName,
-        harvesterName: bin.harvesterName,
-        locoName: bin.locoName
-      }))
-
-      // changed the format of the data filtering
-      const data = {
-        bins: bins,
-        mill: filter.filterById(rows, 6),
-        full: filter.filterById(rows, 4),
-        empty: filter.filterById(rows, 3),
-        route: filter.filterById(rows, 5),
-        harvesters: filter.groupBins(rows, "harvesterID"),
-      };
-
-      return data;
-    })
-    .then((data) => {
-      //getting the name to send back to front end
-      sidingName
-        .then((name) => {
-          //Validates if siding exists in the database
-          if (name.length === 0) {
-            throw Error("Siding Not Found")
-          }
-          res.json({ Error: false, Message: "Success", name: name, data: data });
-        })
-        .catch((err) => {
-          console.log(err);
-          res.json({ Error: true, Message: err.message });
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ Error: true, Message: err.message });
-    });
+  req.db.raw(`
+      SELECT b.binID, b.status, b.sidingID, s.sidingName, t.transactionTime, t.type
+      FROM bin b
+               LEFT JOIN siding s ON b.sidingID = s.sidingID
+               LEFT JOIN (SELECT tl.*, ROW_NUMBER() OVER (PARTITION BY binID ORDER BY transactionTime DESC) AS rn
+                          FROM transactionlog tl) t ON t.binID = b.binID AND t.rn = 1
+      WHERE b.sidingID = ?
+  `, [id])
+      .then(processQueryResult)
+      .then(data => {
+        res.status(200).json(data);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json(err);
+      });
 });
 
-//Siding data grouped by harvesters 
-router.get("/harvester_breakdown", validateID, (req, res) => {
-  const id = req.query.id;
+router.get('/:sidingId/loco_breakdown', (req, res) => {
+  const sidingId = req.params.sidingId;
+  if (!isValidId(sidingId)) return;
 
-  const idExists = req.db.from("siding").count({ valid: 'sidingID' }).where("sidingID", "=", id);
+  req.db.raw(`
+      SELECT s.sidingID, s.sidingName, l.locoID, l.locoName, COUNT(*) as pickedUpBins
+      FROM transactionlog t
+               LEFT JOIN locomotive l ON l.locoID = t.locoID
+               LEFT JOIN siding s on t.sidingID = s.sidingID
+      WHERE t.type = 'PICKED_UP'
+        AND s.sidingID = ?
+      GROUP BY s.sidingID, l.locoID
+  `, [sidingId])
+      .then(processQueryResult)
+      .then(data => {
+        res.status(200).json(data);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json(err);
+      });
+})
 
-  const breakdownData = req.db
-    .from("bins")
-    .join("harvester", "bins.harvesterID", "=", "harvester.harvesterID")
-    .select(
-      "bins.harvesterID",
-      "harvester.harvesterName",
-      "bins.locoID",
-      "bins.statusID",
-      "bins.harvesterID",
-      "bins.binsID"
-    )
-    .where("bins.sidingID", "=", id);
+// Return the harvesters that have filled a bin in this siding in the last month, and how many bins they filled.
+router.get("/:sidingId/harvester_breakdown", (req, res) => {
+  const id = req.params.sidingId;
+  if (!isValidId(id)) return;
 
-  //checking for valid ID 
-  idExists
-    .then((idCheck) => {
-      if (idCheck[0].valid === 0) {
-        throw Error("Invalid ID: Breakdown Not Found")
-      }
-      breakdownData
-        .then((rows) => {
-          const unsortedData = filter.groupBins(rows, "harvesterID");
-          const data = filter.harvesterSort(unsortedData);
-          return data;
-        })
-        .then((data) => {
-          res.json({ Error: false, Message: "Success", data: data });
-        })
-        //Error Handling
-        .catch((err) => {
-          console.log(err);
-          res.json({ Error: true, Message: err.message });
-        });
-    })
-    //Error Handling
-    .catch((err) => {
-      console.log(err);
-      res.json({ Error: true, Message: err.message });
-    });
+  req.db.raw(`SELECT s.sidingID, s.sidingName, h.harvesterID, h.harvesterName, COUNT(t.binID) as filledBins
+              FROM transactionlog t
+                       LEFT JOIN harvester h ON t.harvesterID = h.harvesterID
+                       LEFT JOIN siding s on t.sidingID = s.sidingID
+              WHERE t.type = 'FILLED'
+                AND s.sidingID = ?
+              GROUP BY h.harvesterID, s.sidingID;`, [id])
+      .then(processQueryResult)
+      .then(data => {
+        res.status(200).json(data);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json(err);
+      });
 });
 
 router.post('/', (req, res) => {
-  console.info(req.body);
   req.db.insert({sidingName: req.body.name}).into('siding')
       .then((result) => {
-        res.json({Error: false, Message: 'Success', data: result})
+        res.status(201).send();
       })
       .catch(error => {
         console.error(error);
-        res.json({Error: true, Message: error.message})
+        res.status(500).json(error)
       });
 });
 
 router.put('/:id/name', (req, res) => {
-  req.db('siding').update({sidingName: req.body.name}).where({sidingID: req.params.id})
+  const id = req.params.id;
+  if (!isValidId(id)) return;
+  req.db('siding').update({sidingName: req.body.name}).where({sidingID: id})
       .then(result => {
-        res.json({Error: false, Message: 'Success'});
+        res.status(204).send();
       })
       .catch(error => {
         console.error(error);
-        res.json({Error: true, Message: error.message});
+        res.status(500).json(error);
       })
 });
 
 router.delete('/:id', (req, res) => {
-  req.db('siding').where({sidingID: req.params.id}).del()
+  const id = req.params.id;
+  if (!isValidId(id)) return;
+
+  req.db('siding').where({sidingID: id}).del()
       .then(result => {
-        res.json({Error: false, Message: 'Success'});
+        res.status(204).send();
       })
       .catch(error => {
-        res.json({Error: true, Message: error.message})
+        console.error(error);
+        res.status(500).json(error);
       });
 });
 

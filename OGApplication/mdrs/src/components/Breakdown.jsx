@@ -5,8 +5,7 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.css';
 import LoadingSpinner from "./LoadingSpinner";
 import { ErrorAlert } from "./Alerts";
-import { getHarvesterBreakdown } from "../api/harvesters";
-import { getSidingBreakdown } from "../api/sidings";
+import { getHarvesterBreakdown } from "../api/sidings";
 
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -71,6 +70,7 @@ const Table = ({ columns, data, type }) => {
 }
 
 
+/*
 export const SidingBreakdown = ({ id }) => {
     const [breakdownData, setBreakdownData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ export const SidingBreakdown = ({ id }) => {
     useEffect(() => {
         const fetchBreakdown = async () => {
             try {
-                const data = await getSidingBreakdown(id);
+                const data = await getHarvesterBreakdown(id);
                 setBreakdownData(data);
             } catch (err) {
                 setError(err);
@@ -113,6 +113,7 @@ export const SidingBreakdown = ({ id }) => {
         </>
     );
 };
+*/
 
 export const HarvesterBreakdown = ({ id }) => {
     const [breakdownData, setBreakdownData] = useState([]);

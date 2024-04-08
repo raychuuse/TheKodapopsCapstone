@@ -2,31 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {useAuth} from "../AuthProvider";
 
 
-const Header = ({ onLogout }) => {
-  const navigate = useNavigate();
+const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); 
-  const [user, setUser] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const auth = useAuth();
 
   const toggleNavbar = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  //Clears Token from storage and user id  
-  const handleLogout = () => {
-    sessionStorage.clear();
-    setUser(null)
-    navigate(`/`)
-    onLogout();
-  }
+  if (auth.token == null)
+    return;
 
-  //Accessing logged in User ID from session storage token 
-  useEffect(() => {
-    const idString = sessionStorage.getItem('token');
-    const userId = JSON.parse(idString);
-    setUser(userId.id);
-  }, []);
+  const userId = 1;
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -90,11 +80,11 @@ const Header = ({ onLogout }) => {
               aria-expanded={isDropdownOpen}
               onClick={toggleDropdown}
             >
-              User ID: {user}  
+              User: {auth.user.firstName}
             </button>
             <ul className={`dropdown-menu  ${isDropdownOpen ? 'show' : ''}`} aria-labelledby="navbarDropdown">
               <li>
-                <a className="dropdown-item" href="/" role="button" onClick={handleLogout}>
+                <a className="dropdown-item" href="/" role="button" onClick={auth.logOut}>
                   Log Out
                 </a>
               </li>

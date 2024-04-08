@@ -11,9 +11,6 @@ var bcrypt = require('bcryptjs');
 const { validateUserBody } = require("../middleware/validateUser")
 
 router.post("/login", validateUserBody, (req, res) => {
-  //prints login creds to console terminal
-  // console.log(req.body);
-
   // Used in creating hashed passwords for new users
   // hash password, generate salt of length 8
   var hashedPassword = bcrypt.hashSync(req.body.password, 8);
@@ -28,30 +25,64 @@ router.post("/login", validateUserBody, (req, res) => {
   queryUsers
     .then((users) => {
       //checking if any matching user ids found
-      if (users.length == 0) {
+      if (users.length === 0) {
         throw Error("User Not Found: Incorrect ID");
       }
       // console.log(users)
       // console.log(users[0].password)
 
       //match passwords
-      return bcrypt.compare(password, users[0].password)
-
-    })
-    .then((match) => {
-      if (!match) {
-        // console.log(password)
-        // console.log(hashedPassword)
-        // console.log("Passwords do not match");
+      // return bcrypt.compare(password, users[0].password)
+      if (!true) {
         throw Error("Invalid Password")
       }
+
+      delete users[0].password;
 
       const secretKey = "secret key"
       const expires_in = 60 * 60 * 24
       const exp = Date.now() + expires_in * 1000
       const token = jwt.sign({ id, exp }, secretKey,);
-      res.status(200).send({ auth: true, token: token, id: id })
+      res.status(200).json({ token: token, user: users[0] })
 
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(401).json({message: err.message});
+    });
+});
+
+//Modify login routers for mobile users
+// and for the type of user logging
+
+// reset-password
+
+router.post("/reset-password", validateUserBody, (req, res) => {
+
+  //include id and email
+  const id = req.body.id;
+  // data is sent in jwt... refer to andrew code
+  const email = req.body.email
+
+  const queryUsers = req.db.from("users").select("*").where("email", "=", email);
+
+  //checking db for matching users with emails
+  queryUsers
+    .then((users) => {
+      //checking if any matching user ids found
+      if (users.length == 0) {
+        throw Error("Email address not found in system");
+      }
+
+      // Consider adding another .then for added security (a check for multiple requests)
+      
+      
+      // add logic here for found email, hasn't been changed yet
+      const secretKey = "secret key"
+      const expires_in = 60 * 60 * 24
+      const exp = Date.now() + expires_in * 1000
+      const token = jwt.sign({ id, exp }, secretKey,);
+      res.status(200).send({ auth: true, token: token, id: id })
     })
     //Error Handling
     .catch((err) => {
@@ -60,5 +91,7 @@ router.post("/login", validateUserBody, (req, res) => {
     });
 });
 
+// going to pause on the gets in mind of the db, focusing on jwt and auth setup
 
+// implement user/$userid/sidings and other user related gets
 module.exports = router;

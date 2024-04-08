@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import {ErrorAlert} from "./Alerts";
+import {standardiseData} from "../utils";
 
 // Search Bar 
 export const Search = ({ keyword, onChange }) => {
@@ -28,13 +29,14 @@ export const Search = ({ keyword, onChange }) => {
 export const List = ({ data = [], onClick, onEdit, onDelete, loading }) => {
     const navigate = useNavigate();
 
+    const normalized = standardiseData(data);
+
     return (
       < div className="search-result" >
         <ul id="items" className="list-group">
           {/* Search Result Error  */}
           {data.length === 0 && !loading ? <ErrorAlert message={"No Results Found"} /> : null}
-  
-          {data.map(({ id, name }) => (
+          {normalized.map(({ id, name }) => (
             <button
               key={id}
               type="button"

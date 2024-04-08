@@ -4,6 +4,13 @@ const cors = require("cors");
 const app = express();
 const router = express.Router();
 
+// Websocket integration
+// i.e.
+// const wss = new WebSocket.Server({ server });
+// Run on a seperate port to standard routing, or handle both
+// in the one http server
+// i.e. through express-ws library
+// var expressWs = require('express-ws')(app);  
 
 // Routers imports
 const locoRouter = require("./routes/locos");

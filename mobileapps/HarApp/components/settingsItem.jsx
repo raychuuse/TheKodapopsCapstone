@@ -10,22 +10,16 @@ import Modal from "./modal";
 import * as Type from "./typography";
 import { Colours } from "./colours";
 
-const SettingsItem = ({ type = "", startOption = 0, label = "label", options = [{ label: "Label", value: 0 }] }) => {
+const SettingsItem = ({ type = "", startOption = 0, label = "label", options = [{ label: "Label", value: 0 }], style }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
 
   return (
     <>
-      <Modal
-        isVisible={pickerVisable}
-        onClose={() => setPickerVisable(!pickerVisable)}
-        buttonIcon="check-circle-outline">
+      <Modal isVisible={pickerVisable} onClose={() => setPickerVisable(!pickerVisable)} buttonIcon="check-circle-outline">
         <View style={{ gap: 16, width: "100%" }}>
           <Type.Title1 style={{ textAlign: "center" }}>Select {label}</Type.Title1>
-          <Picker
-            selectedValue={selectedOption}
-            onValueChange={(itemValue, itemIndex) => setSelectedOption(itemValue)}
-            style={{ borderRadius: 16, backgroundColor: Colours.bgLevel6, width: "100%" }}>
+          <Picker selectedValue={selectedOption} onValueChange={(itemValue, itemIndex) => setSelectedOption(itemValue)} style={{ borderRadius: 16, backgroundColor: Colours.bgLevel6, width: "100%" }}>
             <Picker.Item value={0} label="Please Select an Option" style={{ width: "100%" }} />
             {options.map((option) => (
               <Picker.Item value={option.value} label={option.label} style={{ width: "100%" }} />
@@ -33,7 +27,7 @@ const SettingsItem = ({ type = "", startOption = 0, label = "label", options = [
           </Picker>
         </View>
       </Modal>
-      <View style={styles.item}>
+      <View style={[styles.item, style]}>
         <Type.Title3 style={styles.label}>{label}:</Type.Title3>
         <Text style={[Type.styles.body, styles.body]} numberOfLines={1}>
           {options.find((item) => item.value == selectedOption)?.label}

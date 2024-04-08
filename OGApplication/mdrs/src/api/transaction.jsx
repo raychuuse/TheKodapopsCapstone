@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {serverUrl} from "./utils";
 
 const Status = {
     1: 'Empty At Mill',
@@ -11,16 +12,8 @@ const Status = {
 }
 
 export function getAllTransactions(){
-    return fetch("http://localhost:8080/log")
-        .then((res) => res.json())
-        .then((res) => {
-            //check for db error
-            if(res.Error){
-                console.log(res.Message)
-                throw Error(`${res.Message}`)
-            }
-            return res.data
-        })
+    return fetch(`${serverUrl}/log`)
+        .then((body) => body.json())
         .then((data) =>{
             // Data formatted
             return data.map((bin) => ({
