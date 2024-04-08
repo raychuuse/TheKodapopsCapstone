@@ -3,7 +3,6 @@ import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import * as Haptics from 'expo-haptics';
 
 // Import Style Components
 import {
@@ -22,6 +21,9 @@ import CustomModal from '../../components/modal';
 import SettingsItem from '../../components/settingsItem';
 import Divider from '../../components/divider';
 import NotificationItem from '../../components/notificationItem';
+
+// Import Libs
+import { removeNotification } from '../../lib/notification';
 
 const farmOptions = [
   { label: 'Green Valley Farm', value: 1 },
@@ -117,19 +119,12 @@ const Layout = () => {
 
   const [notifications, setNotifications] = useState(notificationsData);
 
-  const removeNotification = (id) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setNotifications((currentNotifications) =>
-      currentNotifications.filter((notification) => notification.id !== id)
-    );
-  };
-
   const renderNotification = ({ item }) => (
     <NotificationItem
       icon={item.icon}
       label={item.message}
       type={item.type}
-      onRemove={() => removeNotification(item.id)}
+      onRemove={() => removeNotification(item.id, setNotifications)}
     />
   );
 
