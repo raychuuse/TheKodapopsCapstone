@@ -235,7 +235,7 @@ const Layout = () => {
         <NotificationBell
           backgroundColor='transparent'
           iconSize={48}
-          notificationCount={0}
+          notificationCount={notifications.length}
           onPress={() => setNotificationVisable(true)}
         />
       </View>
