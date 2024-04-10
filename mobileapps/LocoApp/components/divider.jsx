@@ -1,16 +1,19 @@
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet } from 'react-native';
 
 // Import Style Components
-import { Colours } from "../styles/colours";
+import { Colours } from '../styles/colours';
 
-const Divider = () => {
+const Divider = ({ style }) => {
   return (
     <View
-      style={StyleSheet.create({
-        height: 1,
-        width: "100%",
-        backgroundColor: Colours.spDiv,
-      })}
+      style={[
+        {
+          height: 1,
+          width: '100%',
+          backgroundColor: Colours.spDiv,
+        },
+        style,
+      ]}
     />
   );
 };
