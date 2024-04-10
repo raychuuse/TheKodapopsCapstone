@@ -32,7 +32,9 @@ const BottomBar = () => {
       <CustomModal
         isVisible={routeVisible}
         onClose={() => setRouteVisible(false)}
-        style={{ width: "80%", maxWidth: 800, height: "70%" }}></CustomModal>
+        style={{ width: "80%", maxWidth: 800, height: "70%" }}>
+        <RunSheet onClose={() => setRouteVisible(false)} />
+      </CustomModal>
       {/* Help Modal */}
       <CustomModal
         isVisible={helpVisible}
