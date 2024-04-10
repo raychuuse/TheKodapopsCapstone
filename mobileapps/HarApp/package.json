@@ -22,7 +22,8 @@
     "react-native-screens": "~3.29.0",
     "react-native-gesture-handler": "~2.14.0",
     "@react-native-picker/picker": "2.6.1",
-    "expo-haptics": "~12.8.1"
+    "expo-haptics": "~12.8.1",
+    "expo-image": "~1.10.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
