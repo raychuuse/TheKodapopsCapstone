@@ -72,7 +72,14 @@ const ModalSettings = ({ isVisable, setIsVisable }) => {
         <Title1 style={{ textAlign: 'center', marginBottom: 24 }}>
           Settings
         </Title1>
-        <ScrollView style={{ maxHeight: 600 }}>
+        <ScrollView
+          style={{
+            maxHeight: 600,
+            backgroundColor: Colours.bgLevel6,
+            padding: 8,
+            borderRadius: 10,
+          }}
+        >
           <Title2 style={{ marginBottom: 16 }}>Consignment Settings</Title2>
           <Subhead>
             Configure your consignment details for where you will be dropping
