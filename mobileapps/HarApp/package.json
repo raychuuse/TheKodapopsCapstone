@@ -9,9 +9,9 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo": "~50.0.7",
+    "expo": "~50.0.15",
     "expo-blur": "~12.9.2",
-    "expo-camera": "~14.1.1",
+    "expo-camera": "~14.1.2",
     "expo-constants": "~15.4.5",
     "expo-linking": "~6.2.2",
     "expo-router": "~3.4.7",
