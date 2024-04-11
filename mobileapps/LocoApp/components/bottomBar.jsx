@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 
 // Styles
 import { Colours } from '../styles/colours';
@@ -23,7 +24,12 @@ const BottomBar = () => {
         isVisible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
         style={{ width: '80%', maxWidth: 800, height: '70%' }}
-      ></CustomModal>
+      >
+        <Button
+          title='Log Off'
+          onPress={() => router.replace('/')}
+        />
+      </CustomModal>
       {/* Notifications Modal */}
       <CustomModal
         isVisible={notificationsVisible}
