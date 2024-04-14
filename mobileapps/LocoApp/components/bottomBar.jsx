@@ -1,7 +1,6 @@
 import { View } from 'react-native';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router } from 'expo-router';
 
 // Styles
 import { Colours } from '../styles/colours';
@@ -11,25 +10,19 @@ import NotificationBell from './notificationBell';
 import Button from './button';
 import CustomModal from './modal';
 import RunSheet from './runSheet';
+import ModalSettings from './modalSettings';
 
 const BottomBar = ({ runData, setRunData }) => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [routeVisible, setRouteVisible] = useState(false);
-  const [helpVisible, setHelpVisible] = useState(false);
   return (
     <>
       {/* Settings Modal */}
-      <CustomModal
+      <ModalSettings
         isVisible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
-        style={{ width: '80%', maxWidth: 800, height: '70%' }}
-      >
-        <Button
-          title='Log Off'
-          onPress={() => router.replace('/')}
-        />
-      </CustomModal>
+      />
       {/* Notifications Modal */}
       <CustomModal
         isVisible={notificationsVisible}
@@ -49,12 +42,6 @@ const BottomBar = ({ runData, setRunData }) => {
           setRunData={setRunData}
         />
       </CustomModal>
-      {/* Help Modal */}
-      <CustomModal
-        isVisible={helpVisible}
-        onClose={() => setHelpVisible(false)}
-        style={{ width: '80%', maxWidth: 800, height: '70%' }}
-      ></CustomModal>
       {/* Nav Bar */}
       <LinearGradient
         colors={['rgba(225,225,225,0.7)', 'rgba(225,225,225,0.4)']}
@@ -65,6 +52,7 @@ const BottomBar = ({ runData, setRunData }) => {
           paddingTop: 4,
         }}
       >
+        {/* Open Notification Modal Button */}
         <NotificationBell
           backgroundColor='transparent'
           iconColor={Colours.textLevel3}
@@ -73,23 +61,19 @@ const BottomBar = ({ runData, setRunData }) => {
           onPress={() => setNotificationsVisible(true)}
         />
         <View style={{ marginStart: 'auto', flexDirection: 'row', gap: 8 }}>
+          {/* Open Run Details Modal Button */}
           <Button
             backgroundColor='transparent'
             iconName='route'
             iconSize={48}
             onPress={() => setRouteVisible(true)}
           />
+          {/* Open Settings Modal Button */}
           <Button
             backgroundColor='transparent'
             iconName='settings'
             iconSize={48}
             onPress={() => setSettingsVisible(true)}
-          />
-          <Button
-            backgroundColor='transparent'
-            iconName='help'
-            iconSize={48}
-            onPress={() => setHelpVisible(true)}
           />
         </View>
       </LinearGradient>
