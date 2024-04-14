@@ -1,50 +1,15 @@
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 //Styles
 import { Title1 } from '../styles/typography';
 import { Colours } from '../styles/colours';
 import RunSheetAccordion from './runSheetAccordion';
 
-const data = [
-  {
-    name: 'Siding #1',
-    drop: 11,
-    collect: 11,
-    isComplete: true,
-    isSelected: false,
-    renderContent: () => <Text>Dynamic Content 1</Text>,
-  },
-  {
-    name: 'Siding #2',
-    drop: 22,
-    collect: 22,
-    isComplete: true,
-    isSelected: false,
-    renderContent: () => <Text>Dynamic Content 2</Text>,
-  },
-  {
-    name: 'Siding #3',
-    drop: 33,
-    collect: 33,
-    isComplete: false,
-    isSelected: true,
-    renderContent: () => <Text>Dynamic Content 3</Text>,
-  },
-  {
-    name: 'Siding #4',
-    drop: 44,
-    collect: 44,
-    isComplete: false,
-    isSelected: false,
-    renderContent: () => <Text>Dynamic Content 4</Text>,
-  },
-  // Add more items as needed
-];
-
-const RunSheet = ({ onClose }) => {
+const RunSheet = ({ runData, setRunData, onClose }) => {
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       {/* Header */}
       <View style={Styles.HeaderContainer}>
         <MaterialIcons
@@ -67,9 +32,10 @@ const RunSheet = ({ onClose }) => {
       {/* Run List */}
       <RunSheetAccordion
         style={Styles.RunListContainer}
-        data={data}
+        runData={runData}
+        setRunData={setRunData}
       />
-    </>
+    </GestureHandlerRootView>
   );
 };
 
