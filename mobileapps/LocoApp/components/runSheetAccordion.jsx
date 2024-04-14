@@ -26,7 +26,7 @@ const RunSheetAccordion = ({ runData, setRunData, style }) => {
     <FlatList
       style={{ width: '100%' }}
       contentContainerStyle={style}
-      data={runData}
+      data={runData.sidings}
       renderItem={renderItem}
       keyExtractor={(item, index) => index.toString()}
       extraData={expandedId} // Important for refreshing the list when state changes

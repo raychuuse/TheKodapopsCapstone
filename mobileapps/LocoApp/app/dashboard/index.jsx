@@ -68,7 +68,7 @@ export default function Page() {
               bounces={false}
               horizontal={true}
               keyExtractor={(item) => item.id}
-              data={runData}
+              data={runData.sidings}
               renderItem={({ item, index }) => (
                 <SidingCard
                   isCompleted={item.isCompleted}
@@ -79,7 +79,7 @@ export default function Page() {
                   index={index}
                   scrollX={scrollX}
                   containerWidth={sidingCarouselWidth}
-                  listLength={runData.length}
+                  listLength={runData.sidings.length}
                 />
               )}
             />

@@ -32,7 +32,7 @@ const window = Dimensions.get('window');
 const calculatedHeight = Math.max(window.height * 0.3, 150);
 
 const RunSheetAccordionItem = ({
-  sidingData = RunMockData[0],
+  sidingData = RunMockData.sidings[0],
   runData = RunMockData,
   setRunData,
   isExpanded,
@@ -64,7 +64,7 @@ const RunSheetAccordionItem = ({
     <View
       style={[
         styles.itemContainer,
-        sidingData.isComplete
+        sidingData.isCompleted
           ? styles.itemContatinerComplete
           : sidingData.isSelected
           ? styles.itemContatinerSelected
@@ -79,11 +79,11 @@ const RunSheetAccordionItem = ({
         {/* Header */}
         <View style={styles.HeaderContainer}>
           {/* Selected/Completed Siding Button */}
-          <TouchableOpacity disabled={sidingData.isComplete}>
+          <TouchableOpacity disabled={sidingData.isCompleted}>
             <MaterialCommunityIcons
               size={28}
               name={
-                sidingData.isComplete
+                sidingData.isCompleted
                   ? 'checkbox-marked-circle-outline'
                   : sidingData.isSelected
                   ? 'star-circle-outline'
