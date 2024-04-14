@@ -1,8 +1,9 @@
 import { View, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 // Import Styles
-import { Title1 } from '../styles/typography';
+import { Title1, Title3 } from '../styles/typography';
 import { Colours } from '../styles/colours';
 
 // Import Mock Data
@@ -14,6 +15,7 @@ import {
 // Import Componetns
 import CustomModal from './modal';
 import SettingsItem from './settingsItem';
+import Button from './button';
 
 const ModalSettings = ({ isVisible, onClose }) => {
   return (
@@ -33,6 +35,36 @@ const ModalSettings = ({ isVisible, onClose }) => {
       </View>
       {/* Page Content */}
       <View style={styles.content}>
+        {/* Log Out */}
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            gap: 22,
+            paddingHorizontal: 16,
+            paddingVertical: 4,
+            alignItems: 'center',
+          }}
+        >
+          <Title3
+            style={{ flex: 1, textTransform: 'capitalize' }}
+            numberOfLines={1}
+          >
+            John Smith
+          </Title3>
+          <Button
+            iconName={'logout'}
+            title='Log Out'
+            iconColor={Colours.textLevel3}
+            textColor={Colours.textLevel3}
+            backgroundColor={Colours.bgLevel3}
+            border
+            borderWidth={1}
+            iconSize={28}
+            style={{ paddingVertical: 4 }}
+            onPress={() => router.replace('/')}
+          />
+        </View>
         {/* Locomotive Selector */}
         <SettingsItem
           label='Locomotive'
