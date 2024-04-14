@@ -11,6 +11,7 @@ import Button from './button';
 import CustomModal from './modal';
 import RunSheet from './runSheet';
 import ModalSettings from './modalSettings';
+import ModalNotifications from './modalNotifications';
 
 const BottomBar = ({ runData, setRunData }) => {
   const [settingsVisible, setSettingsVisible] = useState(false);
@@ -24,11 +25,10 @@ const BottomBar = ({ runData, setRunData }) => {
         onClose={() => setSettingsVisible(false)}
       />
       {/* Notifications Modal */}
-      <CustomModal
+      <ModalNotifications
         isVisible={notificationsVisible}
         onClose={() => setNotificationsVisible(false)}
-        style={{ width: '80%', maxWidth: 800, height: '70%' }}
-      ></CustomModal>
+      />
       {/* Route Modal */}
       <CustomModal
         isVisible={routeVisible}
