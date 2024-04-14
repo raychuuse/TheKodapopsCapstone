@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   View,
   TouchableOpacity,
@@ -9,8 +9,16 @@ import {
   Platform,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+// Import Styles
 import { Colours } from '../styles/colours';
 import { Title2 } from '../styles/typography';
+
+// Import Components
+import BinList from './binList';
+
+// Import Mock Data
+import { RunMockData } from '../data/RunMockData';
 
 if (
   Platform.OS === 'android' &&
@@ -24,14 +32,11 @@ const window = Dimensions.get('window');
 const calculatedHeight = Math.max(window.height * 0.3, 150);
 
 const RunSheetAccordionItem = ({
-  id,
+  sidingData = RunMockData[0],
+  runData = RunMockData,
+  setRunData,
   isExpanded,
   onToggle,
-  sidingName = 'Siding Name',
-  collect = 58,
-  drop = 58,
-  isComplete = false,
-  isSelected = false,
 }) => {
   const animatedHeight = useRef(new Animated.Value(0)).current; // Initial height is 0 for collapsed state
   const rotation = useRef(new Animated.Value(0)).current; // For icon rotation
@@ -59,9 +64,9 @@ const RunSheetAccordionItem = ({
     <View
       style={[
         styles.itemContainer,
-        isComplete
+        sidingData.isComplete
           ? styles.itemContatinerComplete
-          : isSelected
+          : sidingData.isSelected
           ? styles.itemContatinerSelected
           : null,
       ]}
@@ -74,13 +79,13 @@ const RunSheetAccordionItem = ({
         {/* Header */}
         <View style={styles.HeaderContainer}>
           {/* Selected/Completed Siding Button */}
-          <TouchableOpacity disabled={isComplete}>
+          <TouchableOpacity disabled={sidingData.isComplete}>
             <MaterialCommunityIcons
               size={28}
               name={
-                isComplete
+                sidingData.isComplete
                   ? 'checkbox-marked-circle-outline'
-                  : isSelected
+                  : sidingData.isSelected
                   ? 'star-circle-outline'
                   : 'checkbox-blank-circle-outline'
               }
@@ -88,7 +93,7 @@ const RunSheetAccordionItem = ({
             />
           </TouchableOpacity>
           {/* Siding Name */}
-          <Title2 style={{ flex: 1 }}>{sidingName}</Title2>
+          <Title2 style={{ flex: 1 }}>{sidingData.name}</Title2>
 
           <View style={styles.binBumberContainer}>
             {/* Drop Number */}
@@ -98,7 +103,7 @@ const RunSheetAccordionItem = ({
                 size={24}
                 color={Colours.textLevel3}
               />
-              <Title2>{drop}</Title2>
+              <Title2>{sidingData.binsDrop.length}</Title2>
             </View>
 
             {/* Collect Number */}
@@ -108,7 +113,7 @@ const RunSheetAccordionItem = ({
                 size={24}
                 color={Colours.textLevel3}
               />
-              <Title2>{collect}</Title2>
+              <Title2>{sidingData.binsCollect.length}</Title2>
             </View>
           </View>
 
@@ -125,7 +130,31 @@ const RunSheetAccordionItem = ({
 
       {/* Accordion Body */}
       <Animated.View style={{ height: animatedHeight, overflow: 'hidden' }}>
-        <View></View>
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            gap: 16,
+            paddingHorizontal: 8,
+          }}
+        >
+          {/* Drop Bin List */}
+          <BinList
+            BinData={sidingData.binsDrop}
+            binListName='binsDrop'
+            sidingId={sidingData.id}
+            runData={runData}
+            setRunData={setRunData}
+          />
+          {/* Collect Bin List */}
+          <BinList
+            BinData={sidingData.binsCollect}
+            binListName='binsCollect'
+            sidingId={sidingData.id}
+            runData={runData}
+            setRunData={setRunData}
+          />
+        </View>
       </Animated.View>
     </View>
   );
