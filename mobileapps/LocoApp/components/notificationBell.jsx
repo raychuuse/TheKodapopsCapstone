@@ -1,16 +1,17 @@
-import React from "react";
-import { TouchableOpacity, StyleSheet, View, Text } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
+import React from 'react';
+import { TouchableOpacity, StyleSheet, View, Text } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { Colours } from '../styles/colours';
 
 const NotificationBell = ({
-  onPress = () => alert("Notification Bell Pressed"),
-  iconName = "notifications",
+  onPress = () => alert('Notification Bell Pressed'),
+  iconName = 'notifications',
   iconSize = 24,
-  iconColor = "#ffffff",
-  backgroundColor = "#4F12FA42",
+  iconColor = '#ffffff',
+  backgroundColor = '#4F12FA42',
   notificationCount = 0,
-  countBackgroundColor = "#ff0000",
-  countTextColor = "#ffffff",
+  countBackgroundColor = Colours.dangerBg,
+  countTextColor = '#ffffff',
   style = {},
 }) => {
   // Counter dimensions and border based on icon size
@@ -30,17 +31,19 @@ const NotificationBell = ({
             borderRadius: counterSize / 2,
             backgroundColor: countBackgroundColor,
             borderWidth: borderWidth,
-            borderColor: "#ffffff", // Counter border color
+            borderColor: '#ffffff', // Counter border color
             top: -counterPosition,
             right: -counterPosition,
           },
-        ]}>
+        ]}
+      >
         <Text
           style={[
             styles.countText,
             { color: countTextColor, fontSize: counterSize / 2 },
-          ]}>
-          {Math.min(99, notificationCount)}{" "}
+          ]}
+        >
+          {Math.min(99, notificationCount)}{' '}
           {/* Limiting displayed count to 99 */}
         </Text>
       </View>
@@ -50,9 +53,14 @@ const NotificationBell = ({
     <TouchableOpacity
       onPress={onPress}
       style={[styles.button, { backgroundColor }, style]}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    >
       <View style={styles.iconContainer}>
-        <MaterialIcons name={iconName} size={iconSize} color={iconColor} />
+        <MaterialIcons
+          name={iconName}
+          size={iconSize}
+          color={iconColor}
+        />
         {renderNotificationCount()}
       </View>
     </TouchableOpacity>
@@ -61,23 +69,23 @@ const NotificationBell = ({
 
 const styles = StyleSheet.create({
   button: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     minWidth: 48,
     minHeight: 48,
   },
   iconContainer: {
-    position: "relative",
+    position: 'relative',
   },
   notificationCount: {
-    position: "absolute",
-    justifyContent: "center",
-    alignItems: "center",
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 1,
   },
   countText: {
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
