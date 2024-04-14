@@ -12,7 +12,7 @@ import Button from './button';
 import CustomModal from './modal';
 import RunSheet from './runSheet';
 
-const BottomBar = () => {
+const BottomBar = ({ runData, setRunData }) => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [routeVisible, setRouteVisible] = useState(false);
@@ -43,7 +43,11 @@ const BottomBar = () => {
         style={{ width: '85%', height: '90%' }}
         buttonIcon=''
       >
-        <RunSheet onClose={() => setRouteVisible(false)} />
+        <RunSheet
+          onClose={() => setRouteVisible(false)}
+          runData={runData}
+          setRunData={setRunData}
+        />
       </CustomModal>
       {/* Help Modal */}
       <CustomModal
