@@ -13,7 +13,12 @@ import RunSheet from './runSheet';
 import ModalSettings from './modalSettings';
 import ModalNotifications from './modalNotifications';
 
-const BottomBar = ({ runData, setRunData }) => {
+const BottomBar = ({
+  runData,
+  setRunData,
+  notifications,
+  setNotifications,
+}) => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [routeVisible, setRouteVisible] = useState(false);
@@ -28,6 +33,8 @@ const BottomBar = ({ runData, setRunData }) => {
       <ModalNotifications
         isVisible={notificationsVisible}
         onClose={() => setNotificationsVisible(false)}
+        notifications={notifications}
+        setNotifications={setNotifications}
       />
       {/* Route Modal */}
       <CustomModal
@@ -56,7 +63,7 @@ const BottomBar = ({ runData, setRunData }) => {
         <NotificationBell
           backgroundColor='transparent'
           iconColor={Colours.textLevel3}
-          notificationCount={5}
+          notificationCount={notifications.length}
           iconSize={48}
           onPress={() => setNotificationsVisible(true)}
         />
