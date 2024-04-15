@@ -1,16 +1,35 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, FlatList } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+
+// Import Libs
+import { removeNotification } from '../lib/notification';
 
 // Import Styles
 import { Title1, Title3 } from '../styles/typography';
 import { Colours } from '../styles/colours';
 
 // Import Mock Data
+import { NotificationsMockData } from '../data/NotificationsMockData';
 
 // Import Componetns
 import CustomModal from './modal';
+import NotificationItem from './notificationItem';
+import Divider from './divider';
 
-const ModalNotifications = ({ isVisible, onClose, notifications = [] }) => {
+const ModalNotifications = ({
+  isVisible,
+  onClose,
+  setNotifications,
+  notifications = NotificationsMockData,
+}) => {
+  const renderNotification = ({ item }) => (
+    <NotificationItem
+      icon={item.icon}
+      label={item.message}
+      type={item.type}
+      onRemove={() => removeNotification(item.id, setNotifications)}
+    />
+  );
   return (
     <CustomModal
       isVisible={isVisible}
@@ -44,7 +63,14 @@ const ModalNotifications = ({ isVisible, onClose, notifications = [] }) => {
         ) : null}
       </View>
       {/* Page Content */}
-      <View style={styles.content}></View>
+      <FlatList
+        style={{ width: '100%' }}
+        contentContainerStyle={styles.content}
+        data={notifications}
+        renderItem={renderNotification}
+        keyExtractor={(item) => item.id}
+        ItemSeparatorComponent={<Divider />}
+      />
     </CustomModal>
   );
 };
