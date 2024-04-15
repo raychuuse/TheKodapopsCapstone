@@ -10,6 +10,7 @@ import BottomBar from '../../components/bottomBar';
 
 // Import Mock Data
 import { RunMockData } from '../../data/RunMockData';
+import { NotificationsMockData } from '../../data/NotificationsMockData';
 
 export default function Page() {
   const scrollX = React.useRef(new Animated.Value(0)).current;
@@ -17,6 +18,7 @@ export default function Page() {
 
   // Run Data for the Whole App
   const [runData, setRunData] = useState(RunMockData);
+  const [notifications, setNotifications] = useState(NotificationsMockData);
 
   return (
     <>
@@ -97,6 +99,8 @@ export default function Page() {
       <BottomBar
         runData={runData}
         setRunData={setRunData}
+        notifications={notifications}
+        setNotifications={setNotifications}
       />
     </>
   );
