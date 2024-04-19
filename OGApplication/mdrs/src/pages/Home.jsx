@@ -10,6 +10,31 @@ import { ErrorAlert } from "../components/Alerts";
 import {useAuth} from "../AuthProvider";
 
 export default function Home() {
+
+    /*useEffect(() => {
+        const newSocket = new WebSocket('ws://localhost:8080/test')
+
+        newSocket.onopen = () => {
+            console.info('Connection');
+        };
+
+        newSocket.onmessage = message => {
+            console.info('Received', message);
+        };
+
+        newSocket.onclose = () => {
+            console.info('Closed');
+        };
+
+        setInterval(() => {
+            newSocket.send('Testing a');
+        }, 5000);
+
+        return () => {
+            newSocket.close();
+        };
+    }, []);*/
+
     return (
         <main>
             <section className="hero">

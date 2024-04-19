@@ -22,6 +22,9 @@ import { LoginForm } from './components/Login';
 import useToken from './useToken';
 import AlertPopup from './utiljs/AlertPopup';
 import AuthRoute from "./pages/AuthRoute";
+import UserList from "./pages/User";
+import UserPage from "./pages/User";
+import UserView from "./pages/UserView";
 
 
 function setToken(userToken) {
@@ -52,6 +55,9 @@ export default function App() {
                 <Route path='/siding' element={<Siding />} />
                 <Route path='/bins' element={<BinAllocation />} />
                 <Route path='/log' element={<TransactionLog />} />
+                <Route path='/users' element={<UserPage />} />
+                <Route path='/users/:id' element={<UserView />} />
+                <Route path='/users/create' element={<UserView />} />
               </Route>
             </Routes>
         </AuthProvider>

@@ -10,7 +10,15 @@ function isValidId(id, res) {
   return true;
 }
 
+function validationErrorToError(validationError) {
+  let str = '';
+  for (const error of validationError.errors)
+    str += error.msg + '\n';
+  return {message: str.substring(0, str.length - 1)};
+}
+
 module.exports = {
   processQueryResult,
-  isValidId
+  isValidId,
+  validationErrorToError
 }

@@ -5,7 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import {ErrorAlert} from "./Alerts";
 import LoadingSpinner from "./LoadingSpinner";
-import loginUser from "../api/loginUser";
+import users, {login} from "../api/users";
 import {useAuth} from "../AuthProvider";
 
 
@@ -36,7 +36,16 @@ export function LoginForm() {
         e.preventDefault();
         setLoading(true);
         setError(null);
-        auth.loginAction({id: id, password: password});
+        login({id: id, password: password})
+            .then(response => {
+                setLoading(false);
+                auth.onLogin(response.user, response.token);
+            })
+            .catch(err => {
+                setLoading(false);
+                console.error(err);
+                setError(err);
+            });
     }
 
     return (

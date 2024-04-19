@@ -18,7 +18,19 @@ function standardiseData(data) {
     })
 }
 
+function clearState() {
+    window.history.replaceState({}, '');
+}
+
+function resetSuccessAlert(setSuccessFunction) {
+    setTimeout(() => {
+        setSuccessFunction(null);
+    }, 2500);
+}
+
 module.exports = {
     calculateDifference,
-    standardiseData
+    standardiseData,
+    clearState,
+    resetSuccessAlert
 }

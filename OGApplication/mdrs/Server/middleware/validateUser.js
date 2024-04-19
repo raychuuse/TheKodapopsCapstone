@@ -1,7 +1,9 @@
 const validateUserBody = (req, res, next) => {
     const id = req.body.id
     const password = req.body.password
-    // console.log(id)
+    const firstName = req.body.firstName;
+    const lastName = req.body.lastName;
+    const role = req.body.role;
     if(id === 'undefined' || password === 'undefined') {
         throw Error("An ID or a Password was not provided")
     }

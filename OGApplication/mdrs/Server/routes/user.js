@@ -1,97 +1,233 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
-var bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({ extended: false }));
+const {body, validationResult} = require('express-validator');
+
+const bodyParser = require('body-parser');
+router.use(bodyParser.urlencoded({extended: false}));
 router.use(bodyParser.json());
 
-var jwt = require('jsonwebtoken');
-var bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-const { validateUserBody } = require("../middleware/validateUser")
+const {validateUserBody} = require("../middleware/validateUser")
+const {processQueryResult, validationErrorToError} = require("../utils");
+const {isNumeric} = require("validator");
 
-router.post("/login", validateUserBody, (req, res) => {
-  // Used in creating hashed passwords for new users
-  // hash password, generate salt of length 8
-  var hashedPassword = bcrypt.hashSync(req.body.password, 8);
+const loginValidationRules = [
+    body('id').isInt({min: 1}).withMessage("Please provide valid user id"),
+    body('password').notEmpty().withMessage('Please provide your password')
+];
 
-  //id and password submitted
-  const id = req.body.id;
-  const password = req.body.password;
+router.post("/login", loginValidationRules, (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({errors: errors.array()});
+    }
+    const id = req.body.id;
+    const password = req.body.password;
 
-  const queryUsers = req.db.from("users").select("*").where("userID", "=", id);
+    req.db.raw(`SELECT *
+                FROM users
+                WHERE userID = ?`, [id])
+        .then(processQueryResult)
+        .then((response) => {
+            if (response.length === 0) {
+                return res.status(401).json({message: "No matching user ID and password"});
+            }
 
-  //checking db for matching user
-  queryUsers
-    .then((users) => {
-      //checking if any matching user ids found
-      if (users.length === 0) {
-        throw Error("User Not Found: Incorrect ID");
-      }
-      // console.log(users)
-      // console.log(users[0].password)
+            bcrypt.compare(password, response[0].password, (err, result) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+                }
 
-      //match passwords
-      // return bcrypt.compare(password, users[0].password)
-      if (!true) {
-        throw Error("Invalid Password")
-      }
+                if (!result) {
+                    return res.status(401).json({message: "No matching user ID and password"});
+                }
 
-      delete users[0].password;
+                const user = response[0];
 
-      const secretKey = "secret key"
-      const expires_in = 60 * 60 * 24
-      const exp = Date.now() + expires_in * 1000
-      const token = jwt.sign({ id, exp }, secretKey,);
-      res.status(200).json({ token: token, user: users[0] })
+                // Remove password from user object so that it is not sent to client.
+                delete user.password;
 
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(401).json({message: err.message});
+                const secretKey = "secret key"
+                const expires_in = 60 * 60 * 24
+                const exp = Date.now() + expires_in * 1000
+                const token = jwt.sign({id, exp}, secretKey,);
+                res.status(200).json({token: token, user: user})
+            });
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(401).json({message: err.message});
+        });
+});
+
+router.get('/:id', (req, res) => {
+    if (!req.params.id || !isNumeric(req.params.id))
+        return res.status(400).json({message: 'Please provide a valid user ID.'});
+
+    req.db.raw(`SELECT userID, firstName, lastName, userRole, active FROM users WHERE userID = ?`, [req.params.id])
+        .then(processQueryResult)
+        .then(rows => {
+            if (rows == null || rows.length !== 1)
+                return res.status(404).json({message: 'No user found with userID ' + req.params.id});
+            res.status(200).json(rows[0]);
+        })
+        .catch(err => {
+            res.status(500).json({message: 'An unknown error occurred. Please try again.'})
+        });
+});
+
+router.post('/set-active/:id/:active', (req, res) => {
+    if (!req.params.id || !isNumeric(req.params.id))
+        return res.status(400).json({message: 'Please provide a valid user ID.'});
+    if (req.params.active == null || !isNumeric(req.params.active) || (req.params.active !== '0' && req.params.active !== '1'))
+        return res.status(400).json({message: 'Please provide a valid active status.'});
+
+    req.db.raw(`UPDATE users SET active=? WHERE userID = ?`, [req.params.active, req.params.id])
+        .then(processQueryResult)
+        .then(result => {
+            if (result == null || result.affectedRows !== 1)
+                return res.status(404).json({message: 'No user found with userID ' + req.params.id});
+            res.sendStatus(204);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({message: 'An unknown error occurred. Please try again.'})
+        });
+});
+
+const createValidationRules = [
+    body('password').notEmpty().withMessage("Please provide a valid password"),
+    body('firstName').notEmpty().withMessage("Please provide your first name"),
+    body('lastName').notEmpty().withMessage("Please provide your last name"),
+    body('role').notEmpty().withMessage('Please provide a role')
+];
+
+router.post('/', createValidationRules, (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.error(errors);
+        return res.status(400).json(validationErrorToError(errors));
+    }
+
+    const {password, firstName, lastName, role} = req.body;
+    const selectedHarvester = role === 'Harvester' ? req.body.selectedHarvester : null;
+    console.info(selectedHarvester);
+    if (role === 'Harvester' && selectedHarvester == undefined) {
+        console.error("Need selected harvester");
+        return res.status(400).json({message: 'Please select the harvesting company this user works for'});
+    }
+
+    bcrypt.hash(password, 8, (err, hashPassword) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({message: 'An unknown error occurred, please try again.'});
+        }
+
+        req.db('users').insert({
+            firstName: firstName,
+            lastName: lastName,
+            userRole: role,
+            password: hashPassword,
+            harvesterID: selectedHarvester
+        })
+            .then(result => {
+                res.status(201).json({userID: result});
+            })
+            .catch(err => {
+                console.error(err);
+                res.status(500).json({message: 'An unknown error occurred, please try again.'})
+            })
     });
 });
 
-//Modify login routers for mobile users
-// and for the type of user logging
+router.post("/reset-password", (req, res) => {
 
-// reset-password
+    //include id and email
+    const id = req.body.id;
+    // data is sent in jwt... refer to andrew code
+    const email = req.body.email
 
-router.post("/reset-password", validateUserBody, (req, res) => {
+    const queryUsers = req.db.from("users").select("*").where("email", "=", email);
 
-  //include id and email
-  const id = req.body.id;
-  // data is sent in jwt... refer to andrew code
-  const email = req.body.email
+    //checking db for matching users with emails
+    queryUsers
+        .then((users) => {
+            //checking if any matching user ids found
+            if (users.length == 0) {
+                throw Error("Email address not found in system");
+            }
 
-  const queryUsers = req.db.from("users").select("*").where("email", "=", email);
+            // Consider adding another .then for added security (a check for multiple requests)
 
-  //checking db for matching users with emails
-  queryUsers
-    .then((users) => {
-      //checking if any matching user ids found
-      if (users.length == 0) {
-        throw Error("Email address not found in system");
-      }
 
-      // Consider adding another .then for added security (a check for multiple requests)
-      
-      
-      // add logic here for found email, hasn't been changed yet
-      const secretKey = "secret key"
-      const expires_in = 60 * 60 * 24
-      const exp = Date.now() + expires_in * 1000
-      const token = jwt.sign({ id, exp }, secretKey,);
-      res.status(200).send({ auth: true, token: token, id: id })
-    })
-    //Error Handling
-    .catch((err) => {
-      console.log(err);
-      res.json({ Error: true, Message: err.message });
-    });
+            // add logic here for found email, hasn't been changed yet
+            const secretKey = "secret key"
+            const expires_in = 60 * 60 * 24
+            const exp = Date.now() + expires_in * 1000
+            const token = jwt.sign({id, exp}, secretKey,);
+            res.status(200).send({auth: true, token: token, id: id})
+        })
+        .catch((err) => {
+            console.log(err);
+            res.json({Error: true, Message: err.message});
+        });
 });
 
-// going to pause on the gets in mind of the db, focusing on jwt and auth setup
+router.get('/', (req, res) => {
+    req.db.raw(`SELECT userID, firstName, lastName, userRole
+                FROM users`)
+        .then(processQueryResult)
+        .then(result => {
+            res.status(200).json(result);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+        });
+});
 
-// implement user/$userid/sidings and other user related gets
+const updateValidationRules = [
+    body('userID').notEmpty().isNumeric().withMessage("Please provide your userID"),
+    body('firstName').notEmpty().withMessage("Please provide your first name"),
+    body('lastName').notEmpty().withMessage("Please provide your last name"),
+    body('role').notEmpty().withMessage('Please provide a role')
+];
+
+router.put('/', updateValidationRules, (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({errors: errors.array()});
+    }
+
+    const {userID, firstName, lastName, role} = req.body;
+    const selectedHarvester = role === 'Harvester' ? req.body.selectedHarvester : null;
+    if (role === 'Harvester' && selectedHarvester == undefined) {
+        console.error("Need selected harvester");
+        return res.status(400).json({message: 'Please select the harvesting company this user works for'});
+    }
+
+    req.db.raw(`UPDATE users
+                SET firstName=?,
+                    lastName=?,
+                    userRole=?,
+                    harvesterID=?
+                WHERE userID = ?`, [firstName, lastName, role, selectedHarvester, userID])
+        .then(processQueryResult)
+        .then(result => {
+            if (result.affectedRows < 1) {
+                res.status(400).json({message: 'Provided userID did not match any users. Please try again.'});
+                return;
+            }
+            res.status(204).send();
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json(err);
+        });
+});
+
 module.exports = router;

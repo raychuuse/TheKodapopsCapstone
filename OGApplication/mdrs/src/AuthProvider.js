@@ -1,6 +1,6 @@
 import {createContext, useContext, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import loginUser from "./api/loginUser";
+import {login} from "./api/users";
 import Cookies from 'js-cookie';
 
 const AuthContext = createContext();
@@ -10,18 +10,12 @@ const AuthProvider = ({children}) => {
     const [token, setToken] = useState(Cookies.get('token'));
     const navigate = useNavigate();
 
-    const loginAction = (data) => {
-        loginUser(data)
-            .then(responseData => {
-                setUser(responseData.user);
-                setToken(responseData.token);
-                Cookies.set('token', token);
-                Cookies.set('user', user);
-                navigate("/");
-            })
-            .catch(err => {
-                console.error(err);
-            });
+    const onLogin = (user, token) => {
+        setUser(user);
+        setToken(token);
+        Cookies.set('token', token);
+        Cookies.set('user', user);
+        navigate("/");
     };
 
     const logOut = () => {
@@ -33,7 +27,7 @@ const AuthProvider = ({children}) => {
     };
 
     return (
-        <AuthContext.Provider value={{token, user, loginAction, logOut}}>
+        <AuthContext.Provider value={{token, user, onLogin, logOut}}>
             {children}
         </AuthContext.Provider>
     );

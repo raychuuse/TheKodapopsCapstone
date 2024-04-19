@@ -1,8 +1,13 @@
 const createError = require('http-errors');
+const http = require('http');
 const express = require("express");
 const cors = require("cors");
 const app = express();
 const router = express.Router();
+const WebSocket = require('ws');
+
+const server = http.createServer(app);
+const wss = new WebSocket.Server({server});
 
 // Websocket integration
 // i.e.
@@ -75,6 +80,17 @@ app.use(function(err, req, res, next) {
 
 });
 
+wss.on('connection', (ws, req) => {
+  const url = req.url;
+  console.info(url);
 
+  if (url === '') {
+    ws.on('message', message => {
+      console.info(message);
+      ws.send('Received: ' + message);
+    });
+  }
 
-app.listen(8080, () => console.log("API runs on http:localhost:8080/login"));
+});
+
+server.listen(8080, () => console.log("API runs on http:localhost:8080"));

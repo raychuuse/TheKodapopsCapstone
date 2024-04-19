@@ -7,7 +7,7 @@ import 'ag-grid-community/styles/ag-theme-balham.css'; // Optional theme CSS
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Table = ({ columns, data }) => {
+const Table = ({ columns, data, onRowClicked }) => {
     const gridRef = useRef();
     const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
     const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
@@ -53,6 +53,7 @@ const Table = ({ columns, data }) => {
                       paginationPageSize={20}
                       domLayout={'autoHeight'}
                       onGridReady={onGridReady}
+                      onRowClicked={params => onRowClicked != null ? onRowClicked(params) : null}
                     ></AgGridReact>
                   </div>
                 </div>

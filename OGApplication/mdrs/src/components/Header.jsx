@@ -16,8 +16,6 @@ const Header = () => {
   if (auth.token == null)
     return;
 
-  const userId = 1;
-
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className='container-fluid'>
@@ -64,6 +62,11 @@ const Header = () => {
             <li className="nav-item">
               <a className="nav-link" href="/log">
                 Transaction Log
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/users">
+                Users
               </a>
             </li>
           </ul>
