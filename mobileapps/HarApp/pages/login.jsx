@@ -1,12 +1,7 @@
 import { useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
 import { Link } from "expo-router";
+import * as Haptics from "expo-haptics";
 
 // Import Components
 import CustomModal from "../components/modal";
@@ -21,16 +16,11 @@ const LogInPage = () => {
   const [modalVisible, setModalVisible] = useState(false);
   return (
     <View style={styles.page}>
-      <CustomModal
-        isVisible={modalVisible}
-        onClose={() => setModalVisible(false)}>
+      <CustomModal isVisible={modalVisible} onClose={() => setModalVisible(false)}>
         <View style={{ width: "100%", gap: 16 }}>
           <View style={{ marginBottom: 32, gap: 8 }}>
             <Title1>Reset Your Password</Title1>
-            <Subhead>
-              Enter the email address associated with your account, and we'll
-              send you a link to reset your password.
-            </Subhead>
+            <Subhead>Enter the email address associated with your account, and we'll send you a link to reset your password.</Subhead>
           </View>
           <TextInput
             style={[styles.input, { backgroundColor: "rgb(230,230,230)" }]}
@@ -59,23 +49,14 @@ const LogInPage = () => {
           onChange={setEmail}
           value={email}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          clearButtonMode="always"
-          value={password}
-          onChange={setPassword}
-        />
+        <TextInput style={styles.input} placeholder="Password" secureTextEntry clearButtonMode="always" value={password} onChange={setPassword} />
         <View style={styles.button_container}>
           <Link href="/dashboard/setup" asChild>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity onPress={() => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)} style={styles.button}>
               <Text style={styles.button_text}>Sign in</Text>
             </TouchableOpacity>
           </Link>
-          <TouchableOpacity
-            style={styles.link}
-            onPress={() => setModalVisible(true)}>
+          <TouchableOpacity style={styles.link} onPress={() => setModalVisible(true)}>
             <Text style={styles.link_text}>Forgot your password?</Text>
           </TouchableOpacity>
         </View>

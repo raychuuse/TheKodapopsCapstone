@@ -42,8 +42,11 @@ export const Caption1 = ({ children, style }) => <Text style={[styles.caption1, 
 
 export const Caption2 = ({ children, style }) => <Text style={[styles.caption2, style]}>{children}</Text>;
 
+export const Strong = ({ children, style }) => <Text style={[styles.strong, style]}>{children}</Text>;
+
 // Styles
 export const styles = StyleSheet.create({
+  strong: { fontWeight: "bold" },
   h1: {
     fontSize: 32,
     fontWeight: "bold",

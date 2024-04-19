@@ -1,82 +1,90 @@
-import { Slot } from "expo-router";
-import { View, StyleSheet } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Slot } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import Components
-import Button from "../../components/button";
-import NotificationBell from "../../components/notificationBell";
-import CustomModal from "../../components/modal";
+import ModalSettings from '../../components/modalSettings';
+import ModalNotifications from '../../components/modalNotification';
+import ModalTutorial from '../../components/modalTutorial';
+import BottomBar from '../../components/bottomBar';
 
-// Import Style Components
-import { Title1, Subhead } from "../../components/typography";
+// Mock Data
+const notificationsData = [
+  {
+    id: '1',
+    type: 'important',
+    title: 'Locomotive ETA',
+    message: 'Locomotive #1234 ETA to pickup point is 15 minutes.',
+    timestamp: '2024-04-08 10:00',
+    icon: 'train',
+  },
+  {
+    id: '2',
+    type: 'default',
+    title: 'Bin Dropped Off',
+    message:
+      'Bin #5678 has been successfully dropped off at the collection point.',
+    timestamp: '2024-04-08 09:45',
+    icon: 'tray-arrow-down',
+  },
+  {
+    id: '3',
+    type: 'default',
+    title: 'Bins Collected',
+    message: 'Bins #5678, #5679 have been collected by Locomotive #1234.',
+    timestamp: '2024-04-08 11:30',
+    icon: 'tray-arrow-up',
+  },
+  {
+    id: '4',
+    type: 'danger',
+    title: 'Error Notification',
+    message: 'Error with Bin #5680: Weight exceeds maximum limit.',
+    timestamp: '2024-04-08 12:15',
+    icon: 'alert-box-outline',
+  },
+  // More notifications as needed...
+];
 
 const Layout = () => {
   const [settingsVisable, setSettingsVisable] = useState(false);
   const [notificationVisable, setNotificationVisable] = useState(false);
+  const [tutorialVisable, setTutorialVisable] = useState(false);
+
+  const [notifications, setNotifications] = useState(notificationsData);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       {/* SettingsModals */}
-      <CustomModal
-        isVisible={settingsVisable}
-        onClose={() => setSettingsVisable(false)}
-        buttonIcon="check-circle-outline">
-        <View style={{ width: "100%", height: "70%", gap: 16 }}>
-          <View style={{ marginBottom: 32, gap: 8 }}>
-            <Title1>Drop-off Consignment Settings</Title1>
-            <Subhead>
-              Configure your consignment details for where you will be dropping off your loads. Ensure accurate settings
-              for smooth operations at the rail siding bins.
-            </Subhead>
-          </View>
-        </View>
-      </CustomModal>
+      <ModalSettings
+        isVisable={settingsVisable}
+        setIsVisable={setSettingsVisable}
+      />
       {/* Notification Modal */}
-      <CustomModal isVisible={notificationVisable} onClose={() => setNotificationVisable(false)}>
-        <View style={{ width: "100%", height: "70%", gap: 16 }}>
-          <View style={{ marginBottom: 32, gap: 8 }}>
-            <Title1>Recent Notifications</Title1>
-            <Subhead>
-              Here's a list of your most recent notifications. Stay up-to-date with the latest alerts and updates.
-            </Subhead>
-          </View>
-        </View>
-      </CustomModal>
+      <ModalNotifications
+        isVisable={notificationVisable}
+        setIsVisable={setNotificationVisable}
+        notifications={notifications}
+        setNotifications={setNotifications}
+      />
+      {/* Help Modal */}
+      <ModalTutorial
+        isVisable={tutorialVisable}
+        setIsVisable={setTutorialVisable}
+      />
       {/* Page */}
       <Slot />
       {/* Navigation */}
-      <View style={styles.nav}>
-        <Button
-          iconName="settings"
-          backgroundColor="transparent"
-          iconSize={48}
-          iconColor="#fff"
-          onPress={() => setSettingsVisable(true)}
-        />
-        <NotificationBell
-          backgroundColor="transparent"
-          iconSize={48}
-          notificationCount={0}
-          onPress={() => setNotificationVisable(true)}
-        />
-      </View>
-      <StatusBar style="light" />
+      <BottomBar
+        notifications={notifications}
+        setNotificationVisable={setNotificationVisable}
+        setSettingsVisable={setSettingsVisable}
+        setTutorialVisable={setTutorialVisable}
+      />
+      <StatusBar style='light' />
     </GestureHandlerRootView>
   );
 };
-
-const styles = StyleSheet.create({
-  nav: {
-    width: "100%",
-
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 16,
-    paddingLeft: 16,
-    paddingRight: 32,
-  },
-});
 
 export default Layout;

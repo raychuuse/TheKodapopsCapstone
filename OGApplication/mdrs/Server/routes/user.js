@@ -27,8 +27,9 @@ router.post("/login", loginValidationRules, (req, res) => {
     const id = req.body.id;
     const password = req.body.password;
 
-    req.db.raw(`SELECT *
-                FROM users
+    req.db.raw(`SELECT u.*, h.harvesterName
+                FROM users u
+                LEFT JOIN harvester h ON h.harvesterID = u.harvesterID
                 WHERE userID = ?`, [id])
         .then(processQueryResult)
         .then((response) => {
@@ -68,7 +69,10 @@ router.get('/:id', (req, res) => {
     if (!req.params.id || !isNumeric(req.params.id))
         return res.status(400).json({message: 'Please provide a valid user ID.'});
 
-    req.db.raw(`SELECT userID, firstName, lastName, userRole, active FROM users WHERE userID = ?`, [req.params.id])
+    req.db.raw(`SELECT u.*, h.harvesterName
+        FROM users u 
+        LEFT JOIN harvester h ON h.harvesterID = u.harvesterID
+        WHERE userID = ?`, [req.params.id])
         .then(processQueryResult)
         .then(rows => {
             if (rows == null || rows.length !== 1)
@@ -178,8 +182,9 @@ router.post("/reset-password", (req, res) => {
 });
 
 router.get('/', (req, res) => {
-    req.db.raw(`SELECT userID, firstName, lastName, userRole
-                FROM users`)
+    req.db.raw(`SELECT u.*, h.harvesterName
+                FROM users u
+                LEFT JOIN harvester h ON h.harvesterID = u.harvesterID`)
         .then(processQueryResult)
         .then(result => {
             res.status(200).json(result);

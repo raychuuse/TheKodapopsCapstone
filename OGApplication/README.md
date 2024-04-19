@@ -1,4 +1,4 @@
-# Note from TheKodaPops Dev Chris
+# Note from The Kodapops
 Please See the original ReadMe Below. Original Appication has been added for future use.
 
 # Cane-Consignment-Application

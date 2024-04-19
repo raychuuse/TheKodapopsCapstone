@@ -39,12 +39,20 @@ Before starting, ensure you have installed:
    npm install
    ```
 
-4. **Start the Development Server**
+4. **Install Dependencies**
+
+   Install the required dependencies in expo:
+
+   ```sh
+   npx expo install
+   ```
+
+5. **Start the Development Server**
 
    Launch the Expo development server:
 
    ```sh
-   expo start
+   npm run start
    ```
 
    This command opens the Expo developer tools in your web browser.
@@ -66,15 +74,15 @@ For a final build:
 1. **iOS Build**
 
    ```sh
-   expo build:ios
+   npx expo build:ios
    ```
 
-   An Apple Developer account is required.
+   An Apple Developer account and mac is required
 
 2. **Android Build**
 
    ```sh
-   expo build:android
+   npx expo build:android
    ```
 
 Choose `.apk` for Android package or `.aab` for an Android App Bundle.

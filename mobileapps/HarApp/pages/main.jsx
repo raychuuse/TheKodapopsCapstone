@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { View, StyleSheet, TouchableOpacity, FlatList, Text } from "react-native";
+import { BlurView } from "expo-blur";
+import * as Haptics from "expo-haptics";
 
 // Import Components
 import GreetingMessage from "../components/greetingMessage";
@@ -15,7 +17,7 @@ import { FinishedAlert } from "../lib/alerts";
 // Import Styling Components
 import { LargeTitle, Title1, Headline, Title3 } from "../components/typography";
 import { Colours } from "../components/colours";
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const MainPage = () => {
   // Test Bin data
@@ -36,14 +38,17 @@ const MainPage = () => {
   ];
 
   const [addBinVisable, setAddBinVisable] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+
+  const toggleLock = () => {
+    setIsLocked(!isLocked);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
   return (
     <View style={styles.body}>
       {/* Add Bin Modal */}
-      <CustomModal
-        isVisible={addBinVisable}
-        onClose={() => setAddBinVisable(false)}
-        buttonIcon="close-circle-outline"
-        style={{ height: "60%", marginTop: 56 }}>
+      <CustomModal isVisible={addBinVisable} onClose={() => setAddBinVisable(false)} buttonIcon="close-circle-outline" style={{ height: "60%", marginTop: 56 }}>
         <AddBinCamera modalCloser={() => setAddBinVisable(false)} />
       </CustomModal>
       {/* Page Headings */}
@@ -58,7 +63,7 @@ const MainPage = () => {
         {/* Selected Siding */}
         <SelectedSiding sidingName="Old Creek Rd" />
         {/* Bin List */}
-        <View style={{ flex: 1, position: "relative" }}>
+        <View style={{ flex: 1, position: "relative", borderRadius: 16, overflow: "hidden" }}>
           {/* Bin List Header */}
           <View
             style={{
@@ -73,33 +78,56 @@ const MainPage = () => {
               backgroundColor: "rgb(235, 235, 235)",
               zIndex: 100,
               borderRadius: 12,
+              zIndex: 3,
             }}>
             <View style={{ flex: 1, flexDirection: "row", gap: 16, alignItems: "center" }}>
               <Title3>{BinData.length}</Title3>
               <Headline>{BinData.length > 1 ? "Bins" : "Bin"} at Siding</Headline>
             </View>
             <TouchableOpacity
-              onPress={() => alert("Locked")}
-              style={{ backgroundColor: "#4F12FA42", padding: 8, borderRadius: 8 }}>
-              <MaterialCommunityIcons name={"lock-open-outline"} size={24} />
+              onLongPress={() => toggleLock()}
+              style={{
+                backgroundColor: "#4F12FA42",
+                padding: 8,
+                borderRadius: 8,
+                alignItems: "center",
+                flexDirection: "row",
+              }}>
+              <MaterialCommunityIcons name={isLocked ? "lock" : "lock-open-outline"} size={24} />
+              {isLocked ? <Text>Locked</Text> : null}
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setAddBinVisable(true)}
-              style={{ backgroundColor: "#4F12FA42", padding: 8, borderRadius: 8 }}>
-              <MaterialCommunityIcons name={"plus-circle-outline"} size={24} />
-            </TouchableOpacity>
+            {isLocked ? null : (
+              <TouchableOpacity
+                onPress={() => {
+                  setAddBinVisable(true);
+                  Haptics.selectionAsync();
+                }}
+                style={{ backgroundColor: "#4F12FA42", padding: 8, borderRadius: 8 }}>
+                <MaterialCommunityIcons name={"plus-circle-outline"} size={24} />
+              </TouchableOpacity>
+            )}
           </View>
+          {/* Bin List Lock */}
+          {isLocked ? (
+            <BlurView
+              intensity={10}
+              style={{
+                position: "absolute",
+                backgroundColor: Colours.bgOverlay,
+                zIndex: 1,
+                width: "100%",
+                height: "100%",
+                alignItems: "center",
+                justifyContent: "center",
+              }}>
+              <MaterialCommunityIcons name="lock" size={34} color={Colours.bgLevel6} />
+              <LargeTitle style={{ color: Colours.bgLevel6 }}>Locked</LargeTitle>
+            </BlurView>
+          ) : null}
           {/* Bin List Body */}
           <FlatList
             data={BinData}
-            renderItem={({ item }) => (
-              <SwipeableBinItem
-                checked={item.isFull}
-                binNumber={item.binNum}
-                style={styles.binList}
-                burnt={item.isBurnt}
-              />
-            )}
+            renderItem={({ item }) => <SwipeableBinItem checked={item.isFull} binNumber={item.binNum} style={styles.binList} burnt={item.isBurnt} />}
             style={styles.binList}
             ItemSeparatorComponent={<View style={styles.binListSeparator} />}
             ListFooterComponent={<View style={{ marginVertical: 40 }} />}
@@ -107,7 +135,7 @@ const MainPage = () => {
           />
         </View>
       </View>
-      <Button title="Finished at Siding" style={StyleSheet.create({ width: "100%" })} onPress={FinishedAlert} />
+      <Button title="Done" style={StyleSheet.create({ width: "100%" })} onPress={FinishedAlert} />
     </View>
   );
 };
@@ -120,7 +148,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginLeft: "auto",
     marginRight: "auto",
-    opacity: "0.3",
+    opacity: 0.3,
   },
   binList: {
     position: "relative",

@@ -1,74 +1,107 @@
-import { Text, View } from "react-native";
-import { useEffect, useState } from "react";
-
-// Styles
-import { LargeTitle, Title2, Title1 } from "../../styles/typography";
+import { View, Animated, Text } from 'react-native';
+import React, { useState } from 'react';
 
 // Components
-import Container from "../../components/container";
-import GreetingMessage from "../../lib/greetingMessage";
-import Button from "../../components/button";
+import StatusIndicator from '../../components/statusIndicator';
+import UserGreeting from '../../components/userGreeting';
+import SelectedSiddingStats from '../../components/selectedSidingStats';
+import SidingCard from '../../components/sidingCard';
+import BottomBar from '../../components/bottomBar';
 
-const Clock = () => {
-  const [time, setTime] = useState(
-    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })
-  );
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const time = new Date();
-      setTime(time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true })); // Update the time every minute
-    }, 60000); // 60000 milliseconds = 1 minute
-
-    return () => clearInterval(intervalId); // Clear the interval on component unmount
-  }, []);
-
-  return `${time}`;
-};
+// Import Mock Data
+import { RunMockData } from '../../data/RunMockData';
+import { NotificationsMockData } from '../../data/NotificationsMockData';
 
 export default function Page() {
+  const scrollX = React.useRef(new Animated.Value(0)).current;
+  const [sidingCarouselWidth, setSidingCarouselWidth] = useState(0);
+
+  // Run Data for the Whole App
+  const [runData, setRunData] = useState(RunMockData);
+  const [notifications, setNotifications] = useState(NotificationsMockData);
+
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          borderWidth: 1,
-          borderColor: "red",
-          borderStyle: "solid",
-          flexDirection: "row",
-          paddingHorizontal: 16,
-          gap: 32,
-        }}>
-        <Container>
-          {/* Connection Status */}
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-            <Button
-              backgroundColor="transparent"
-              iconName="sensors"
-              iconSize={32}
-              style={{ paddingVertical: 0, paddingHorizontal: 0 }}
+    <>
+      <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            paddingHorizontal: 32,
+            gap: 16,
+            justifyContent: 'center',
+          }}
+        >
+          <StatusIndicator />
+          <UserGreeting />
+          <SelectedSiddingStats />
+        </View>
+        <View
+          style={{
+            flex: 1,
+            paddingHorizontal: 128,
+            paddingVertical: 32,
+            gap: 32,
+          }}
+        >
+          <View
+            onLayout={(event) =>
+              setSidingCarouselWidth(event.nativeEvent.layout.width)
+            }
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(255,255,255,0.6)',
+              borderRadius: 16,
+              flexDirection: 'row',
+            }}
+          >
+            <Animated.FlatList
+              contentContainerStyle={{
+                alignItems: 'center',
+                paddingVertical: 10,
+                gap: 16,
+              }}
+              snapToInterval={85}
+              decelerationRate={0}
+              scrollEventThrottle={16}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                { useNativeDriver: true }
+              )}
+              bounces={false}
+              horizontal={true}
+              keyExtractor={(item) => item.id}
+              data={runData.sidings}
+              renderItem={({ item, index }) => (
+                <SidingCard
+                  isCompleted={item.isCompleted}
+                  isSelected={item.isSelected}
+                  name={item.name}
+                  drop={item.binsDrop.length}
+                  collect={item.binsCollect.length}
+                  index={index}
+                  scrollX={scrollX}
+                  containerWidth={sidingCarouselWidth}
+                  listLength={runData.sidings.length}
+                />
+              )}
             />
-            <Title1>Loco #12</Title1>
           </View>
-          {/* Clock */}
-          <View>
-            <Title2 style={{ textAlign: "center" }}>
-              <Clock />
-            </Title2>
-          </View>
-        </Container>
-        <Container>
-          <View style={{ alignItems: "center" }}>
-            <Title1>
-              <GreetingMessage />
-            </Title1>
-            <Title2>John Smith</Title2>
-          </View>
-        </Container>
-        <Container marginLeft={"auto"}></Container>
+          <View
+            style={{
+              minHeight: 56,
+              backgroundColor: 'rgba(255,255,255,0.6)',
+              borderRadius: 16,
+            }}
+          ></View>
+        </View>
       </View>
-      <View style={{ flex: 1, borderWidth: 1, borderColor: "red", borderStyle: "solid" }}>
-        <LargeTitle>The Dashboard Page</LargeTitle>
-      </View>
-    </View>
+      {/* Nav Bar */}
+      <BottomBar
+        runData={runData}
+        setRunData={setRunData}
+        notifications={notifications}
+        setNotifications={setNotifications}
+      />
+    </>
   );
 }
