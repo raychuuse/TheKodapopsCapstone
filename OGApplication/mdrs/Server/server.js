@@ -25,6 +25,7 @@ const sidingRouter = require("./routes/siding");
 const harvesterRouter = require("./routes/harvester");
 const transactionRouter = require("./routes/transactionLog");
 const dashboardRouter = require("./routes/dashboard");
+const runsRouter = require('./routes/runs');
 
 //database config
 const options = require("./knex.js");
@@ -46,6 +47,7 @@ app.use("/locos?", locoRouter);
 app.use("/sidings?", sidingRouter);
 app.use("/harvesters?", harvesterRouter);
 app.use("/dashboard",dashboardRouter);
+app.use("/runs", runsRouter);
 app.use("/user", userRouter);
 
 //test db connection

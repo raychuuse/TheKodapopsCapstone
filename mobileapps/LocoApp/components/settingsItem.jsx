@@ -64,7 +64,7 @@ const SettingsItem = ({
           style={[Type.styles.body, styles.body]}
           numberOfLines={1}
         >
-          {options.find((item) => item.id == selectedOption)?.label}
+          {options.find((item) => item.id == selectedOption)?.label ?? 'Please Select an Option'}
         </Text>
 
         <Button
