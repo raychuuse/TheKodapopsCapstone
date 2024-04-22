@@ -1,23 +1,47 @@
-import React from "react";
-import { Modal, StyleSheet, TouchableOpacity } from "react-native";
-import { BlurView } from "expo-blur";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React from 'react';
+import { Modal, StyleSheet, TouchableOpacity } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Colours } from '../styles/colours';
 
-const CustomModal = ({ isVisible, onClose, children, buttonIcon = "close-circle-outline", style }) => {
+const CustomModal = ({
+  isVisible,
+  onClose,
+  children,
+  buttonIcon = 'close-circle-outline',
+  style,
+}) => {
   return (
-    <Modal transparent={true} visible={isVisible} animationType="fade" onRequestClose={onClose}>
+    <Modal
+      transparent={true}
+      visible={isVisible}
+      animationType='fade'
+      onRequestClose={onClose}
+    >
       <TouchableOpacity
         style={styles.container}
         activeOpacity={1}
         onPressOut={onClose} // When the user taps outside the modal content, it will close
       >
-        <BlurView intensity={100} style={styles.blurView} tint="dark">
+        <BlurView
+          intensity={100}
+          style={styles.blurView}
+          tint='dark'
+        >
           <TouchableOpacity
             activeOpacity={1} // Prevents the press from triggering the BlurView's onPressOut
-            style={[styles.modalContent, style]}>
+            style={[styles.modalContent, style]}
+          >
             {children}
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <MaterialCommunityIcons name={buttonIcon} size={56} color="white" />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={onClose}
+            >
+              <MaterialCommunityIcons
+                name={buttonIcon}
+                size={56}
+                color='white'
+              />
             </TouchableOpacity>
           </TouchableOpacity>
         </BlurView>
@@ -29,22 +53,22 @@ const CustomModal = ({ isVisible, onClose, children, buttonIcon = "close-circle-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   blurView: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContent: {
-    width: "80%",
-    backgroundColor: "white",
+    width: '80%',
+    backgroundColor: Colours.bgModal,
     borderRadius: 32,
     padding: 20,
-    alignItems: "center",
-    shadowColor: "#000",
+    alignItems: 'center',
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -52,10 +76,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    position: "relative",
+    position: 'relative',
   },
   closeButton: {
-    position: "absolute",
+    position: 'absolute',
     bottom: -76,
     left: 0,
   },
