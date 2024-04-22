@@ -1,6 +1,5 @@
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 //Styles
 import { Title1 } from '../styles/typography';
@@ -11,7 +10,7 @@ import RunSheetAccordion from './runSheetAccordion';
 
 const RunSheet = ({ runData, setRunData, onClose }) => {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <>
       {/* Header */}
       <View style={Styles.HeaderContainer}>
         <MaterialIcons
@@ -37,7 +36,7 @@ const RunSheet = ({ runData, setRunData, onClose }) => {
         runData={runData}
         setRunData={setRunData}
       />
-    </GestureHandlerRootView>
+    </>
   );
 };
 
