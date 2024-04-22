@@ -34,10 +34,85 @@ export const RunMockData = {
           isFull: true,
           isBurnt: false,
         },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
       ],
       binsCollect: [
         {
           binNumber: 3345,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2234,
           isFull: true,
           isBurnt: false,
         },
