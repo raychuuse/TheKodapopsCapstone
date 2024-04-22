@@ -7,6 +7,7 @@ import UserGreeting from '../../components/userGreeting';
 import SelectedSiddingStats from '../../components/selectedSidingStats';
 import SidingCard from '../../components/sidingCard';
 import BottomBar from '../../components/bottomBar';
+import ModalSidingDetails from '../../components/modalSidingDetails';
 
 // Import Mock Data
 import { RunMockData } from '../../data/RunMockData';
@@ -20,8 +21,20 @@ export default function Page() {
   const [runData, setRunData] = useState(RunMockData);
   const [notifications, setNotifications] = useState(NotificationsMockData);
 
+  // Modal State
+  const [modalSidingVisible, setModalSidingVisible] = useState(false);
+  const [selectedSidingID, setSelectedSidingID] = useState(3);
+  const [sidingToViewID, setSidingToViewID] = useState(2);
+
   return (
     <>
+      <ModalSidingDetails
+        isVisible={modalSidingVisible}
+        onClose={() => setModalSidingVisible(!modalSidingVisible)}
+        setRunData={setRunData}
+        runData={runData}
+        sidingToViewID={sidingToViewID}
+      />
       <View style={{ flex: 1 }}>
         <View
           style={{
@@ -33,7 +46,14 @@ export default function Page() {
         >
           <StatusIndicator />
           <UserGreeting />
-          <SelectedSiddingStats />
+          <SelectedSiddingStats
+            runData={runData}
+            selectedSidingID={selectedSidingID}
+            openSidingDetailsModal={() => {
+              setSidingToViewID(selectedSidingID);
+              setModalSidingVisible(true);
+            }}
+          />
         </View>
         <View
           style={{
@@ -82,6 +102,10 @@ export default function Page() {
                   scrollX={scrollX}
                   containerWidth={sidingCarouselWidth}
                   listLength={runData.sidings.length}
+                  onPress={() => {
+                    setSidingToViewID(item.id);
+                    setModalSidingVisible(true);
+                  }}
                 />
               )}
             />
