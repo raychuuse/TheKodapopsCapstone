@@ -1,10 +1,12 @@
 import { View, FlatList } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import Styles
 import { Colours } from '../styles/colours';
 
 // Import Components
 import SwipeableBinItem from './swipeableBinItem';
+import { Title2 } from '../styles/typography';
 
 const BinList = ({ BinData, setRunData, runData, sidingId, binListName }) => {
   const RenderItem = ({ item }) => (
@@ -32,20 +34,59 @@ const BinList = ({ BinData, setRunData, runData, sidingId, binListName }) => {
   );
 
   return (
-    <FlatList
-      data={BinData}
-      renderItem={RenderItem}
-      style={{
-        flex: 1,
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        borderRadius: 16,
-        backgroundColor: Colours.bgOverlay,
-      }}
-      ItemSeparatorComponent={BinListSeparator}
-      ListFooterComponent={<View style={{ marginVertical: 40 }} />}
-      showsVerticalScrollIndicator={false}
-    />
+    <GestureHandlerRootView
+      style={{ flex: 1, width: '100%', position: 'relative' }}
+    >
+      {/* List Header */}
+      <View
+        style={[
+          {
+            height: 56,
+            width: '100%',
+            position: 'absolute',
+            zIndex: 1,
+            borderRadius: 10,
+            flexDirection: 'row',
+            gap: 8,
+            alignItems: 'center',
+            paddingHorizontal: 8,
+          },
+          runData.sidings.find((item) => item.id === sidingId).isCompleted
+            ? { backgroundColor: Colours.spComplete }
+            : runData.sidings.find((item) => item.id === sidingId).isSelected
+            ? { backgroundColor: Colours.spSelected }
+            : { backgroundColor: Colours.spPending },
+        ]}
+      >
+        <Title2>
+          {binListName == 'binsDrop'
+            ? 'Drop Off:'
+            : binListName == 'binsCollect'
+            ? 'Collect:'
+            : null}
+        </Title2>
+        <Title2>{BinData.length}</Title2>
+        <Title2>{BinData.length > 1 ? 'Bins' : 'Bin'} at Siding</Title2>
+      </View>
+      {/* Bin List */}
+      <FlatList
+        data={BinData}
+        style={{
+          width: '100%',
+          backgroundColor: Colours.bgOverlay,
+          borderRadius: 10,
+          height: '100%',
+          padding: 8,
+          marginTop: 16,
+        }}
+        renderItem={RenderItem}
+        ItemSeparatorComponent={BinListSeparator}
+        ListHeaderComponent={<View style={{ marginTop: 40 }} />}
+        ListFooterComponent={<View style={{ marginTop: 18 }} />}
+        nestedScrollEnabled
+        showsVerticalScrollIndicator={false}
+      />
+    </GestureHandlerRootView>
   );
 };
 
