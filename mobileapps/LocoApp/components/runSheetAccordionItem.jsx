@@ -29,7 +29,7 @@ if (
 
 const window = Dimensions.get('window');
 // 30% of the window height, with a minimum of 150 units
-const calculatedHeight = Math.max(window.height * 0.3, 150);
+const calculatedHeight = Math.min(window.height * 0.3, 300);
 
 const RunSheetAccordionItem = ({
   sidingData = RunMockData.sidings[0],
@@ -49,6 +49,7 @@ const RunSheetAccordionItem = ({
     }).start();
 
     Animated.timing(animatedHeight, {
+      // toValue: isExpanded ? calculatedHeight : 0,
       toValue: isExpanded ? calculatedHeight : 0,
       duration: 300,
       useNativeDriver: false,
@@ -129,32 +130,32 @@ const RunSheetAccordionItem = ({
       </TouchableOpacity>
 
       {/* Accordion Body */}
-      <Animated.View style={{ height: animatedHeight, overflow: 'hidden' }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            width: '100%',
-            gap: 16,
-            paddingHorizontal: 8,
-          }}
-        >
-          {/* Drop Bin List */}
-          <BinList
-            BinData={sidingData.binsDrop}
-            binListName='binsDrop'
-            sidingId={sidingData.id}
-            runData={runData}
-            setRunData={setRunData}
-          />
-          {/* Collect Bin List */}
-          <BinList
-            BinData={sidingData.binsCollect}
-            binListName='binsCollect'
-            sidingId={sidingData.id}
-            runData={runData}
-            setRunData={setRunData}
-          />
-        </View>
+      <Animated.View
+        style={{
+          height: animatedHeight,
+          overflow: 'hidden',
+          flexDirection: 'row',
+          width: '100%',
+          gap: 16,
+          paddingHorizontal: 8,
+        }}
+      >
+        {/* Drop Bin List */}
+        <BinList
+          BinData={sidingData.binsDrop}
+          binListName='binsDrop'
+          sidingId={sidingData.id}
+          runData={runData}
+          setRunData={setRunData}
+        />
+        {/* Collect Bin List */}
+        <BinList
+          BinData={sidingData.binsCollect}
+          binListName='binsCollect'
+          sidingId={sidingData.id}
+          runData={runData}
+          setRunData={setRunData}
+        />
       </Animated.View>
     </View>
   );
