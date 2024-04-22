@@ -2,13 +2,18 @@
 export const Colours = {
   spSelectedText: '#0F145B',
   spSelected: '#49BDF2',
+  spSelectedBGText: '#2B5876',
+  spSelectedBG: '#B3E3F7',
   spCompleteText: '#0B4618',
   spComplete: '#6EF130',
+  spCompleteBGText: '#2A6026',
+  spCompleteBG: '#C4F5A9',
   spPendingText: '#404040',
   spPending: '#CACACA',
   bgLevel3: 'rgba(255, 255, 255, 0.3)', // 30% opacity
   bgLevel5: 'rgba(255, 255, 255, 0.5)', // 50% opacity
   bgLevel6: 'rgba(235, 235, 235, 0.8)', // 80% opacity
+  bgModal: 'rgb(235, 235, 235)',
   binItemBg: 'rgb(150, 150, 150)',
   binItemGreenText: '#FFFFFF',
   binItemGreen: '#4CAF50',
