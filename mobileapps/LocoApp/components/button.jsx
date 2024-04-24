@@ -1,17 +1,17 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const Button = ({
   title = '',
   onPress = () => alert('Button Pressed'),
-  backgroundColor = '#4F12FA42',
-  textColor = Colours.textLevel3,
+  backgroundColor,
+  textColor,
   iconPosition = 'left',
   iconName = '',
   iconSize = 24,
-  iconColor = Colours.textLevel3,
+  iconColor,
   style = {},
   textStyle = {},
   border = false,
@@ -20,6 +20,11 @@ const Button = ({
   // Determine if the icon should be rendered and if title is provided
   const shouldRenderIcon = iconName !== '';
   const shouldRenderTitle = title !== '';
+  const { theme, toggleTheme } = useTheme();
+
+  backgroundColor = backgroundColor || theme.bgButton;
+  textColor = textColor || theme.textButton;
+  iconColor = iconColor || theme.textButton;
 
   // Function to render the icon component with adjusted style based on title presence
   const renderIcon = () =>
@@ -28,18 +33,41 @@ const Button = ({
         name={iconName}
         size={iconSize}
         color={iconColor}
-        style={[shouldRenderTitle ? (iconPosition === 'left' ? styles.iconLeft : styles.iconRight) : styles.iconNoMargin]}
+        style={[
+          shouldRenderTitle
+            ? iconPosition === 'left'
+              ? styles.iconLeft
+              : styles.iconRight
+            : styles.iconNoMargin,
+        ]}
       />
     ) : null;
 
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.button, { backgroundColor }, { borderColor: textColor }, border ? { borderStyle: 'solid' } : {}, border ? { borderWidth } : { borderWidth: 0 }, style]}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-      <View style={[styles.buttonContent, !shouldRenderIcon && styles.buttonContentNoIcon]}>
+      style={[
+        styles.button,
+        { backgroundColor },
+        { borderColor: textColor },
+        border ? { borderStyle: 'solid' } : {},
+        border ? { borderWidth } : { borderWidth: 0 },
+        style,
+      ]}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+    >
+      <View
+        style={[
+          styles.buttonContent,
+          !shouldRenderIcon && styles.buttonContentNoIcon,
+        ]}
+      >
         {iconPosition === 'left' && renderIcon()}
-        {shouldRenderTitle && <Text style={[styles.button_text, { color: textColor }, textStyle]}>{title}</Text>}
+        {shouldRenderTitle && (
+          <Text style={[styles.button_text, { color: textColor }, textStyle]}>
+            {title}
+          </Text>
+        )}
         {iconPosition === 'right' && renderIcon()}
       </View>
     </TouchableOpacity>
@@ -54,7 +82,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10,
-    backgroundColor: '#4F12FA42',
     minWidth: 48,
     minHeight: 48,
   },

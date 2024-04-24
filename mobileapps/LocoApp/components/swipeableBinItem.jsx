@@ -6,7 +6,7 @@ import * as Haptics from 'expo-haptics';
 
 // Import Styling Components
 import { Headline } from '../styles/typography';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 // Import Functions
 import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
@@ -24,6 +24,7 @@ const SwipeableBinItem = ({
   runData = RunMockData,
   setRunData,
 }) => {
+  const { theme, toggleTheme } = useTheme();
   const [isChecked, setIsChecked] = useState(binData.isFull);
   const [isBurnt, setIsBurnt] = useState(binData.isBurnt);
 
@@ -51,7 +52,7 @@ const SwipeableBinItem = ({
             size={24}
             color='#fff'
           />
-          <Headline style={styles.binText}>Repair</Headline>
+          <Headline style={{ color: theme.spAtSidingText }}>Repair</Headline>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: '#D32F2F' }]}
@@ -65,7 +66,7 @@ const SwipeableBinItem = ({
             size={24}
             color='#fff'
           />
-          <Headline style={styles.binText}>Missing</Headline>
+          <Headline style={{ color: theme.spAtSidingText }}>Missing</Headline>
         </TouchableOpacity>
       </View>
     );
@@ -86,7 +87,9 @@ const SwipeableBinItem = ({
         <View
           style={[
             styles.actionButton,
-            isBurnt ? styles.actionButtonGreen : styles.actionButtonBurnt,
+            isBurnt
+              ? { backgroundColor: theme.bgGreen }
+              : { backgroundColor: theme.bgBurnt },
             { width: 180 },
           ]}
           onPress={() => {
@@ -106,7 +109,7 @@ const SwipeableBinItem = ({
             size={24}
             color='#fff'
           />
-          <Headline style={styles.binText}>
+          <Headline style={{ color: theme.spAtSidingText }}>
             Mark as {isBurnt ? 'Green' : 'Burnt'}
           </Headline>
         </View>
@@ -138,10 +141,11 @@ const SwipeableBinItem = ({
       <View
         style={[
           styles.binItem,
+          { backgroundColor: theme.binItemBg },
           isChecked
             ? isBurnt
-              ? styles.binItemCaneBurnt
-              : styles.binItemCaneGreen
+              ? { backgroundColor: theme.binItemBurnt }
+              : { backgroundColor: theme.binItemGreen }
             : null,
         ]}
       >
@@ -160,11 +164,11 @@ const SwipeableBinItem = ({
         >
           <Feather
             style={[
-              styles.binCheckBox,
+              { color: theme.spAtSidingText },
               isChecked
                 ? isBurnt
-                  ? styles.binItemCaneBurnt
-                  : styles.binItemCaneGreen
+                  ? { color: theme.binItemBurntText }
+                  : { color: theme.binItemGreenText }
                 : null,
             ]}
             name={isChecked ? 'check-circle' : 'circle'}
@@ -172,11 +176,11 @@ const SwipeableBinItem = ({
           />
           <Headline
             style={[
-              styles.binText,
+              { color: theme.spAtSidingText },
               isChecked
                 ? isBurnt
-                  ? styles.binItemCaneBurnt
-                  : styles.binItemCaneGreen
+                  ? { color: theme.binItemBurntText }
+                  : { color: theme.binItemGreenText }
                 : null,
             ]}
           >
@@ -187,11 +191,11 @@ const SwipeableBinItem = ({
         {isChecked ? (
           <Headline
             style={[
-              styles.binText,
+              { color: theme.spAtSidingText },
               isChecked
                 ? isBurnt
-                  ? styles.binItemCaneBurnt
-                  : styles.binItemCaneGreen
+                  ? { color: theme.binItemBurntText }
+                  : { color: theme.binItemGreenText }
                 : null,
             ]}
           >
@@ -211,11 +215,7 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: Colours.binItemBg,
     alignItems: 'center',
-  },
-  binText: {
-    color: Colours.spAtSidingText,
   },
   binPressable: {
     flexDirection: 'row',
@@ -223,17 +223,6 @@ const styles = StyleSheet.create({
     gap: 32,
     paddingHorizontal: 8,
     paddingVertical: 8,
-  },
-  binCheckBox: {
-    color: Colours.spAtSidingText,
-  },
-  binItemCaneGreen: {
-    color: Colours.binItemGreenText,
-    backgroundColor: Colours.binItemGreen,
-  },
-  binItemCaneBurnt: {
-    color: Colours.binItemBurntText,
-    backgroundColor: Colours.binItemBurnt,
   },
   actionButton: {
     flexDirection: 'row',
@@ -243,8 +232,6 @@ const styles = StyleSheet.create({
     height: '100%',
     gap: 10,
   },
-  actionButtonGreen: { backgroundColor: '#8BC34A' },
-  actionButtonBurnt: { backgroundColor: '#BF8A30' },
 });
 
 export default SwipeableBinItem;

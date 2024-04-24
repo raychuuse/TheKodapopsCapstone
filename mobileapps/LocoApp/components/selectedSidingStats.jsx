@@ -4,16 +4,19 @@ import { MaterialIcons } from '@expo/vector-icons';
 // Components
 import Container from './container';
 import { Footnote, Headline, Title3 } from '../styles/typography';
-import { Colours } from '../styles/colours';
 
 // Import Mock Data
 import { RunMockData } from '../data/RunMockData';
+
+// Import Style
+import { useTheme } from '../styles/themeContext';
 
 export default function SelectedSiddingStats({
   runData = RunMockData,
   selectedSidingID,
   openSidingDetailsModal,
 }) {
+  const { theme, toggleTheme } = useTheme();
   return (
     <Container
       style={{
@@ -32,9 +35,9 @@ export default function SelectedSiddingStats({
           <MaterialIcons
             name='download'
             size={18}
-            color={Colours.textLevel3}
+            color={theme.textLevel3}
           />
-          <Headline style={{ marginRight: 9, color: Colours.textLevel3 }}>
+          <Headline style={{ marginRight: 9, color: theme.textLevel3 }}>
             Drop Off
           </Headline>
         </View>
@@ -50,7 +53,7 @@ export default function SelectedSiddingStats({
         style={{
           marginHorizontal: 4,
           borderStyle: 'solid',
-          borderColor: Colours.textLevel3,
+          borderColor: theme.textLevel3,
           borderWidth: 0.25,
           height: '80%',
         }}
@@ -59,26 +62,26 @@ export default function SelectedSiddingStats({
       {/* Siding */}
       <View style={{ flex: 3, height: '100%', alignItems: 'center' }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Footnote style={{ marginLeft: 9, color: Colours.textLevel3 }}>
+          <Footnote style={{ marginLeft: 9, color: theme.textLevel3 }}>
             Selected Siding
           </Footnote>
           <MaterialIcons
             name='edit-location-alt'
             size={18}
-            color={Colours.textLevel3}
+            color={theme.textLevel3}
           />
         </View>
         <Title3>
           {runData.sidings.find((item) => item.id === selectedSidingID).name}
         </Title3>
-        <Footnote style={{ color: Colours.textLevel3 }}>ETA: 12:05 PM</Footnote>
+        <Footnote style={{ color: theme.textLevel3 }}>ETA: 12:05 PM</Footnote>
       </View>
 
       <View
         style={{
           marginHorizontal: 4,
           borderStyle: 'solid',
-          borderColor: Colours.textLevel3,
+          borderColor: theme.textLevel3,
           borderWidth: 0.25,
           height: '80%',
         }}
@@ -90,13 +93,13 @@ export default function SelectedSiddingStats({
         onPress={openSidingDetailsModal}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-          <Headline style={{ marginLeft: 9, color: Colours.textLevel3 }}>
+          <Headline style={{ marginLeft: 9, color: theme.textLevel3 }}>
             Collect
           </Headline>
           <MaterialIcons
             name='upload'
             size={18}
-            color={Colours.textLevel3}
+            color={theme.textLevel3}
           />
         </View>
         <Title3>

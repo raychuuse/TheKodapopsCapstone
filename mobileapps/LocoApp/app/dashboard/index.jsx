@@ -1,4 +1,4 @@
-import { View, Animated, Text } from 'react-native';
+import { View, Animated } from 'react-native';
 import React, { useState } from 'react';
 
 // Components
@@ -13,6 +13,9 @@ import ModalSidingDetails from '../../components/modalSidingDetails';
 import { RunMockData } from '../../data/RunMockData';
 import { NotificationsMockData } from '../../data/NotificationsMockData';
 
+// Import Styles
+import { useTheme } from '../../styles/themeContext';
+
 export default function Page() {
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const [sidingCarouselWidth, setSidingCarouselWidth] = useState(0);
@@ -26,8 +29,17 @@ export default function Page() {
   const [selectedSidingID, setSelectedSidingID] = useState(3);
   const [sidingToViewID, setSidingToViewID] = useState(2);
 
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <>
+    <View
+      style={{
+        flex: 1,
+        height: '100%',
+        backgroundColor: theme.appBG,
+        paddingTop: 32,
+      }}
+    >
       <ModalSidingDetails
         isVisible={modalSidingVisible}
         onClose={() => setModalSidingVisible(!modalSidingVisible)}
@@ -69,7 +81,7 @@ export default function Page() {
             }
             style={{
               flex: 1,
-              backgroundColor: 'rgba(255,255,255,0.6)',
+              backgroundColor: theme.containerGradient[0],
               borderRadius: 16,
               flexDirection: 'row',
             }}
@@ -113,7 +125,7 @@ export default function Page() {
           <View
             style={{
               minHeight: 56,
-              backgroundColor: 'rgba(255,255,255,0.6)',
+              backgroundColor: theme.containerGradient[0],
               borderRadius: 16,
             }}
           ></View>
@@ -126,6 +138,6 @@ export default function Page() {
         notifications={notifications}
         setNotifications={setNotifications}
       />
-    </>
+    </View>
   );
 }

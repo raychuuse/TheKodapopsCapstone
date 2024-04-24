@@ -11,7 +11,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Import Styles
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 import { Title2 } from '../styles/typography';
 
 // Import Components
@@ -40,6 +40,7 @@ const RunSheetAccordionItem = ({
 }) => {
   const animatedHeight = useRef(new Animated.Value(0)).current; // Initial height is 0 for collapsed state
   const rotation = useRef(new Animated.Value(0)).current; // For icon rotation
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     Animated.timing(rotation, {
@@ -65,10 +66,11 @@ const RunSheetAccordionItem = ({
     <View
       style={[
         styles.itemContainer,
+        { backgroundColor: theme.spPendingBG },
         sidingData.isCompleted
-          ? styles.itemContatinerComplete
+          ? { backgroundColor: theme.spCompleteBG }
           : sidingData.isSelected
-          ? styles.itemContatinerSelected
+          ? { backgroundColor: theme.spSelectedBG }
           : null,
       ]}
     >
@@ -90,7 +92,7 @@ const RunSheetAccordionItem = ({
                   ? 'star-circle-outline'
                   : 'checkbox-blank-circle-outline'
               }
-              color={Colours.textLevel3}
+              color={theme.textLevel3}
             />
           </TouchableOpacity>
           {/* Siding Name */}
@@ -102,7 +104,7 @@ const RunSheetAccordionItem = ({
               <MaterialCommunityIcons
                 name='tray-arrow-down'
                 size={24}
-                color={Colours.textLevel3}
+                color={theme.textLevel3}
               />
               <Title2>{sidingData.binsDrop.length}</Title2>
             </View>
@@ -112,7 +114,7 @@ const RunSheetAccordionItem = ({
               <MaterialCommunityIcons
                 name='tray-arrow-up'
                 size={24}
-                color={Colours.textLevel3}
+                color={theme.textLevel3}
               />
               <Title2>{sidingData.binsCollect.length}</Title2>
             </View>
@@ -123,7 +125,7 @@ const RunSheetAccordionItem = ({
             <MaterialCommunityIcons
               name='chevron-down'
               size={36}
-              color={Colours.textLevel3}
+              color={theme.textLevel3}
             />
           </Animated.View>
         </View>
@@ -170,14 +172,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     padding: 4,
-    backgroundColor: Colours.bgLevel6,
     borderRadius: 10,
-  },
-  itemContatinerComplete: {
-    backgroundColor: Colours.spComplete,
-  },
-  itemContatinerSelected: {
-    backgroundColor: Colours.spSelected,
   },
   HeaderContainer: {
     flexDirection: 'row',

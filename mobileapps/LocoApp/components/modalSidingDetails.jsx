@@ -8,7 +8,7 @@ import { RunMockData } from '../data/RunMockData';
 
 // Import Styles
 import { Title1 } from '../styles/typography';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const ModalSidingDetails = ({
   runData = RunMockData,
@@ -17,7 +17,7 @@ const ModalSidingDetails = ({
   isVisible = true,
   sidingToViewID = 2,
 }) => {
-  // const sidingData = runData.sidings.filter((item) => item.id === sidingID);
+  const { theme, toggleTheme } = useTheme();
   return (
     <CustomModal
       onClose={onClose}
@@ -25,40 +25,40 @@ const ModalSidingDetails = ({
       style={[
         { width: '85%', height: '90%' },
         runData.sidings.find((item) => item.id === sidingToViewID).isCompleted
-          ? { backgroundColor: Colours.spCompleteBG }
+          ? { backgroundColor: theme.spCompleteBG }
           : null,
         runData.sidings.find((item) => item.id === sidingToViewID).isSelected
-          ? { backgroundColor: Colours.spSelectedBG }
+          ? { backgroundColor: theme.spSelectedBG }
           : null,
       ]}
       buttonIcon=''
     >
       {/* Siding Details */}
       {/* Header */}
-      <View style={Styles.HeaderContainer}>
+      <View style={[Styles.HeaderContainer, { borderColor: theme.textLevel2 }]}>
         <MaterialIcons
           name='pin-drop'
           size={28}
           color={
             runData.sidings.find((item) => item.id === sidingToViewID)
               .isCompleted
-              ? Colours.spCompleteBGText
+              ? theme.spCompleteBGText
               : runData.sidings.find((item) => item.id === sidingToViewID)
                   .isSelected
-              ? Colours.spSelectedBGText
-              : Colours.textLevel2
+              ? theme.spSelectedBGText
+              : theme.textLevel2
           }
         />
         <Title1
           style={[
             runData.sidings.find((item) => item.id === sidingToViewID)
               .isCompleted
-              ? { color: Colours.spCompleteBGText }
-              : Colours.spPendingText,
+              ? { color: theme.spCompleteBGText }
+              : theme.spPendingText,
             runData.sidings.find((item) => item.id === sidingToViewID)
               .isSelected
-              ? { color: Colours.spSelectedBGText }
-              : Colours.textLevel2,
+              ? { color: theme.spSelectedBGText }
+              : theme.textLevel2,
           ]}
         >
           {runData.sidings.find((item) => item.id === sidingToViewID).name}
@@ -73,11 +73,11 @@ const ModalSidingDetails = ({
             color={
               runData.sidings.find((item) => item.id === sidingToViewID)
                 .isCompleted
-                ? Colours.spCompleteBGText
+                ? theme.spCompleteBGText
                 : runData.sidings.find((item) => item.id === sidingToViewID)
                     .isSelected
-                ? Colours.spSelectedBGText
-                : Colours.textLevel2
+                ? theme.spSelectedBGText
+                : theme.textLevel2
             }
           />
         </TouchableOpacity>
@@ -128,7 +128,6 @@ const Styles = StyleSheet.create({
     width: '100%',
     gap: 8,
     borderStyle: 'solid',
-    borderColor: Colours.textLevel2,
     borderBottomWidth: 2,
     paddingLeft: 6,
     paddingBottom: 6,

@@ -3,20 +3,21 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 //Styles
 import { Title1 } from '../styles/typography';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 // Import Components
 import RunSheetAccordion from './runSheetAccordion';
 
 const RunSheet = ({ runData, setRunData, onClose }) => {
+  const { theme, toggleTheme } = useTheme();
   return (
     <>
       {/* Header */}
-      <View style={Styles.HeaderContainer}>
+      <View style={[Styles.HeaderContainer, { borderColor: theme.textLevel2 }]}>
         <MaterialIcons
           name='route'
           size={28}
-          color={Colours.textLevel2}
+          color={theme.textLevel2}
         />
         <Title1>Run Details</Title1>
         <TouchableOpacity
@@ -26,7 +27,7 @@ const RunSheet = ({ runData, setRunData, onClose }) => {
           <MaterialCommunityIcons
             name='close-circle-outline'
             size={36}
-            color={Colours.textLevel2}
+            color={theme.textLevel2}
           />
         </TouchableOpacity>
       </View>
@@ -53,7 +54,6 @@ const Styles = StyleSheet.create({
     width: '100%',
     gap: 8,
     borderStyle: 'solid',
-    borderColor: Colours.textLevel2,
     borderBottomWidth: 2,
     paddingLeft: 6,
     paddingBottom: 6,

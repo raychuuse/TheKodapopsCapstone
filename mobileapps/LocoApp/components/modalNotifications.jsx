@@ -6,7 +6,7 @@ import { removeNotification } from '../lib/notification';
 
 // Import Styles
 import { Title1, Title3 } from '../styles/typography';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 // Import Mock Data
 import { NotificationsMockData } from '../data/NotificationsMockData';
@@ -22,6 +22,8 @@ const ModalNotifications = ({
   setNotifications,
   notifications = NotificationsMockData,
 }) => {
+  const { theme, toggleTheme } = useTheme();
+
   const renderNotification = ({ item }) => (
     <NotificationItem
       icon={item.icon}
@@ -37,11 +39,11 @@ const ModalNotifications = ({
       style={{ width: '80%', maxWidth: 800, height: '70%' }}
     >
       {/* Header */}
-      <View style={styles.HeaderContainer}>
+      <View style={[styles.HeaderContainer, { borderColor: theme.textLevel2 }]}>
         <MaterialIcons
           name='notifications'
           size={28}
-          color={Colours.textLevel2}
+          color={theme.textLevel2}
         />
         <Title1>Notifications</Title1>
 
@@ -55,7 +57,7 @@ const ModalNotifications = ({
               paddingVertical: 4,
               borderRadius: 8,
               color: '#fff',
-              backgroundColor: Colours.dangerBg,
+              backgroundColor: theme.dangerBg,
             }}
           >
             {notifications.length} Unread
@@ -90,7 +92,7 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 8,
     borderStyle: 'solid',
-    borderColor: Colours.textLevel2,
+
     borderBottomWidth: 2,
     paddingLeft: 6,
     paddingBottom: 6,

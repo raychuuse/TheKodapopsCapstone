@@ -9,6 +9,7 @@ import Modal from './modal';
 // Import Style Components
 import * as Type from '../styles/typography';
 import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const SettingsItem = ({
   type = '',
@@ -19,6 +20,8 @@ const SettingsItem = ({
 }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
+
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <>
@@ -61,7 +64,7 @@ const SettingsItem = ({
       <View style={[styles.item, style]}>
         <Type.Title3 style={styles.label}>{label}:</Type.Title3>
         <Text
-          style={[Type.styles.body, styles.body]}
+          style={[Type.styles.body, styles.body, { color: theme.body }]}
           numberOfLines={1}
         >
           {options.find((item) => item.id == selectedOption)?.label}
@@ -69,9 +72,9 @@ const SettingsItem = ({
 
         <Button
           iconName={type == 'location' ? 'edit-location-alt' : 'edit'}
-          iconColor={Colours.textLevel3}
-          textColor={Colours.textLevel3}
-          backgroundColor={Colours.bgLevel3}
+          iconColor={theme.textLevel3}
+          textColor={theme.textLevel3}
+          backgroundColor={theme.bgLevel3}
           border
           borderWidth={1}
           iconSize={28}

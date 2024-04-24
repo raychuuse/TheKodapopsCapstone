@@ -4,7 +4,7 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Styles
 import { Title3, Headline, H1 } from '../styles/typography';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const SidingCard = ({
   containerWidth,
@@ -19,6 +19,7 @@ const SidingCard = ({
   scrollX,
   onPress,
 }) => {
+  const { theme, toggleTheme } = useTheme();
   const [_isCompleted, setIsCompleted] = useState(isCompleted);
   const [_isSelected, setIsSelected] = useState(isSelected);
   const inputRange = [(index - 1) * 170, index * 170, (index + 1) * 170];
@@ -38,8 +39,21 @@ const SidingCard = ({
     <Animated.View
       style={[
         styles.card,
-        styles.default,
-        _isCompleted ? styles.complete : _isSelected ? styles.selected : null,
+        {
+          backgroundColor: theme.spPending,
+          borderColor: theme.spPendingBorder,
+        },
+        _isCompleted
+          ? {
+              backgroundColor: theme.spComplete,
+              borderColor: theme.spCompleteBorder,
+            }
+          : _isSelected
+          ? {
+              backgroundColor: theme.spSelected,
+              borderColor: theme.spSelectedBorder,
+            }
+          : null,
         { transform: [{ translateY }] },
         index == 0 ? { marginLeft: (containerWidth - 170) / 2 } : null,
         index == listLength - 1
@@ -54,40 +68,41 @@ const SidingCard = ({
         <View style={{ flex: 3, justifyContent: 'center' }}>
           <Title3
             style={[
-              styles.defaultText,
+              { color: theme.spPendingText },
               _isCompleted
-                ? styles.completeText
+                ? { color: theme.spCompleteText }
                 : _isSelected
-                ? styles.selectedText
+                ? { color: theme.spSelectedText }
                 : null,
             ]}
           >
             {name}
           </Title3>
         </View>
-        <View style={styles.devider} />
+        <View
+          style={[styles.devider, { backgroundColor: theme.spPendingText }]}
+        />
         <View style={styles.binCounterContainer}>
           <View style={styles.binCounterLabel}>
             <MaterialIcons
               name='download'
               size={18}
               color={
-                (Colours.spPendingText,
                 _isCompleted
-                  ? Colours.spCompleteText
+                  ? theme.spCompleteText
                   : _isSelected
-                  ? Colours.spSelectedText
-                  : null)
+                  ? theme.spSelectedText
+                  : theme.spPendingText
               }
             />
             <Headline
               style={[
                 { marginRight: 9 },
-                styles.defaultText,
+                { color: theme.spPendingText },
                 _isCompleted
-                  ? styles.completeText
+                  ? { color: theme.spCompleteText }
                   : _isSelected
-                  ? styles.selectedText
+                  ? { color: theme.spSelectedText }
                   : null,
               ]}
             >
@@ -97,39 +112,41 @@ const SidingCard = ({
           <H1
             style={[
               styles.binCounter,
+              { color: theme.spPendingText },
               _isCompleted
-                ? styles.completeText
+                ? { color: theme.spCompleteText }
                 : _isSelected
-                ? styles.selectedText
+                ? { color: theme.spSelectedText }
                 : null,
             ]}
           >
             {drop}
           </H1>
         </View>
-        <View style={styles.devider} />
+        <View
+          style={[styles.devider, { backgroundColor: theme.spPendingText }]}
+        />
         <View style={styles.binCounterContainer}>
           <View style={styles.binCounterLabel}>
             <MaterialIcons
               name='upload'
               size={18}
               color={
-                (Colours.spPendingText,
                 _isCompleted
-                  ? Colours.spCompleteText
+                  ? theme.spCompleteText
                   : _isSelected
-                  ? Colours.spSelectedText
-                  : null)
+                  ? theme.spSelectedText
+                  : theme.spPendingText
               }
             />
             <Headline
               style={[
                 { marginRight: 9 },
-                styles.defaultText,
+                { color: theme.spPendingText },
                 _isCompleted
-                  ? styles.completeText
+                  ? { color: theme.spCompleteText }
                   : _isSelected
-                  ? styles.selectedText
+                  ? { color: theme.spSelectedText }
                   : null,
               ]}
             >
@@ -139,17 +156,20 @@ const SidingCard = ({
           <H1
             style={[
               styles.binCounter,
+              { color: theme.spPendingText },
               _isCompleted
-                ? styles.completeText
+                ? { color: theme.spCompleteText }
                 : _isSelected
-                ? styles.selectedText
+                ? { color: theme.spSelectedText }
                 : null,
             ]}
           >
             {collect}
           </H1>
         </View>
-        <View style={styles.devider} />
+        <View
+          style={[styles.devider, { backgroundColor: theme.spPendingText }]}
+        />
         <View style={{ flex: 3, justifyContent: 'center' }}>
           <TouchableOpacity
             onPress={selectedHandeler}
@@ -165,12 +185,11 @@ const SidingCard = ({
               }
               size={36}
               color={
-                (Colours.spPendingText,
                 _isCompleted
-                  ? Colours.spCompleteText
+                  ? theme.spCompleteText
                   : _isSelected
-                  ? Colours.spSelectedText
-                  : null)
+                  ? theme.spSelectedText
+                  : theme.spPendingText
               }
             />
           </TouchableOpacity>
@@ -197,52 +216,22 @@ const styles = StyleSheet.create({
     fontSize: 51,
     fontWeight: '800',
     lineHeight: 61,
-    color: Colours.spPendingText,
     marginVertical: 0,
   },
   devider: {
     height: 1,
     width: '70%',
-    backgroundColor: Colours.spPendingText,
-  },
-  debug: {
-    borderStyle: 'dashed',
-    borderColor: 'red',
-    borderWidth: 1,
   },
   card: {
     borderStyle: 'solid',
-    borderColor: '#fff',
     borderTopWidth: 4,
     borderLeftWidth: 2,
     borderRightWidth: 2,
     borderRadius: 15,
-    // margin: 10,
     padding: 10,
     width: 170,
     alignItems: 'center',
     height: '90%',
-  },
-  default: {
-    backgroundColor: Colours.spPending,
-    color: Colours.spPendingText,
-  },
-  complete: {
-    backgroundColor: Colours.spComplete,
-    color: Colours.spCompleteText,
-  },
-  selected: {
-    backgroundColor: Colours.spSelected,
-    color: Colours.spSelectedText,
-  },
-  defaultText: {
-    color: Colours.spPendingText,
-  },
-  completeText: {
-    color: Colours.spCompleteText,
-  },
-  selectedText: {
-    color: Colours.spSelectedText,
   },
 });
 

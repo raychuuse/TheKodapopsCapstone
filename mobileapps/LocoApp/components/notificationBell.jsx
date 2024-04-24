@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, View, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const NotificationBell = ({
   onPress = () => alert('Notification Bell Pressed'),
@@ -10,7 +11,6 @@ const NotificationBell = ({
   iconColor = '#ffffff',
   backgroundColor = '#4F12FA42',
   notificationCount = 0,
-  countBackgroundColor = Colours.dangerBg,
   countTextColor = '#ffffff',
   style = {},
 }) => {
@@ -19,6 +19,7 @@ const NotificationBell = ({
   const borderWidth = iconSize * 0.025; // Border width as 5% of the icon size
   // Adjusting counter position to scale with the icon size
   const counterPosition = iconSize * 0.125; // Positioning the counter at 30% of the icon size from the top left
+  const { theme, toggleTheme } = useTheme();
 
   const renderNotificationCount = () =>
     notificationCount > 0 && (
@@ -29,9 +30,9 @@ const NotificationBell = ({
             width: counterSize,
             height: counterSize,
             borderRadius: counterSize / 2,
-            backgroundColor: countBackgroundColor,
+            backgroundColor: theme.dangerBg,
             borderWidth: borderWidth,
-            borderColor: '#ffffff', // Counter border color
+            borderColor: theme.modalClose, // Counter border color
             top: -counterPosition,
             right: -counterPosition,
           },
@@ -40,7 +41,7 @@ const NotificationBell = ({
         <Text
           style={[
             styles.countText,
-            { color: countTextColor, fontSize: counterSize / 2 },
+            { color: theme.modalClose, fontSize: counterSize / 2 },
           ]}
         >
           {Math.min(99, notificationCount)}{' '}

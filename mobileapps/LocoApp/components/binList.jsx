@@ -3,12 +3,14 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import Styles
 import { Colours } from '../styles/colours';
+import { Title2 } from '../styles/typography';
+import { useTheme } from '../styles/themeContext';
 
 // Import Components
 import SwipeableBinItem from './swipeableBinItem';
-import { Title2 } from '../styles/typography';
 
 const BinList = ({ BinData, setRunData, runData, sidingId, binListName }) => {
+  const { theme, toggleTheme } = useTheme();
   const RenderItem = ({ item }) => (
     <SwipeableBinItem
       binData={item}
@@ -24,7 +26,7 @@ const BinList = ({ BinData, setRunData, runData, sidingId, binListName }) => {
       style={{
         width: '80%',
         height: 1,
-        backgroundColor: Colours.spAtSidingText,
+        backgroundColor: theme.spAtSidingText,
         marginVertical: 10,
         marginLeft: 'auto',
         marginRight: 'auto',
@@ -52,10 +54,10 @@ const BinList = ({ BinData, setRunData, runData, sidingId, binListName }) => {
             paddingHorizontal: 8,
           },
           runData.sidings.find((item) => item.id === sidingId).isCompleted
-            ? { backgroundColor: Colours.spComplete }
+            ? { backgroundColor: theme.spComplete }
             : runData.sidings.find((item) => item.id === sidingId).isSelected
-            ? { backgroundColor: Colours.spSelected }
-            : { backgroundColor: Colours.spPending },
+            ? { backgroundColor: theme.spSelected }
+            : { backgroundColor: theme.spPending },
         ]}
       >
         <Title2>
@@ -73,7 +75,7 @@ const BinList = ({ BinData, setRunData, runData, sidingId, binListName }) => {
         data={BinData}
         style={{
           width: '100%',
-          backgroundColor: Colours.bgOverlay,
+          backgroundColor: theme.bgOverlay,
           borderRadius: 10,
           height: '100%',
           padding: 8,

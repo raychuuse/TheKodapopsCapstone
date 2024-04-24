@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 
 // Styles
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 // Components
 import NotificationBell from './notificationBell';
@@ -22,6 +22,7 @@ const BottomBar = ({
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [routeVisible, setRouteVisible] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   return (
     <>
       {/* Settings Modal */}
@@ -51,7 +52,7 @@ const BottomBar = ({
       </CustomModal>
       {/* Nav Bar */}
       <LinearGradient
-        colors={['rgba(225,225,225,0.7)', 'rgba(225,225,225,0.4)']}
+        colors={theme.containerGradient}
         style={{
           flexDirection: 'row',
           paddingLeft: 32,
@@ -62,7 +63,7 @@ const BottomBar = ({
         {/* Open Notification Modal Button */}
         <NotificationBell
           backgroundColor='transparent'
-          iconColor={Colours.textLevel3}
+          iconColor={theme.textLevel3}
           notificationCount={notifications.length}
           iconSize={48}
           onPress={() => setNotificationsVisible(true)}
@@ -73,6 +74,7 @@ const BottomBar = ({
             backgroundColor='transparent'
             iconName='route'
             iconSize={48}
+            iconColor={theme.textLevel3}
             onPress={() => setRouteVisible(true)}
           />
           {/* Open Settings Modal Button */}
@@ -80,6 +82,7 @@ const BottomBar = ({
             backgroundColor='transparent'
             iconName='settings'
             iconSize={48}
+            iconColor={theme.textLevel3}
             onPress={() => setSettingsVisible(true)}
           />
         </View>

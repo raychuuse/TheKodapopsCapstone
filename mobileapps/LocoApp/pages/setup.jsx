@@ -9,7 +9,7 @@ import SettingsItem from '../components/settingsItem';
 
 // Import Styling Components
 import { LargeTitle, Title1 } from '../styles/typography';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 // Import Mock Data
 import {
@@ -18,9 +18,10 @@ import {
 } from '../data/settingsMockData';
 
 const SetupPage = () => {
+  const { theme, toggleTheme } = useTheme();
   return (
-    <View style={styles.page}>
-      <View style={styles.body}>
+    <View style={[styles.page, { backgroundColor: theme.appBG }]}>
+      <View style={[styles.body, { backgroundColor: theme.bgModal }]}>
         {/* Page Headings */}
         <View style={styles.page_heading}>
           <LargeTitle>
@@ -51,7 +52,7 @@ const SetupPage = () => {
           >
             <Button
               title='Log Out'
-              textColor={Colours.textLevel2}
+              textColor={theme.textLevel2}
               backgroundColor='transparent'
               border
             />
@@ -62,7 +63,6 @@ const SetupPage = () => {
           >
             <Button
               title='Start'
-              textColor={Colours.textLevel3}
               style={StyleSheet.create({ flex: 1 })}
             />
           </Link>
@@ -77,12 +77,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#574294',
     padding: '6%',
   },
   body: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     alignItems: 'center',
     borderRadius: 32,
     padding: 16,

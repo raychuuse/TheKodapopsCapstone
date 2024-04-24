@@ -3,6 +3,7 @@ import { Modal, StyleSheet, TouchableOpacity } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const CustomModal = ({
   isVisible,
@@ -11,6 +12,7 @@ const CustomModal = ({
   buttonIcon = 'close-circle-outline',
   style,
 }) => {
+  const { theme, toggleTheme } = useTheme();
   return (
     <Modal
       transparent={true}
@@ -30,7 +32,11 @@ const CustomModal = ({
         >
           <TouchableOpacity
             activeOpacity={1} // Prevents the press from triggering the BlurView's onPressOut
-            style={[styles.modalContent, style]}
+            style={[
+              styles.modalContent,
+              { backgroundColor: theme.bgModal },
+              style,
+            ]}
           >
             {children}
             <TouchableOpacity
@@ -40,7 +46,7 @@ const CustomModal = ({
               <MaterialCommunityIcons
                 name={buttonIcon}
                 size={56}
-                color='white'
+                color={theme.modalClose}
               />
             </TouchableOpacity>
           </TouchableOpacity>
@@ -64,7 +70,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '80%',
-    backgroundColor: Colours.bgModal,
+
     borderRadius: 32,
     padding: 20,
     alignItems: 'center',
