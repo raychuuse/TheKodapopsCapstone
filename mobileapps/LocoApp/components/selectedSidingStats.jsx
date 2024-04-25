@@ -15,6 +15,7 @@ export default function SelectedSiddingStats({
   runData = RunMockData,
   selectedSidingID,
   openSidingDetailsModal,
+  openSidingSelectModal,
 }) {
   const { theme, toggleTheme } = useTheme();
   return (
@@ -27,6 +28,7 @@ export default function SelectedSiddingStats({
       }}
     >
       {/* Drop Off */}
+      {/* Displays the number of bins to drop off at the selected siding */}
       <TouchableOpacity
         style={{ flex: 2, alignItems: 'center' }}
         onPress={openSidingDetailsModal}
@@ -49,6 +51,7 @@ export default function SelectedSiddingStats({
         </Title3>
       </TouchableOpacity>
 
+      {/* Vertical Rule */}
       <View
         style={{
           marginHorizontal: 4,
@@ -59,8 +62,12 @@ export default function SelectedSiddingStats({
         }}
       />
 
-      {/* Siding */}
-      <View style={{ flex: 3, height: '100%', alignItems: 'center' }}>
+      {/* Selected Siding */}
+      {/* Show the name and ETA for the Selected Siding */}
+      <TouchableOpacity
+        onPress={openSidingSelectModal}
+        style={{ flex: 3, height: '100%', alignItems: 'center' }}
+      >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Footnote style={{ marginLeft: 9, color: theme.textLevel3 }}>
             Selected Siding
@@ -75,8 +82,9 @@ export default function SelectedSiddingStats({
           {runData.sidings.find((item) => item.id === selectedSidingID).name}
         </Title3>
         <Footnote style={{ color: theme.textLevel3 }}>ETA: 12:05 PM</Footnote>
-      </View>
+      </TouchableOpacity>
 
+      {/* Vertical Rule */}
       <View
         style={{
           marginHorizontal: 4,
@@ -87,7 +95,8 @@ export default function SelectedSiddingStats({
         }}
       />
 
-      {/* Collect */}
+      {/* Collect Bins */}
+      {/* Displays the number of bins to collect from the selected siding */}
       <TouchableOpacity
         style={{ flex: 2, alignItems: 'center' }}
         onPress={openSidingDetailsModal}
