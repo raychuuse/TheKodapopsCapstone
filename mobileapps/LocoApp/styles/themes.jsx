@@ -81,7 +81,7 @@ export const darkTheme = {
   bgButton: '#a491c1',
   modalClose: '#c4c4c4',
   binItemBg: 'rgb(77, 77, 77)',
-  binItemGreenText: '#a491c1',
+  binItemGreenText: '#CDCDCD',
   binItemGreen: '#1B5E20',
   binItemBurntText: '#FFF9C4',
   binItemBurnt: '#3E2723',

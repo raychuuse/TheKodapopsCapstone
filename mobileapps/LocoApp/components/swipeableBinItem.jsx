@@ -50,7 +50,7 @@ const SwipeableBinItem = ({
           <Feather
             name='tool'
             size={24}
-            color='#fff'
+            color={theme.spAtSidingText}
           />
           <Headline style={{ color: theme.spAtSidingText }}>Repair</Headline>
         </TouchableOpacity>
@@ -64,7 +64,7 @@ const SwipeableBinItem = ({
           <Feather
             name='help-circle'
             size={24}
-            color='#fff'
+            color={theme.spAtSidingText}
           />
           <Headline style={{ color: theme.spAtSidingText }}>Missing</Headline>
         </TouchableOpacity>
@@ -107,7 +107,7 @@ const SwipeableBinItem = ({
           <MaterialCommunityIcons
             name={!isBurnt ? 'fire' : 'leaf'}
             size={24}
-            color='#fff'
+            color={theme.spAtSidingText}
           />
           <Headline style={{ color: theme.spAtSidingText }}>
             Mark as {isBurnt ? 'Green' : 'Burnt'}
