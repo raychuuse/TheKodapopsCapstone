@@ -7,7 +7,10 @@ import UserGreeting from '../../components/userGreeting';
 import SelectedSiddingStats from '../../components/selectedSidingStats';
 import SidingCard from '../../components/sidingCard';
 import BottomBar from '../../components/bottomBar';
+
+// Modals
 import ModalSidingDetails from '../../components/modalSidingDetails';
+import ModalSelectSiding from '../../components/modalSelectSiding';
 
 // Import Mock Data
 import { RunMockData } from '../../data/RunMockData';
@@ -26,6 +29,8 @@ export default function Page() {
 
   // Modal State
   const [modalSidingVisible, setModalSidingVisible] = useState(false);
+  const [modalSelectSidingVisible, setModalSelectSidingVisible] =
+    useState(false);
   const [selectedSidingID, setSelectedSidingID] = useState(3);
   const [sidingToViewID, setSidingToViewID] = useState(2);
 
@@ -47,6 +52,12 @@ export default function Page() {
         runData={runData}
         sidingToViewID={sidingToViewID}
       />
+      <ModalSelectSiding
+        isVisible={modalSelectSidingVisible}
+        onClose={() => setModalSelectSidingVisible(!modalSelectSidingVisible)}
+        setRunData={setRunData}
+        runData={runData}
+      />
       <View style={{ flex: 1 }}>
         <View
           style={{
@@ -64,6 +75,9 @@ export default function Page() {
             openSidingDetailsModal={() => {
               setSidingToViewID(selectedSidingID);
               setModalSidingVisible(true);
+            }}
+            openSidingSelectModal={() => {
+              setModalSelectSidingVisible(true);
             }}
           />
         </View>
