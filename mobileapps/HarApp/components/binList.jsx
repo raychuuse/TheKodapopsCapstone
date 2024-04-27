@@ -18,6 +18,7 @@ const BinList = ({ BinData, openAddBinModal }) => {
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
   const [selectedIndices, setSelectedIndices] = useState([]);
+  const [isSelected, setIsSelected] = useState(null);
   const [isLocked, setIsLocked] = useState(false);
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
@@ -38,6 +39,8 @@ const BinList = ({ BinData, openAddBinModal }) => {
       newSelection.push({ binNumber, index });
       // Update the state to reflect the new selection.
       setSelectedIndices(newSelection);
+      // Set the is selected indicator
+      setIsSelected(index);
       // Provide haptic feedback to indicate successful selection.
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
@@ -47,6 +50,8 @@ const BinList = ({ BinData, openAddBinModal }) => {
       if (newSelection[0].index === index) {
         // Clear the selection if the same bin is selected again.
         setSelectedIndices([]);
+        // Unset the is selected indicator
+        setIsSelected(null);
         // Provide haptic feedback to indicate removal.
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
@@ -74,6 +79,8 @@ const BinList = ({ BinData, openAddBinModal }) => {
         setBinData(_binData);
         // Clear the selection after the action is completed.
         setSelectedIndices([]);
+        // Unset the is selected indicator
+        setIsSelected(null);
         // Provide haptic feedback to indicate successful processing.
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       }
@@ -87,6 +94,7 @@ const BinList = ({ BinData, openAddBinModal }) => {
     return (
       <SwipeableBinItem
         index={index}
+        isSelected={isSelected}
         binNumber={item.binNum}
         longPressHandler={LongPressRangeSelect}
         style={{

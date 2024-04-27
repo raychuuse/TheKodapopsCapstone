@@ -12,7 +12,12 @@ import { Colours } from './colours';
 import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
 import { useBins } from '../context/binContext';
 
-const SwipeableBinItem = ({ index, binNumber, longPressHandler }) => {
+const SwipeableBinItem = ({
+  index,
+  binNumber,
+  longPressHandler,
+  isSelected,
+}) => {
   // Providers
   const { getBinData, setBinFull, setBinBurnt } = useBins();
 
@@ -122,6 +127,14 @@ const SwipeableBinItem = ({ index, binNumber, longPressHandler }) => {
       <View
         style={[
           styles.binItem,
+          isSelected == index && {
+            borderColor: Colours.spAtSidingText,
+            borderWidth: 4,
+            borderStyle: 'solid',
+            paddingLeft: 4,
+            paddingRight: 14,
+            paddingVertical: 4,
+          },
           getBinData(binNumber).isFull
             ? getBinData(binNumber).isBurnt
               ? styles.binItemCaneBurnt
