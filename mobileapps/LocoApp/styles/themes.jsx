@@ -93,7 +93,7 @@ export const darkTheme = {
   bgOverlay: 'rgba(255, 255, 255, 0.1)',
   spAtSidingBg: 'rgba(130, 119, 23, 0.95)',
   spAtSidingEdge: 'rgba(130, 177, 255, 0.7)',
-  spAtSidingText: 'rgba(255, 255, 255, 0.9)',
+  spAtSidingText: 'rgba(255, 255, 255, 0.4)',
   dangerBg: '#B71C1C',
   warningBg: '#FF6F00',
   containerGradient: ['rgba(100,100,100,0.7)', 'rgba(100,100,100,0.4)'],
