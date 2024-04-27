@@ -12,7 +12,7 @@ import { Colours } from './colours';
 import SwipeableBinItem from './swipeableBinItem';
 import { useBins } from '../context/binContext';
 
-const BinList = ({ BinData }) => {
+const BinList = ({ BinData, openAddBinModal }) => {
   // Provider
   const { binData, setBinData, getBinData } = useBins();
 
@@ -165,7 +165,7 @@ const BinList = ({ BinData }) => {
         {isLocked ? null : (
           <TouchableOpacity
             onPress={() => {
-              setAddBinVisable(true);
+              openAddBinModal(true);
               Haptics.selectionAsync();
             }}
             style={{

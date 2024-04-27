@@ -58,7 +58,10 @@ const MainPage = () => {
         {/* Selected Siding */}
         <SelectedSiding sidingName='Old Creek Rd' />
         {/* Bin List */}
-        <BinList BinData={binData} />
+        <BinList
+          BinData={binData}
+          openAddBinModal={setAddBinVisable}
+        />
       </View>
       <Button
         title='Done'
