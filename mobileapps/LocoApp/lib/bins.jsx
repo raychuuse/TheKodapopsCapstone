@@ -1,106 +1,47 @@
-// Import Mock Data
-import { RunMockData } from '../data/RunMockData';
+import { useCallback } from 'react';
+import { useRun } from '../context/runContext';
 
 /**
- * Used to set if a bin is full, Required to rerender the app and set data correctly.
- * @param {number} binNumber
+ * Custom hook to toggle the 'isFull' status of a bin.
  * @param {number} sidingId
- * @param {object} runData
- * @param {object} setRunData
- * @param {string} binListName
- * @param {boolean} debug
+ * @param {number} binNumber
+ * @param {boolean} isDrop
  */
-export function SetIsFull(
-  binNumber,
-  sidingId,
-  runData,
-  setRunData,
-  binListName,
-  debug = false
-) {
-  // Initialise New Run Data bases off old run data
-  const newRunData = runData;
-  let currentState;
+export function useSetIsFull() {
+  const { updateBin, getBin } = useRun();
 
-  // Find and set bin to full
-  if (binListName === 'binsDrop') {
-    // Get Current State
-    currentState = newRunData.sidings
-      .find((item) => item.id === sidingId)
-      .binsDrop.find((item) => item.binNumber === binNumber).isFull;
-
-    // Set the inverted State as new state
-    newRunData.sidings
-      .find((item) => item.id === sidingId)
-      .binsDrop.find((item) => item.binNumber === binNumber).isFull =
-      !currentState;
-  } else if (binListName === 'binsCollect') {
-    // Get Current State
-    currentState = newRunData.sidings
-      .find((item) => item.id === sidingId)
-      .binsCollect.find((item) => item.binNumber === binNumber).isFull;
-
-    // Set the inverted State as new state
-    newRunData.sidings
-      .find((item) => item.id === sidingId)
-      .binsCollect.find((item) => item.binNumber === binNumber).isFull =
-      !currentState;
-  }
-  // Apply changes to the state
-  setRunData(newRunData);
-
-  // Debug Log
-  debug ? console.log(JSON.stringify(runData)) : null;
+  return useCallback(
+    (sidingId, binNumber, isDrop) => {
+      const bin = getBin(sidingId, binNumber, isDrop);
+      console.log(bin);
+      if (bin) {
+        // Toggle the 'isFull' flag
+        const updatedBin = { ...bin, isFull: !bin.isFull };
+        updateBin(sidingId, binNumber, updatedBin, isDrop);
+      }
+    },
+    [getBin, updateBin]
+  );
 }
 
 /**
- * Used to set if a bin is burnt, Required to rerender the app and set data correctly.
- * @param {number} binNumber
+ * Custom hook to toggle the 'isBurnt' status of a bin.
  * @param {number} sidingId
- * @param {RunMockData} runData
- * @param {object} setRunData
- * @param {string} binListName
- * @param {boolean} debug
+ * @param {number} binNumber
+ * @param {boolean} isDrop
  */
-export function SetIsBurnt(
-  binNumber,
-  sidingId,
-  runData,
-  setRunData,
-  binListName,
-  debug = false
-) {
-  // Initialise New Run Data bases off old run data
-  const newRunData = runData;
-  let currentState;
+export function useSetIsBurnt() {
+  const { updateBin, getBin } = useRun();
 
-  // Find and set bin to full
-  if (binListName === 'binsDrop') {
-    // Get Current State
-    currentState = newRunData.sidings
-      .find((item = RunMockData) => item.id === sidingId)
-      .binsDrop.find((item) => item.binNumber === binNumber).isBurnt;
-
-    // Set the inverted State as new state
-    newRunData.sidings
-      .find((item) => item.id === sidingId)
-      .binsDrop.find((item) => item.binNumber === binNumber).isBurnt =
-      !currentState;
-  } else if (binListName === 'binsCollect') {
-    // Get Current State
-    currentState = newRunData.sidings
-      .find((item) => item.id === sidingId)
-      .binsCollect.find((item) => item.binNumber === binNumber).isBurnt;
-
-    // Set the inverted State as new state
-    newRunData.sidings
-      .find((item) => item.id === sidingId)
-      .binsCollect.find((item) => item.binNumber === binNumber).isBurnt =
-      !currentState;
-  }
-  // Apply changes to the state
-  setRunData(newRunData);
-
-  // Debug Log
-  debug ? console.log(JSON.stringify(runData)) : null;
+  return useCallback(
+    (sidingId, binNumber, isDrop) => {
+      const bin = getBin(sidingId, binNumber, isDrop);
+      if (bin) {
+        // Toggle the 'isBurnt' flag
+        const updatedBin = { ...bin, isBurnt: !bin.isBurnt };
+        updateBin(sidingId, binNumber, updatedBin, isDrop);
+      }
+    },
+    [getBin, updateBin]
+  );
 }
