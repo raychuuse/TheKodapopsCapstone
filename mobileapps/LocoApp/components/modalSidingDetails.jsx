@@ -4,32 +4,33 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 // Import Components
 import CustomModal from './modal';
 import BinList from './binList';
-import { RunMockData } from '../data/RunMockData';
 
 // Import Styles
 import { Title1 } from '../styles/typography';
 import { useTheme } from '../styles/themeContext';
 
+// Import Provider
+import { useRun } from '../context/runContext';
+
 const ModalSidingDetails = ({
-  runData = RunMockData,
-  setRunData,
   onClose,
   isVisible = true,
   sidingToViewID = 2,
 }) => {
-  const { theme, toggleTheme } = useTheme();
+  // Providers
+  const { theme } = useTheme();
+  const { getSiding } = useRun();
+
+  // Data
+  const siding = getSiding(sidingToViewID);
   return (
     <CustomModal
       onClose={onClose}
       isVisible={isVisible}
       style={[
         { width: '85%', height: '90%' },
-        runData.sidings.find((item) => item.id === sidingToViewID).isCompleted
-          ? { backgroundColor: theme.spCompleteBG }
-          : null,
-        runData.sidings.find((item) => item.id === sidingToViewID).isSelected
-          ? { backgroundColor: theme.spSelectedBG }
-          : null,
+        siding.isCompleted && { backgroundColor: theme.spCompleteBG },
+        siding.isSelected && { backgroundColor: theme.spSelectedBG },
       ]}
       buttonIcon=''
     >
@@ -40,28 +41,24 @@ const ModalSidingDetails = ({
           name='pin-drop'
           size={28}
           color={
-            runData.sidings.find((item) => item.id === sidingToViewID)
-              .isCompleted
+            siding.isCompleted
               ? theme.spCompleteBGText
-              : runData.sidings.find((item) => item.id === sidingToViewID)
-                  .isSelected
+              : siding.isSelected
               ? theme.spSelectedBGText
               : theme.textLevel2
           }
         />
         <Title1
           style={[
-            runData.sidings.find((item) => item.id === sidingToViewID)
-              .isCompleted
+            siding.isCompleted
               ? { color: theme.spCompleteBGText }
               : theme.spPendingText,
-            runData.sidings.find((item) => item.id === sidingToViewID)
-              .isSelected
+            siding.isSelected
               ? { color: theme.spSelectedBGText }
               : theme.textLevel2,
           ]}
         >
-          {runData.sidings.find((item) => item.id === sidingToViewID).name}
+          {siding.name}
         </Title1>
         <TouchableOpacity
           style={Styles.closeButton}
@@ -71,11 +68,9 @@ const ModalSidingDetails = ({
             name='close-circle-outline'
             size={36}
             color={
-              runData.sidings.find((item) => item.id === sidingToViewID)
-                .isCompleted
+              siding.isCompleted
                 ? theme.spCompleteBGText
-                : runData.sidings.find((item) => item.id === sidingToViewID)
-                    .isSelected
+                : siding.isSelected
                 ? theme.spSelectedBGText
                 : theme.textLevel2
             }
@@ -97,24 +92,15 @@ const ModalSidingDetails = ({
       >
         {/* Drop */}
         <BinList
-          BinData={
-            runData.sidings.find((item) => item.id === sidingToViewID).binsDrop
-          }
+          BinData={siding.binsDrop}
           binListName='binsDrop'
           sidingId={sidingToViewID}
-          runData={runData}
-          setRunData={setRunData}
         />
         {/* Collect */}
         <BinList
-          BinData={
-            runData.sidings.find((item) => item.id === sidingToViewID)
-              .binsCollect
-          }
+          BinData={siding.binsCollect}
           binListName='binsCollect'
           sidingId={sidingToViewID}
-          runData={runData}
-          setRunData={setRunData}
         />
       </View>
     </CustomModal>
