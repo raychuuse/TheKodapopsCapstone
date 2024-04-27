@@ -13,18 +13,22 @@ import ModalSidingDetails from '../../components/modalSidingDetails';
 import ModalSelectSiding from '../../components/modalSelectSiding';
 
 // Import Mock Data
-import { RunMockData } from '../../data/RunMockData';
 import { NotificationsMockData } from '../../data/NotificationsMockData';
 
 // Import Styles
 import { useTheme } from '../../styles/themeContext';
 
+// Import Providers
+import { useRun } from '../../context/runContext';
+
 export default function Page() {
+  // Providers
+  const { runData, updateRun, getSiding } = useRun();
+
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const [sidingCarouselWidth, setSidingCarouselWidth] = useState(0);
 
   // Run Data for the Whole App
-  const [runData, setRunData] = useState(RunMockData);
   const [notifications, setNotifications] = useState(NotificationsMockData);
 
   // Modal State
@@ -48,14 +52,12 @@ export default function Page() {
       <ModalSidingDetails
         isVisible={modalSidingVisible}
         onClose={() => setModalSidingVisible(!modalSidingVisible)}
-        setRunData={setRunData}
-        runData={runData}
         sidingToViewID={sidingToViewID}
       />
       <ModalSelectSiding
         isVisible={modalSelectSidingVisible}
         onClose={() => setModalSelectSidingVisible(!modalSelectSidingVisible)}
-        setRunData={setRunData}
+        setRunData={updateRun}
         runData={runData}
       />
       <View style={{ flex: 1 }}>
@@ -148,7 +150,7 @@ export default function Page() {
       {/* Nav Bar */}
       <BottomBar
         runData={runData}
-        setRunData={setRunData}
+        setRunData={updateRun}
         notifications={notifications}
         setNotifications={setNotifications}
       />
