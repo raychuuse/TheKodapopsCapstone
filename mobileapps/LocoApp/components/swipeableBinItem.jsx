@@ -18,11 +18,14 @@ import { RunMockData } from '../data/RunMockData';
 import { SetIsFull, SetIsBurnt } from '../lib/bins';
 
 const SwipeableBinItem = ({
+  index,
+  isSelected,
   binData = RunMockData[0].binsDrop[0],
   binListName = 'binsDrop',
   sidingId = RunMockData[0].id,
   runData = RunMockData,
   setRunData,
+  longPressHandler,
 }) => {
   const { theme, toggleTheme } = useTheme();
   const [isChecked, setIsChecked] = useState(binData.isFull);
@@ -141,6 +144,14 @@ const SwipeableBinItem = ({
       <View
         style={[
           styles.binItem,
+          isSelected == index && {
+            borderColor: theme.spAtSidingText,
+            borderWidth: 4,
+            borderStyle: 'solid',
+            paddingLeft: 4,
+            paddingRight: 14,
+            paddingVertical: 4,
+          },
           { backgroundColor: theme.binItemBg },
           isChecked
             ? isBurnt
@@ -161,6 +172,7 @@ const SwipeableBinItem = ({
             );
             setIsChecked(!isChecked);
           }}
+          onLongPress={() => longPressHandler(binData.binNumber, index)}
         >
           <Feather
             style={[
