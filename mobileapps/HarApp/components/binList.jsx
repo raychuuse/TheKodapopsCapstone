@@ -10,9 +10,14 @@ import { Colours } from './colours';
 
 // Import Components
 import SwipeableBinItem from './swipeableBinItem';
+import { useBins } from '../context/binContext';
 
 const BinList = ({ BinData }) => {
+  // Provider
+  const { binData, setBinData, getBinData } = useBins();
+
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
+  const [selectedIndices, setSelectedIndices] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
@@ -20,6 +25,59 @@ const BinList = ({ BinData }) => {
   const toggleLock = () => {
     setIsLocked(!isLocked);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
+  // Function to handle long press range selection on bins.
+  const LongPressRangeSelect = (binNumber, index) => {
+    // Clone the current selection to avoid direct state mutation.
+    let newSelection = [...selectedIndices];
+
+    // Case when no bins are currently selected.
+    if (newSelection.length === 0) {
+      // Add the first selected bin's details to the array.
+      newSelection.push({ binNumber, index });
+      // Update the state to reflect the new selection.
+      setSelectedIndices(newSelection);
+      // Provide haptic feedback to indicate successful selection.
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+    // Case when there is already one bin selected.
+    else if (newSelection.length === 1) {
+      // Check if the same bin is selected again.
+      if (newSelection[0].index === index) {
+        // Clear the selection if the same bin is selected again.
+        setSelectedIndices([]);
+        // Provide haptic feedback to indicate removal.
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } else {
+        // Add the newly selected bin to the selection array.
+        newSelection.push({ binNumber, index });
+
+        // Temporary copy of bin data for mutation.
+        const _binData = binData;
+
+        // Extract indices from the selected objects for range calculation.
+        const indices = newSelection.map((selection) => selection.index);
+        // Calculate the minimum and maximum indices to define the range.
+        const minIndex = Math.min(...indices);
+        const maxIndex = Math.max(...indices);
+
+        // Determine the desired 'full' state based on the first selected bin.
+        const toSet = !binData[newSelection[0].index].isFull;
+
+        // Loop through the range of indices and set each bin's 'full' state.
+        for (let i = minIndex; i <= maxIndex; i++) {
+          _binData[i].isFull = toSet;
+        }
+
+        // Update the bin data state with the new 'full' states.
+        setBinData(_binData);
+        // Clear the selection after the action is completed.
+        setSelectedIndices([]);
+        // Provide haptic feedback to indicate successful processing.
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    }
   };
 
   // ~ ~ ~ ~ ~ ~ ~ List Components ~ ~ ~ ~ ~ ~ ~ //
@@ -30,6 +88,7 @@ const BinList = ({ BinData }) => {
       <SwipeableBinItem
         index={index}
         binNumber={item.binNum}
+        longPressHandler={LongPressRangeSelect}
         style={{
           position: 'relative',
           paddingHorizontal: 8,

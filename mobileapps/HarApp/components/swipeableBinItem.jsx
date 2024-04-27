@@ -12,7 +12,7 @@ import { Colours } from './colours';
 import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
 import { useBins } from '../context/binContext';
 
-const SwipeableBinItem = ({ index = 0, binNumber = 'Bin Number' }) => {
+const SwipeableBinItem = ({ index, binNumber, longPressHandler }) => {
   // Providers
   const { getBinData, setBinFull, setBinBurnt } = useBins();
 
@@ -135,6 +135,7 @@ const SwipeableBinItem = ({ index = 0, binNumber = 'Bin Number' }) => {
             setBinFull(binNumber, !getBinData(binNumber).isFull);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }}
+          onLongPress={() => longPressHandler(binNumber, index)}
         >
           <Feather
             style={[
