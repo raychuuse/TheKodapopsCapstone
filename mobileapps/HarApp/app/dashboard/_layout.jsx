@@ -9,6 +9,9 @@ import ModalNotifications from '../../components/modalNotification';
 import ModalTutorial from '../../components/modalTutorial';
 import BottomBar from '../../components/bottomBar';
 
+// Import Providers
+import { BinProvider } from '../../context/binContext';
+
 // Mock Data
 const notificationsData = [
   {
@@ -74,7 +77,9 @@ const Layout = () => {
         setIsVisable={setTutorialVisable}
       />
       {/* Page */}
-      <Slot />
+      <BinProvider>
+        <Slot />
+      </BinProvider>
       {/* Navigation */}
       <BottomBar
         notifications={notifications}
