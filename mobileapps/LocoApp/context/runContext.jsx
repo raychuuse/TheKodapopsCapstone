@@ -84,6 +84,14 @@ export const RunProvider = ({ children }) => {
     return siding ? (isDrop ? siding.binsDrop : siding.binsCollect) : [];
   };
 
+  // Retrieves a specific bin from a specific siding, either drop or collect
+  const getBin = (sidingId, binNumber, isDrop) => {
+    const siding = getSiding(sidingId);
+    if (!siding) return undefined;
+    const binsKey = isDrop ? 'binsDrop' : 'binsCollect';
+    return siding[binsKey].find((bin) => bin.binNumber === binNumber);
+  };
+
   return (
     <RunContext.Provider
       value={{
@@ -91,6 +99,7 @@ export const RunProvider = ({ children }) => {
         getRun,
         getSiding,
         getBins,
+        getBin,
         updateRun,
         updateSiding,
         updateBin,
@@ -107,26 +116,37 @@ export const RunProvider = ({ children }) => {
  * throughout the application without having to deal with the context directly.
  *
  * @returns {{
- *   state: object,
+ *   runData: object,
  *   getRun: () => object,
  *   getSiding: (id: number) => object | undefined,
  *   getBins: (sidingId: number, isDrop: boolean) => array,
+ *   getBin: (sidingId, binNumber, isDrop) => object | undefined
  *   updateRun: (updates: object) => void,
  *   updateSiding: (id: number, updates: object) => void,
  *   updateBin: (sidingId: number, binNumber: number, updates: object, isDrop: boolean) => void
  * }} Returns an object containing:
- * - `state`: The entire run state object.
+ * - `runData`: The entire run data state object.
+ *
  * - `getRun`: Retrieves the entire current run data.
+ *
  * - `getSiding`: Retrieves details about a specific siding by its ID.
  *   @param {number} id The ID of the siding to retrieve.
+ *
  * - `getBins`: Retrieves bins from a specific siding, either drop or collect.
  *   @param {number} sidingId The ID of the siding from which to retrieve bins.
  *   @param {boolean} isDrop Specifies whether to retrieve 'drop' bins or 'collect' bins.
+ *
+ * - `getBin`: Retrieves a specific bin from a specific siding, either drop or collect.
+ *   @param {number} sidingId The ID of the siding from which to retrieve the bin.
+ *   @param {number} binNumber The number of the bin to retrieve.
+ *   @param {boolean} isDrop Specifies whether to retrieve the bin from 'drop' bins or 'collect' bins.
+ *
  * - `updateRun`: Updates the global run properties.
  *   @param {object} updates An object containing the updates to apply to the run.
  * - `updateSiding`: Updates specific properties of a siding.
  *   @param {number} id The ID of the siding to update.
  *   @param {object} updates An object containing the updates to apply to the siding.
+ *
  * - `updateBin`: Updates specific bin details in drop or collect arrays.
  *   @param {number} sidingId The ID of the siding containing the bin.
  *   @param {number} binNumber The number of the bin to update.
@@ -134,7 +154,7 @@ export const RunProvider = ({ children }) => {
  *   @param {boolean} isDrop Specifies whether the bin is in the 'drop' array or 'collect' array.
  *
  * @example
- * const { state, getRun, updateRun, getSiding, getBins, updateSiding, updateBin } = useRun();
+ * const { runData, getRun, updateRun, getSiding, getBins, updateSiding, updateBin } = useRun();
  *
  * Example of using `getSiding`:
  * const siding = getSiding(1);
@@ -144,4 +164,25 @@ export const RunProvider = ({ children }) => {
  *
  * This hook abstracts away the complexity of the context API and provides direct access to the state and functions.
  */
-export const useRun = () => useContext(RunContext);
+export const useRun = () => {
+  const {
+    state,
+    getRun,
+    getSiding,
+    getBins,
+    getBin,
+    updateRun,
+    updateSiding,
+    updateBin,
+  } = useContext(RunContext);
+  return {
+    runData: state,
+    getRun,
+    getSiding,
+    getBins,
+    getBin,
+    updateRun,
+    updateSiding,
+    updateBin,
+  };
+};
