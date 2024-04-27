@@ -10,18 +10,18 @@ import { useTheme } from '../styles/themeContext';
 // Import Components
 import SwipeableBinItem from './swipeableBinItem';
 
-// Import Mock Data
-import { RunMockData } from '../data/RunMockData';
+// Import Provider
+import { useRun } from '../context/runContext';
 
-const BinList = ({
-  BinData,
-  setRunData,
-  runData = RunMockData,
-  sidingId,
-  binListName,
-}) => {
+const BinList = ({ sidingId, binListName }) => {
   // Provider
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
+  const { runData, getBins, updateRun, getSiding } = useRun();
+
+  // Data
+  const binsKey = binListName == 'binsDrop';
+  const BinData = getBins(sidingId, binsKey);
+  const siding = getSiding(sidingId);
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
   const [selectedIndices, setSelectedIndices] = useState([]);
@@ -30,6 +30,7 @@ const BinList = ({
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
+  // TODO: Fix this to use the context right and the re-render issue after updates
   // Function to handle long press range selection on bins.
   const LongPressRangeSelect = (binNumber, index) => {
     // Clone the current selection to avoid direct state mutation.
@@ -91,7 +92,7 @@ const BinList = ({
         });
 
         // Update the bin data state with the new 'full' states.
-        setRunData(_runData);
+        updateRun(_runData);
         // Clear the selection after the action is completed.
         setSelectedIndices([]);
         // Unset the is selected indicator
@@ -99,11 +100,11 @@ const BinList = ({
         // Provide haptic feedback to indicate successful processing.
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-        console.log(
-          JSON.stringify(
-            _runData.sidings.find((siding) => siding.id == sidingId)
-          )
-        );
+        // console.log(
+        //   JSON.stringify(
+        //     _runData.sidings.find((siding) => siding.id == sidingId)
+        //   )
+        // );
       }
     }
   };
@@ -113,11 +114,9 @@ const BinList = ({
     <SwipeableBinItem
       index={index}
       isSelected={isSelected}
-      binData={item}
+      binNumber={item.binNumber}
       binListName={binListName}
       sidingId={sidingId}
-      runData={runData}
-      setRunData={setRunData}
       longPressHandler={LongPressRangeSelect}
     />
   );
@@ -154,9 +153,9 @@ const BinList = ({
             alignItems: 'center',
             paddingHorizontal: 8,
           },
-          runData.sidings.find((item) => item.id === sidingId).isCompleted
+          siding.isCompleted
             ? { backgroundColor: theme.spComplete }
-            : runData.sidings.find((item) => item.id === sidingId).isSelected
+            : siding.isSelected
             ? { backgroundColor: theme.spSelected }
             : { backgroundColor: theme.spPending },
         ]}
