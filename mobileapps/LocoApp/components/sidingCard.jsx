@@ -4,36 +4,28 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Styles
 import { Title3, Headline, H1 } from '../styles/typography';
-import { useTheme } from '../styles/themeContext';
 
-const SidingCard = ({
-  containerWidth,
-  index,
-  listLength,
-  isCompleted = false,
-  isSelected = false,
-  name: name = 'Siding Name',
-  drop = 888,
-  collect = 888,
-  selectedHandeler,
-  scrollX,
-  onPress,
-}) => {
-  const { theme, toggleTheme } = useTheme();
-  const [_isCompleted, setIsCompleted] = useState(isCompleted);
-  const [_isSelected, setIsSelected] = useState(isSelected);
+// Import Providers
+import { useTheme } from '../styles/themeContext';
+import { useModal } from '../context/modalContext';
+import { useRun } from '../context/runContext';
+
+const SidingCard = ({ sidingID, index, scrollX, containerWidth }) => {
+  // Providers
+  const { theme } = useTheme();
+  const { getSiding, runData } = useRun();
+  const { updateSelectedSidingID, selectedSidingID, openSidingModal } =
+    useModal();
+
+  // Data
+  const siding = getSiding(sidingID);
+
+  // Animation Constants
   const inputRange = [(index - 1) * 170, index * 170, (index + 1) * 170];
   const translateY = scrollX.interpolate({
     inputRange,
     outputRange: [0, -10, 0],
   });
-
-  // TODO: REMOVE when a selectedHandeler is implemented!!!
-  if (selectedHandeler == null) {
-    selectedHandeler = () => {
-      setIsSelected(!_isSelected);
-    };
-  }
 
   return (
     <Animated.View
@@ -43,12 +35,12 @@ const SidingCard = ({
           backgroundColor: theme.spPending,
           borderColor: theme.spPendingBorder,
         },
-        _isCompleted
+        siding.isCompleted
           ? {
               backgroundColor: theme.spComplete,
               borderColor: theme.spCompleteBorder,
             }
-          : _isSelected
+          : siding.id == selectedSidingID
           ? {
               backgroundColor: theme.spSelected,
               borderColor: theme.spSelectedBorder,
@@ -56,27 +48,27 @@ const SidingCard = ({
           : null,
         { transform: [{ translateY }] },
         index == 0 ? { marginLeft: (containerWidth - 170) / 2 } : null,
-        index == listLength - 1
+        index == runData.sidings.length - 1
           ? { marginRight: (containerWidth - 170) / 2 }
           : null,
       ]}
     >
       <TouchableOpacity
-        onPress={onPress}
+        onPress={() => openSidingModal(sidingID)}
         style={{ flex: 1, width: '100%', alignItems: 'center' }}
       >
         <View style={{ flex: 3, justifyContent: 'center' }}>
           <Title3
             style={[
               { color: theme.spPendingText },
-              _isCompleted
+              siding.isCompleted
                 ? { color: theme.spCompleteText }
-                : _isSelected
+                : siding.id == selectedSidingID
                 ? { color: theme.spSelectedText }
                 : null,
             ]}
           >
-            {name}
+            {siding.name}
           </Title3>
         </View>
         <View
@@ -88,9 +80,9 @@ const SidingCard = ({
               name='download'
               size={18}
               color={
-                _isCompleted
+                siding.isCompleted
                   ? theme.spCompleteText
-                  : _isSelected
+                  : siding.id == selectedSidingID
                   ? theme.spSelectedText
                   : theme.spPendingText
               }
@@ -99,9 +91,9 @@ const SidingCard = ({
               style={[
                 { marginRight: 9 },
                 { color: theme.spPendingText },
-                _isCompleted
+                siding.isCompleted
                   ? { color: theme.spCompleteText }
-                  : _isSelected
+                  : siding.id == selectedSidingID
                   ? { color: theme.spSelectedText }
                   : null,
               ]}
@@ -113,14 +105,14 @@ const SidingCard = ({
             style={[
               styles.binCounter,
               { color: theme.spPendingText },
-              _isCompleted
+              siding.isCompleted
                 ? { color: theme.spCompleteText }
-                : _isSelected
+                : siding.id == selectedSidingID
                 ? { color: theme.spSelectedText }
                 : null,
             ]}
           >
-            {drop}
+            {siding.binsDrop.length}
           </H1>
         </View>
         <View
@@ -132,9 +124,9 @@ const SidingCard = ({
               name='upload'
               size={18}
               color={
-                _isCompleted
+                siding.isCompleted
                   ? theme.spCompleteText
-                  : _isSelected
+                  : siding.id == selectedSidingID
                   ? theme.spSelectedText
                   : theme.spPendingText
               }
@@ -143,9 +135,9 @@ const SidingCard = ({
               style={[
                 { marginRight: 9 },
                 { color: theme.spPendingText },
-                _isCompleted
+                siding.isCompleted
                   ? { color: theme.spCompleteText }
-                  : _isSelected
+                  : siding.id == selectedSidingID
                   ? { color: theme.spSelectedText }
                   : null,
               ]}
@@ -157,14 +149,14 @@ const SidingCard = ({
             style={[
               styles.binCounter,
               { color: theme.spPendingText },
-              _isCompleted
+              siding.isCompleted
                 ? { color: theme.spCompleteText }
-                : _isSelected
+                : siding.id == selectedSidingID
                 ? { color: theme.spSelectedText }
                 : null,
             ]}
           >
-            {collect}
+            {siding.binsCollect.length}
           </H1>
         </View>
         <View
@@ -172,22 +164,22 @@ const SidingCard = ({
         />
         <View style={{ flex: 3, justifyContent: 'center' }}>
           <TouchableOpacity
-            onPress={selectedHandeler}
-            disabled={isCompleted}
+            onPress={() => updateSelectedSidingID(sidingID)}
+            disabled={siding.isCompleted}
           >
             <MaterialCommunityIcons
               name={
-                _isCompleted
+                siding.isCompleted
                   ? 'checkbox-marked-circle-outline'
-                  : _isSelected
+                  : siding.id == selectedSidingID
                   ? 'star-circle-outline'
                   : 'checkbox-blank-circle-outline'
               }
               size={36}
               color={
-                _isCompleted
+                siding.isCompleted
                   ? theme.spCompleteText
-                  : _isSelected
+                  : siding.id == selectedSidingID
                   ? theme.spSelectedText
                   : theme.spPendingText
               }

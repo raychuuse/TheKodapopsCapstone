@@ -5,19 +5,21 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Container from './container';
 import { Footnote, Headline, Title3 } from '../styles/typography';
 
-// Import Mock Data
-import { RunMockData } from '../data/RunMockData';
-
 // Import Style
 import { useTheme } from '../styles/themeContext';
+import { useRun } from '../context/runContext';
+import { useModal } from '../context/modalContext';
 
-export default function SelectedSiddingStats({
-  runData = RunMockData,
-  selectedSidingID,
-  openSidingDetailsModal,
-  openSidingSelectModal,
-}) {
-  const { theme, toggleTheme } = useTheme();
+export default function SelectedSiddingStats() {
+  // Porviders
+  const { theme } = useTheme();
+  const { getSiding } = useRun();
+  const { openSelectSidingModal, selectedSidingID, openSidingModal } =
+    useModal();
+
+  // Data
+  const siding = getSiding(selectedSidingID);
+
   return (
     <Container
       style={{
@@ -31,7 +33,7 @@ export default function SelectedSiddingStats({
       {/* Displays the number of bins to drop off at the selected siding */}
       <TouchableOpacity
         style={{ flex: 2, alignItems: 'center' }}
-        onPress={openSidingDetailsModal}
+        onPress={() => openSidingModal(selectedSidingID)}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <MaterialIcons
@@ -43,12 +45,7 @@ export default function SelectedSiddingStats({
             Drop Off
           </Headline>
         </View>
-        <Title3>
-          {
-            runData.sidings.find((item) => item.id === selectedSidingID)
-              .binsDrop.length
-          }
-        </Title3>
+        <Title3>{siding.binsDrop.length}</Title3>
       </TouchableOpacity>
 
       {/* Vertical Rule */}
@@ -65,7 +62,7 @@ export default function SelectedSiddingStats({
       {/* Selected Siding */}
       {/* Show the name and ETA for the Selected Siding */}
       <TouchableOpacity
-        onPress={openSidingSelectModal}
+        onPress={openSelectSidingModal}
         style={{ flex: 3, height: '100%', alignItems: 'center' }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -78,10 +75,8 @@ export default function SelectedSiddingStats({
             color={theme.textLevel3}
           />
         </View>
-        <Title3>
-          {runData.sidings.find((item) => item.id === selectedSidingID).name}
-        </Title3>
-        <Footnote style={{ color: theme.textLevel3 }}>ETA: 12:05 PM</Footnote>
+        <Title3>{siding.name}</Title3>
+        {/* <Footnote style={{ color: theme.textLevel3 }}>ETA: 12:05 PM</Footnote> */}
       </TouchableOpacity>
 
       {/* Vertical Rule */}
@@ -99,7 +94,7 @@ export default function SelectedSiddingStats({
       {/* Displays the number of bins to collect from the selected siding */}
       <TouchableOpacity
         style={{ flex: 2, alignItems: 'center' }}
-        onPress={openSidingDetailsModal}
+        onPress={() => openSidingModal(selectedSidingID)}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Headline style={{ marginLeft: 9, color: theme.textLevel3 }}>
@@ -111,12 +106,7 @@ export default function SelectedSiddingStats({
             color={theme.textLevel3}
           />
         </View>
-        <Title3>
-          {
-            runData.sidings.find((item) => item.id === selectedSidingID)
-              .binsCollect.length
-          }
-        </Title3>
+        <Title3>{siding.binsCollect.length}</Title3>
       </TouchableOpacity>
     </Container>
   );

@@ -15,30 +15,20 @@ import ModalSelectSiding from '../../components/modalSelectSiding';
 // Import Mock Data
 import { NotificationsMockData } from '../../data/NotificationsMockData';
 
-// Import Styles
-import { useTheme } from '../../styles/themeContext';
-
 // Import Providers
+import { useTheme } from '../../styles/themeContext';
 import { useRun } from '../../context/runContext';
 
 export default function Page() {
   // Providers
-  const { runData, updateRun, getSiding } = useRun();
+  const { runData, updateRun } = useRun();
+  const { theme } = useTheme();
 
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const [sidingCarouselWidth, setSidingCarouselWidth] = useState(0);
 
   // Run Data for the Whole App
   const [notifications, setNotifications] = useState(NotificationsMockData);
-
-  // Modal State
-  const [modalSidingVisible, setModalSidingVisible] = useState(false);
-  const [modalSelectSidingVisible, setModalSelectSidingVisible] =
-    useState(false);
-  const [selectedSidingID, setSelectedSidingID] = useState(3);
-  const [sidingToViewID, setSidingToViewID] = useState(2);
-
-  const { theme, toggleTheme } = useTheme();
 
   return (
     <View
@@ -49,17 +39,8 @@ export default function Page() {
         paddingTop: 32,
       }}
     >
-      <ModalSidingDetails
-        isVisible={modalSidingVisible}
-        onClose={() => setModalSidingVisible(!modalSidingVisible)}
-        sidingToViewID={sidingToViewID}
-      />
-      <ModalSelectSiding
-        isVisible={modalSelectSidingVisible}
-        onClose={() => setModalSelectSidingVisible(!modalSelectSidingVisible)}
-        setRunData={updateRun}
-        runData={runData}
-      />
+      <ModalSidingDetails />
+      <ModalSelectSiding />
       <View style={{ flex: 1 }}>
         <View
           style={{
@@ -71,17 +52,7 @@ export default function Page() {
         >
           <StatusIndicator />
           <UserGreeting />
-          <SelectedSiddingStats
-            runData={runData}
-            selectedSidingID={selectedSidingID}
-            openSidingDetailsModal={() => {
-              setSidingToViewID(selectedSidingID);
-              setModalSidingVisible(true);
-            }}
-            openSidingSelectModal={() => {
-              setModalSelectSidingVisible(true);
-            }}
-          />
+          <SelectedSiddingStats />
         </View>
         <View
           style={{
@@ -121,19 +92,10 @@ export default function Page() {
               data={runData.sidings}
               renderItem={({ item, index }) => (
                 <SidingCard
-                  isCompleted={item.isCompleted}
-                  isSelected={item.isSelected}
-                  name={item.name}
-                  drop={item.binsDrop.length}
-                  collect={item.binsCollect.length}
+                  sidingID={item.id}
                   index={index}
                   scrollX={scrollX}
                   containerWidth={sidingCarouselWidth}
-                  listLength={runData.sidings.length}
-                  onPress={() => {
-                    setSidingToViewID(item.id);
-                    setModalSidingVisible(true);
-                  }}
                 />
               )}
             />

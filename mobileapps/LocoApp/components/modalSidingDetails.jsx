@@ -7,30 +7,35 @@ import BinList from './binList';
 
 // Import Styles
 import { Title1 } from '../styles/typography';
-import { useTheme } from '../styles/themeContext';
 
 // Import Provider
+import { useTheme } from '../styles/themeContext';
 import { useRun } from '../context/runContext';
+import { useModal } from '../context/modalContext';
 
-const ModalSidingDetails = ({
-  onClose,
-  isVisible = true,
-  sidingToViewID = 2,
-}) => {
+const ModalSidingDetails = () => {
   // Providers
   const { theme } = useTheme();
   const { getSiding } = useRun();
+  const {
+    sidingToViewID,
+    modalSidingVisible,
+    closeSidingModal,
+    selectedSidingID,
+  } = useModal();
 
   // Data
   const siding = getSiding(sidingToViewID);
   return (
     <CustomModal
-      onClose={onClose}
-      isVisible={isVisible}
+      onClose={closeSidingModal}
+      isVisible={modalSidingVisible}
       style={[
         { width: '85%', height: '90%' },
         siding.isCompleted && { backgroundColor: theme.spCompleteBG },
-        siding.isSelected && { backgroundColor: theme.spSelectedBG },
+        siding.id === selectedSidingID && {
+          backgroundColor: theme.spSelectedBG,
+        },
       ]}
       buttonIcon=''
     >
@@ -43,7 +48,7 @@ const ModalSidingDetails = ({
           color={
             siding.isCompleted
               ? theme.spCompleteBGText
-              : siding.isSelected
+              : siding.id === selectedSidingID
               ? theme.spSelectedBGText
               : theme.textLevel2
           }
@@ -53,7 +58,7 @@ const ModalSidingDetails = ({
             siding.isCompleted
               ? { color: theme.spCompleteBGText }
               : theme.spPendingText,
-            siding.isSelected
+            siding.id === selectedSidingID
               ? { color: theme.spSelectedBGText }
               : theme.textLevel2,
           ]}
@@ -62,7 +67,7 @@ const ModalSidingDetails = ({
         </Title1>
         <TouchableOpacity
           style={Styles.closeButton}
-          onPress={onClose}
+          onPress={closeSidingModal}
         >
           <MaterialCommunityIcons
             name='close-circle-outline'
@@ -70,7 +75,7 @@ const ModalSidingDetails = ({
             color={
               siding.isCompleted
                 ? theme.spCompleteBGText
-                : siding.isSelected
+                : siding.id === selectedSidingID
                 ? theme.spSelectedBGText
                 : theme.textLevel2
             }

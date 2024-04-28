@@ -2,36 +2,47 @@ import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Import Styles
-import { Headline, Subhead, Title1, Title2 } from '../styles/typography';
-import { useTheme } from '../styles/themeContext';
-
-// Import Mock Data
-import { RunMockData } from '../data/RunMockData';
+import { Headline, Title1, Title2 } from '../styles/typography';
 
 // Import Componetns
 import CustomModal from './modal';
 import Divider from './divider';
 
-const ModalSelectSiding = ({ isVisible, onClose, runData = RunMockData }) => {
-  const { theme, toggleTheme } = useTheme();
+// Import Providers
+import { useTheme } from '../styles/themeContext';
+import { useModal } from '../context/modalContext';
+import { useRun } from '../context/runContext';
 
-  const SidingListItem = ({ sidingData = RunMockData.sidings[0] }) => {
+const ModalSelectSiding = () => {
+  const { theme } = useTheme();
+  const { runData, getSiding } = useRun();
+  const {
+    modalSelectSidingVisible,
+    closeSelectSidingModal,
+    selectedSidingID,
+    updateSelectedSidingID,
+  } = useModal();
+
+  const SidingListItem = ({ sidingId }) => {
+    // Data
+    const sidingData = getSiding(sidingId);
+
     // Background Color for the Siding, this is base on the siding data
     const backgroundColor = sidingData.isCompleted
       ? theme.spCompleteBG
-      : sidingData.isSelected
+      : sidingData.id == selectedSidingID
       ? theme.spSelectedBG
       : theme.spPendingBG;
     // Text Color for the Siding, this is base on the siding data
     const TextColor = sidingData.isCompleted
       ? theme.spCompleteText
-      : sidingData.isSelected
+      : sidingData.id == selectedSidingID
       ? theme.spSelectedText
       : theme.spPendingText;
     // Icon Name for the Siding Icon, this is base on the siding data
     const Icon = sidingData.isCompleted
       ? 'checkbox-marked-circle-outline'
-      : sidingData.isSelected
+      : sidingData.id == selectedSidingID
       ? 'star-circle-outline'
       : 'checkbox-blank-circle-outline';
     return (
@@ -46,6 +57,7 @@ const ModalSelectSiding = ({ isVisible, onClose, runData = RunMockData }) => {
           alignItems: 'center',
           backgroundColor: backgroundColor,
         }}
+        onPress={() => updateSelectedSidingID(sidingId)}
         disabled={sidingData.isCompleted}
       >
         {/* Siding State Icon */}
@@ -113,12 +125,13 @@ const ModalSelectSiding = ({ isVisible, onClose, runData = RunMockData }) => {
   };
 
   const renderItem = ({ item }) => {
-    return <SidingListItem sidingData={item} />;
+    return <SidingListItem sidingId={item.id} />;
   };
+
   return (
     <CustomModal
-      isVisible={isVisible}
-      onClose={onClose}
+      isVisible={modalSelectSidingVisible}
+      onClose={closeSelectSidingModal}
       buttonIcon='check-circle-outline'
       style={{ width: '80%', maxWidth: 800, height: '70%' }}
     >

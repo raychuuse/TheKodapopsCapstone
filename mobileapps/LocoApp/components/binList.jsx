@@ -5,18 +5,20 @@ import * as Haptics from 'expo-haptics';
 
 // Import Styles
 import { Title2 } from '../styles/typography';
-import { useTheme } from '../styles/themeContext';
 
 // Import Components
 import SwipeableBinItem from './swipeableBinItem';
 
 // Import Provider
 import { useRun } from '../context/runContext';
+import { useTheme } from '../styles/themeContext';
+import { useModal } from '../context/modalContext';
 
 const BinList = ({ sidingId, binListName }) => {
   // Provider
   const { theme } = useTheme();
   const { runData, getBins, updateRun, getSiding } = useRun();
+  const { selectedSidingID } = useModal();
 
   // Data
   const binsKey = binListName == 'binsDrop';
@@ -155,7 +157,7 @@ const BinList = ({ sidingId, binListName }) => {
           },
           siding.isCompleted
             ? { backgroundColor: theme.spComplete }
-            : siding.isSelected
+            : siding.id == selectedSidingID
             ? { backgroundColor: theme.spSelected }
             : { backgroundColor: theme.spPending },
         ]}

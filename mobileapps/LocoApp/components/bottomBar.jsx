@@ -8,21 +8,15 @@ import { useTheme } from '../styles/themeContext';
 // Components
 import NotificationBell from './notificationBell';
 import Button from './button';
-import CustomModal from './modal';
 import RunSheet from './runSheet';
 import ModalSettings from './modalSettings';
 import ModalNotifications from './modalNotifications';
 
-const BottomBar = ({
-  runData,
-  setRunData,
-  notifications,
-  setNotifications,
-}) => {
+const BottomBar = ({ notifications, setNotifications }) => {
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [routeVisible, setRouteVisible] = useState(false);
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   return (
     <>
       {/* Settings Modal */}
@@ -38,18 +32,10 @@ const BottomBar = ({
         setNotifications={setNotifications}
       />
       {/* Route Modal */}
-      <CustomModal
+      <RunSheet
         isVisible={routeVisible}
         onClose={() => setRouteVisible(false)}
-        style={{ width: '85%', height: '90%' }}
-        buttonIcon=''
-      >
-        <RunSheet
-          onClose={() => setRouteVisible(false)}
-          runData={runData}
-          setRunData={setRunData}
-        />
-      </CustomModal>
+      />
       {/* Nav Bar */}
       <LinearGradient
         colors={theme.containerGradient}
