@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import Component
 import Button from './button';
@@ -21,7 +22,31 @@ const SettingsItem = ({
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
 
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    const loadSelectedOption = async () => {
+      try {
+        const storedOption = await AsyncStorage.getItem(label);
+        if (storedOption !== null) {
+          setSelectedOption(parseInt(storedOption));
+        }
+      } catch (error) {
+        console.error('Failed to load the selected option from storage', error);
+      }
+    };
+
+    loadSelectedOption();
+  }, [label]);
+
+  const handleValueChange = async (itemValue, itemIndex) => {
+    try {
+      await AsyncStorage.setItem(label, itemValue.toString());
+      setSelectedOption(itemValue);
+    } catch (error) {
+      console.error('Failed to save the selected option to storage', error);
+    }
+  };
 
   return (
     <>
@@ -37,9 +62,7 @@ const SettingsItem = ({
           </Type.Title1>
           <Picker
             selectedValue={selectedOption}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedOption(itemValue)
-            }
+            onValueChange={handleValueChange}
             style={{
               borderRadius: 16,
               backgroundColor: Colours.bgLevel6,
@@ -90,12 +113,9 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     width: '100%',
-
     gap: 22,
-
     paddingHorizontal: 16,
     paddingVertical: 4,
-
     alignItems: 'center',
   },
   button: {

@@ -18,7 +18,7 @@ import {
 } from '../data/settingsMockData';
 
 const SetupPage = () => {
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   return (
     <View style={[styles.page, { backgroundColor: theme.appBG }]}>
       <View style={[styles.body, { backgroundColor: theme.bgModal }]}>
