@@ -5,11 +5,13 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 // Your custom Colours and Type objects
 
 import { Headline } from '../styles/typography';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const NotificationItem = ({ icon, label, onRemove, type = 'default' }) => {
+  const { theme, toggleTheme } = useTheme();
+
   // Get the color based on the type, default to 'default' if not specified
-  const textColor = Colours.types[type] || Colours.types.default;
+  const textColor = theme.types[type] || theme.types.default;
 
   return (
     <View style={styles.container}>

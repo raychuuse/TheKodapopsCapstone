@@ -6,21 +6,38 @@ import * as Haptics from 'expo-haptics';
 
 // Import Styling Components
 import { Headline } from '../styles/typography';
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 import {pickUpBin, dropOffBin} from '../api/runs.api';
 
 // Import Functions
 import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
 
+// Import Provider
+import { useRun } from '../context/runContext';
+
+// Import Function
+import { useSetIsFull, useSetIsBurnt } from '../lib/bins';
+
 const SwipeableBinItem = ({
-  bin,
-  onBinSelected,
-  type
+  index,
+  isSelected,
+  binNumber,
+  binListName = 'binsDrop',
+  sidingId,
+  longPressHandler,
 }) => {
-  const isChecked = type === 'PICKED_UP' ? bin.dropped_off_in_stop : bin.picked_up_in_stop;
-  const message = type === 'PICKED_UP' ? 'Dropped Off' : 'Picked Up';
-  const [isBurnt, setIsBurnt] = useState(bin.burnt);
+  // Providers
+  const { theme } = useTheme();
+  const { getBin } = useRun();
+
+  // Build Function Hooks
+  const SetIsFull = useSetIsFull();
+  const SetIsBurnt = useSetIsBurnt();
+
+  // Data
+  const binsKey = binListName == 'binsDrop';
+  const binData = getBin(sidingId, binNumber, binsKey);
 
   // Define the right actions for swipe
   const renderRightActions = () => {
@@ -36,7 +53,7 @@ const SwipeableBinItem = ({
       >
         <TouchableOpacity
           onPress={() => {
-            RepairBinAlert(bin.binNumber);
+            RepairBinAlert(binData.binNumber);
             Haptics.selectionAsync();
           }}
           style={[styles.actionButton, { backgroundColor: '#FFA000' }]}
@@ -44,23 +61,23 @@ const SwipeableBinItem = ({
           <Feather
             name='tool'
             size={24}
-            color='#fff'
+            color={theme.spAtSidingText}
           />
-          <Headline style={styles.binText}>Repair</Headline>
+          <Headline style={{ color: theme.spAtSidingText }}>Repair</Headline>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: '#D32F2F' }]}
           onPress={() => {
-            RemoveBinAlert(`Bin #${bin.binNumber}`);
+            RemoveBinAlert(`Bin #${binData.binNumber}`);
             Haptics.selectionAsync();
           }}
         >
           <Feather
             name='help-circle'
             size={24}
-            color='#fff'
+            color={theme.spAtSidingText}
           />
-          <Headline style={styles.binText}>Missing</Headline>
+          <Headline style={{ color: theme.spAtSidingText }}>Missing</Headline>
         </TouchableOpacity>
       </View>
     );
@@ -81,22 +98,19 @@ const SwipeableBinItem = ({
         <View
           style={[
             styles.actionButton,
-            isBurnt ? styles.actionButtonGreen : styles.actionButtonBurnt,
+            binData.isBurnt
+              ? { backgroundColor: theme.bgGreen }
+              : { backgroundColor: theme.bgBurnt },
             { width: 180 },
           ]}
-          onPress={() => {
-            bin.burnt = !isBurnt;
-            setIsBurnt(!isBurnt);
-            Haptics.selectionAsync();
-          }}
         >
           <MaterialCommunityIcons
-            name={!isBurnt ? 'fire' : 'leaf'}
+            name={binData.isBurnt ? 'fire' : 'leaf'}
             size={24}
-            color='#fff'
+            color={theme.spAtSidingText}
           />
-          <Headline style={styles.binText}>
-            Mark as {isBurnt ? 'Green' : 'Burnt'}
+          <Headline style={{ color: theme.spAtSidingText }}>
+            Mark as {binData.isBurnt ? 'Green' : 'Burnt'}
           </Headline>
         </View>
       </View>
@@ -109,12 +123,10 @@ const SwipeableBinItem = ({
   // OnSwipeOpen Handler
   const onSwipeOpen = (direction) => {
     if (direction == 'left') {
-      setIsBurnt(!isBurnt);
+      SetIsBurnt(sidingId, binNumber, binsKey);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       swipeableRef.current.close();
     }
-    // TODO Remove
-    swipeableRef.current.close();
   };
 
   return (
@@ -129,38 +141,48 @@ const SwipeableBinItem = ({
       <View
         style={[
           styles.binItem,
-          isChecked
-            ? isBurnt
-              ? styles.binItemCaneBurnt
-              : styles.binItemCaneGreen
+          isSelected == index && {
+            borderColor: theme.spAtSidingText,
+            borderWidth: 4,
+            borderStyle: 'solid',
+            paddingLeft: 4,
+            paddingRight: 14,
+            paddingVertical: 4,
+          },
+          { backgroundColor: theme.binItemBg },
+          binData.isFull
+            ? binData.isBurnt
+              ? { backgroundColor: theme.binItemBurnt }
+              : { backgroundColor: theme.binItemGreen }
             : null,
         ]}
       >
         <TouchableOpacity
           style={styles.binPressable}
           onPress={() => {
-            onBinSelected(bin);
+            SetIsFull(sidingId, binData.binNumber, binsKey);
           }}
+          onLongPress={() => longPressHandler(binData.binNumber, index)}
         >
           <Feather
             style={[
-              styles.binCheckBox,
-              isChecked
-                ? isBurnt
-                  ? styles.binItemCaneBurnt
-                  : styles.binItemCaneGreen
+              { color: theme.spAtSidingText },
+              binData.isFull
+                ? binData.isBurnt
+                  ? { color: theme.binItemBurntText }
+                  : { color: theme.binItemGreenText }
                 : null,
             ]}
-            name={isChecked ? 'check-circle' : 'circle'}
+            name={binData.isFull ? 'check-circle' : 'circle'}
             size={24}
           />
           <Headline
             style={[
-              styles.binText,
-              isChecked
-                ? isBurnt
-                  ? styles.binItemCaneBurnt
-                  : styles.binItemCaneGreen
+              { color: theme.spAtSidingText },
+              binData.isFull
+                ? binData.isBurnt
+                  ? { color: theme.binItemBurntText }
+                  : { color: theme.binItemGreenText }
                 : null,
             ]}
           >
@@ -168,18 +190,20 @@ const SwipeableBinItem = ({
           </Headline>
         </TouchableOpacity>
         {/* Edit Btn / Full Indicator */}
-        <Headline
-          style={[
-            styles.binText,
-            isChecked
-              ? isBurnt
-                ? styles.binItemCaneBurnt
-                : styles.binItemCaneGreen
-              : null,
-          ]}
-        >
-          {(bin.dropped_off_in_stop || bin.picked_up_in_stop) && message + ' | '} {bin.full ? 'Full' : 'Empty'} {isBurnt ? ' | Burnt' : ''}
-        </Headline>
+        {binData.isFull ? (
+          <Headline
+            style={[
+              { color: theme.spAtSidingText },
+              binData.isFull
+                ? binData.isBurnt
+                  ? { color: theme.binItemBurntText }
+                  : { color: theme.binItemGreenText }
+                : null,
+            ]}
+          >
+            Full{binData.isBurnt ? ' | Burnt' : ''}
+          </Headline>
+        ) : null}
       </View>
     </Swipeable>
   );
@@ -193,11 +217,7 @@ const styles = StyleSheet.create({
     paddingRight: 16,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: Colours.binItemBg,
     alignItems: 'center',
-  },
-  binText: {
-    color: Colours.spAtSidingText,
   },
   binPressable: {
     flexDirection: 'row',
@@ -205,17 +225,6 @@ const styles = StyleSheet.create({
     gap: 32,
     paddingHorizontal: 8,
     paddingVertical: 8,
-  },
-  binCheckBox: {
-    color: Colours.spAtSidingText,
-  },
-  binItemCaneGreen: {
-    color: Colours.binItemGreenText,
-    backgroundColor: Colours.binItemGreen,
-  },
-  binItemCaneBurnt: {
-    color: Colours.binItemBurntText,
-    backgroundColor: Colours.binItemBurnt,
   },
   actionButton: {
     flexDirection: 'row',
@@ -225,8 +234,6 @@ const styles = StyleSheet.create({
     height: '100%',
     gap: 10,
   },
-  actionButtonGreen: { backgroundColor: '#8BC34A' },
-  actionButtonBurnt: { backgroundColor: '#BF8A30' },
 });
 
 export default SwipeableBinItem;

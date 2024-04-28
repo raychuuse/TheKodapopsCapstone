@@ -1,16 +1,17 @@
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 
 // Import Style Components
-import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const Divider = ({ style }) => {
+  const { theme, toggleTheme } = useTheme();
   return (
     <View
       style={[
         {
           height: 1,
           width: '100%',
-          backgroundColor: Colours.spDiv,
+          backgroundColor: theme.spDiv,
         },
         style,
       ]}

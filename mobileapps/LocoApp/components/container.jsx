@@ -1,18 +1,21 @@
-import { LinearGradient } from "expo-linear-gradient";
+import { LinearGradient } from 'expo-linear-gradient';
+import { useTheme } from '../styles/themeContext';
 
-const Container = ({ children, style, marginLeft, marginRight, marginHorizontal, marginVertical, margin }) => {
+const Container = ({ children, style }) => {
+  const { theme, toggleTheme } = useTheme();
   return (
     <LinearGradient
-      colors={["rgba(255,255,255,0.7)", "rgba(255,255,255,0.4)"]}
+      colors={theme.containerGradient}
       style={[
         {
           borderRadius: 16,
-          flexDirection: "column",
+          flexDirection: 'column',
           paddingHorizontal: 12,
           paddingVertical: 8,
         },
         style,
-      ]}>
+      ]}
+    >
       {children}
     </LinearGradient>
   );

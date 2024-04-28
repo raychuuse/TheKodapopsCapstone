@@ -1,0 +1,182 @@
+import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+
+// Import Styles
+import { Headline, Title1, Title2 } from '../styles/typography';
+
+// Import Componetns
+import CustomModal from './modal';
+import Divider from './divider';
+
+// Import Providers
+import { useTheme } from '../styles/themeContext';
+import { useModal } from '../context/modalContext';
+import { useRun } from '../context/runContext';
+
+const ModalSelectSiding = () => {
+  const { theme } = useTheme();
+  const { runData, getSiding } = useRun();
+  const {
+    modalSelectSidingVisible,
+    closeSelectSidingModal,
+    selectedSidingID,
+    updateSelectedSidingID,
+  } = useModal();
+
+  const SidingListItem = ({ sidingId }) => {
+    // Data
+    const sidingData = getSiding(sidingId);
+
+    // Background Color for the Siding, this is base on the siding data
+    const backgroundColor = sidingData.isCompleted
+      ? theme.spCompleteBG
+      : sidingData.id == selectedSidingID
+      ? theme.spSelectedBG
+      : theme.spPendingBG;
+    // Text Color for the Siding, this is base on the siding data
+    const TextColor = sidingData.isCompleted
+      ? theme.spCompleteText
+      : sidingData.id == selectedSidingID
+      ? theme.spSelectedText
+      : theme.spPendingText;
+    // Icon Name for the Siding Icon, this is base on the siding data
+    const Icon = sidingData.isCompleted
+      ? 'checkbox-marked-circle-outline'
+      : sidingData.id == selectedSidingID
+      ? 'star-circle-outline'
+      : 'checkbox-blank-circle-outline';
+    return (
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          gap: 16,
+          paddingHorizontal: 8,
+          paddingVertical: 4,
+          borderRadius: 10,
+          alignItems: 'center',
+          backgroundColor: backgroundColor,
+        }}
+        onPress={() => updateSelectedSidingID(sidingId)}
+        disabled={sidingData.isCompleted}
+      >
+        {/* Siding State Icon */}
+        <MaterialCommunityIcons
+          name={Icon}
+          color={TextColor}
+          size={24}
+        />
+        {/* Siding Name */}
+        <Title2 style={{ color: TextColor, marginRight: 'auto' }}>
+          {sidingData.name}
+        </Title2>
+
+        {/* Bin Details */}
+        {sidingData.isCompleted ? (
+          <Title2 style={{ color: TextColor, marginRight: 8 }}>
+            Completed
+          </Title2>
+        ) : (
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 4,
+              marginRight: 8,
+              alignItems: 'center',
+              height: '100%',
+            }}
+          >
+            {/* Number of Drop Bins */}
+            {/* Icon */}
+            <MaterialIcons
+              name='download'
+              size={18}
+              color={TextColor}
+            />
+            {/* Label */}
+            <Headline style={{ color: TextColor, width: 14 }}>
+              {sidingData.binsDrop.length}
+            </Headline>
+            {/* Vertical Rule */}
+            <View
+              style={{
+                marginHorizontal: 8,
+                borderStyle: 'solid',
+                borderColor: TextColor,
+                borderWidth: 0.25,
+                height: '60%',
+              }}
+            />
+            {/* Number of Collect Bins */}
+            {/* Icon */}
+            <MaterialIcons
+              name='upload'
+              size={18}
+              color={TextColor}
+            />
+            {/* Label */}
+            <Headline style={{ color: TextColor, width: 14 }}>
+              {sidingData.binsCollect.length}
+            </Headline>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
+  const renderItem = ({ item }) => {
+    return <SidingListItem sidingId={item.id} />;
+  };
+
+  return (
+    <CustomModal
+      isVisible={modalSelectSidingVisible}
+      onClose={closeSelectSidingModal}
+      buttonIcon='check-circle-outline'
+      style={{ width: '80%', maxWidth: 800, height: '70%' }}
+    >
+      {/* Modal Header */}
+      <View style={[styles.HeaderContainer, { borderColor: theme.textLevel2 }]}>
+        <MaterialIcons
+          name='edit-location-alt'
+          size={28}
+          color={theme.textLevel2}
+        />
+        <Title1>Select a Siding</Title1>
+      </View>
+      {/* Modal Content */}
+      <FlatList
+        style={styles.content}
+        data={runData.sidings}
+        renderItem={renderItem}
+        ItemSeparatorComponent={<Divider style={{ marginVertical: 10 }} />}
+      />
+    </CustomModal>
+  );
+};
+
+export default ModalSelectSiding;
+
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    width: '100%',
+    gap: 8,
+    paddingVertical: 16,
+  },
+  HeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    gap: 8,
+    borderStyle: 'solid',
+    borderBottomWidth: 2,
+    paddingLeft: 6,
+    paddingBottom: 6,
+  },
+  debug: {
+    borderWidth: 1,
+    borderStyle: 'dotted',
+    borderColor: 'red',
+  },
+});

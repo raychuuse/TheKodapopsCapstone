@@ -4,7 +4,6 @@ import { router } from 'expo-router';
 
 // Import Styles
 import { Title1, Title3 } from '../styles/typography';
-import { Colours } from '../styles/colours';
 
 // Import Mock Data
 import {
@@ -16,8 +15,13 @@ import {
 import CustomModal from './modal';
 import SettingsItem from './settingsItem';
 import Button from './button';
+import { useTheme } from '../styles/themeContext';
+import { lightTheme } from '../styles/themes';
+
+// Import Colours
 
 const ModalSettings = ({ isVisible, onClose }) => {
+  const { theme, toggleTheme } = useTheme();
   return (
     <CustomModal
       isVisible={isVisible}
@@ -25,13 +29,34 @@ const ModalSettings = ({ isVisible, onClose }) => {
       style={{ width: '80%', maxWidth: 800, height: '70%' }}
     >
       {/* Header */}
-      <View style={styles.HeaderContainer}>
+      <View style={[styles.HeaderContainer, { borderColor: theme.textLevel2 }]}>
         <MaterialIcons
           name='settings'
           size={28}
-          color={Colours.textLevel2}
+          color={theme.textLevel2}
         />
         <Title1>Settings</Title1>
+        <Button
+          title={theme === lightTheme ? 'Dark Mode' : 'Light Mode'}
+          iconName={theme === lightTheme ? 'dark-mode' : 'light-mode'}
+          iconColor={theme.textLevel3}
+          textColor={theme.textLevel3}
+          backgroundColor={theme.bgLevel3}
+          border
+          borderWidth={1}
+          iconSize={18}
+          textStyle={{ fontSize: 18 }}
+          style={{
+            paddingVertical: 8,
+            padding: 0,
+            minHeight: 0,
+            width: 150,
+            marginLeft: 'auto',
+            marginRight: 16,
+            marginBottom: 10,
+          }}
+          onPress={toggleTheme}
+        />
       </View>
       {/* Page Content */}
       <View style={styles.content}>
@@ -53,11 +78,11 @@ const ModalSettings = ({ isVisible, onClose }) => {
             John Smith
           </Title3>
           <Button
-            iconName={'logout'}
             title='Log Out'
-            iconColor={Colours.textLevel3}
-            textColor={Colours.textLevel3}
-            backgroundColor={Colours.bgLevel3}
+            iconName={'logout'}
+            iconColor={theme.textLevel3}
+            textColor={theme.textLevel3}
+            backgroundColor={theme.bgLevel3}
             border
             borderWidth={1}
             iconSize={28}
@@ -97,7 +122,6 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 8,
     borderStyle: 'solid',
-    borderColor: Colours.textLevel2,
     borderBottomWidth: 2,
     paddingLeft: 6,
     paddingBottom: 6,

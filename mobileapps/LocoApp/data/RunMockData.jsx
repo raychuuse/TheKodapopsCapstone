@@ -6,7 +6,6 @@ export const RunMockData = {
     {
       id: 1,
       isCompleted: false,
-      isSelected: false,
       name: 'Siding #1',
       binsDrop: [
         {
@@ -26,18 +25,92 @@ export const RunMockData = {
     {
       id: 2,
       isCompleted: true,
-      isSelected: false,
       name: 'Siding #2',
       binsDrop: [
         {
-          binNumber: 2234,
+          binNumber: 1111,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2222,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 3333,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 4444,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 5555,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 6666,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 7777,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 8888,
           isFull: true,
           isBurnt: false,
         },
       ],
       binsCollect: [
         {
-          binNumber: 3345,
+          binNumber: 1111,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 2222,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 3333,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 4444,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 5555,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 6666,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 7777,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 8888,
+          isFull: true,
+          isBurnt: false,
+        },
+        {
+          binNumber: 9999,
           isFull: true,
           isBurnt: false,
         },
@@ -46,7 +119,6 @@ export const RunMockData = {
     {
       id: 3,
       isCompleted: false,
-      isSelected: true,
       name: 'Siding #3',
       binsDrop: [
         {

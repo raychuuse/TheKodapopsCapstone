@@ -1,23 +1,41 @@
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 //Styles
 import { Title1 } from '../styles/typography';
-import { Colours } from '../styles/colours';
 
 // Import Components
-import RunSheetAccordion from './runSheetAccordion';
+import CustomModal from './modal';
+import RunSheetSidingItem from './runSheetSidingItem';
+import Divider from './divider';
 
-const RunSheet = ({ run, setRun, onClose }) => {
+// Import Provider
+import { useTheme } from '../styles/themeContext';
+import { useRun } from '../context/runContext';
+
+const RunSheet = ({ onClose, isVisible }) => {
+  // Providers
+  const { theme } = useTheme();
+  const { runData } = useRun();
+
+  // List Render Item
+  const renderItem = ({ item }) => {
+    return <RunSheetSidingItem sidingId={item.id} />;
+  };
+
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <CustomModal
+      isVisible={isVisible}
+      onClose={onClose}
+      style={{ width: '80%', maxWidth: 800, height: '70%' }}
+      buttonIcon=''
+    >
       {/* Header */}
-      <View style={Styles.HeaderContainer}>
+      <View style={[Styles.HeaderContainer, { borderColor: theme.textLevel2 }]}>
         <MaterialIcons
           name='route'
           size={28}
-          color={Colours.textLevel2}
+          color={theme.textLevel2}
         />
         <Title1>Run Details</Title1>
         <TouchableOpacity
@@ -27,25 +45,26 @@ const RunSheet = ({ run, setRun, onClose }) => {
           <MaterialCommunityIcons
             name='close-circle-outline'
             size={36}
-            color={Colours.textLevel2}
+            color={theme.textLevel2}
           />
         </TouchableOpacity>
       </View>
       {/* Run List */}
-      <RunSheetAccordion
-        style={Styles.RunListContainer}
-        run={run}
-        setRun={setRun}
+      <FlatList
+        style={Styles.content}
+        data={runData.sidings}
+        renderItem={renderItem}
+        ItemSeparatorComponent={<Divider style={{ marginVertical: 10 }} />}
       />
-    </GestureHandlerRootView>
+    </CustomModal>
   );
 };
 
 const Styles = StyleSheet.create({
-  RunListContainer: {
+  content: {
     flex: 1,
     width: '100%',
-    paddingHorizontal: 8,
+    gap: 8,
     paddingVertical: 16,
   },
   HeaderContainer: {
@@ -54,7 +73,6 @@ const Styles = StyleSheet.create({
     width: '100%',
     gap: 8,
     borderStyle: 'solid',
-    borderColor: Colours.textLevel2,
     borderBottomWidth: 2,
     paddingLeft: 6,
     paddingBottom: 6,

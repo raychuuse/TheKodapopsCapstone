@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import Component
 import Button from './button';
@@ -9,6 +10,7 @@ import Modal from './modal';
 // Import Style Components
 import * as Type from '../styles/typography';
 import { Colours } from '../styles/colours';
+import { useTheme } from '../styles/themeContext';
 
 const SettingsItem = ({
   type = '',
@@ -20,6 +22,33 @@ const SettingsItem = ({
 }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
+
+  const { theme } = useTheme();
+
+  useEffect(() => {
+    const loadSelectedOption = async () => {
+      try {
+        const storedOption = await AsyncStorage.getItem(label);
+        if (storedOption !== null) {
+          setSelectedOption(parseInt(storedOption));
+        }
+      } catch (error) {
+        console.error('Failed to load the selected option from storage', error);
+      }
+    };
+
+    loadSelectedOption();
+  }, [label]);
+
+  const handleValueChange = async (itemValue, itemIndex) => {
+    try {
+      await AsyncStorage.setItem(label, itemValue.toString());
+      setSelectedItem(itemValue);
+      setSelectedOption(itemValue);
+    } catch (error) {
+      console.error('Failed to save the selected option to storage', error);
+    }
+  };
 
   return (
     <>
@@ -35,10 +64,7 @@ const SettingsItem = ({
           </Type.Title1>
           <Picker
             selectedValue={selectedOption}
-            onValueChange={(itemValue, itemIndex) => {
-              setSelectedOption(itemValue);
-              setSelectedItem(itemValue);
-            }}
+            onValueChange={handleValueChange}
             style={{
               borderRadius: 16,
               backgroundColor: Colours.bgLevel6,
@@ -63,7 +89,7 @@ const SettingsItem = ({
       <View style={[styles.item, style]}>
         <Type.Title3 style={styles.label}>{label}:</Type.Title3>
         <Text
-          style={[Type.styles.body, styles.body]}
+          style={[Type.styles.body, styles.body, { color: theme.body }]}
           numberOfLines={1}
         >
           {options.find((item) => item.id == selectedOption)?.label ?? 'Please Select an Option'}
@@ -71,9 +97,9 @@ const SettingsItem = ({
 
         <Button
           iconName={type == 'location' ? 'edit-location-alt' : 'edit'}
-          iconColor={Colours.textLevel3}
-          textColor={Colours.textLevel3}
-          backgroundColor={Colours.bgLevel3}
+          iconColor={theme.textLevel3}
+          textColor={theme.textLevel3}
+          backgroundColor={theme.bgLevel3}
           border
           borderWidth={1}
           iconSize={28}
@@ -89,12 +115,9 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     width: '100%',
-
     gap: 22,
-
     paddingHorizontal: 16,
     paddingVertical: 4,
-
     alignItems: 'center',
   },
   button: {
