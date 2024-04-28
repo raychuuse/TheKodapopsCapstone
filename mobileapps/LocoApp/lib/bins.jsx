@@ -3,23 +3,23 @@ import { RunMockData } from '../data/RunMockData';
 
 /**
  * Used to set if a bin is full, Required to rerender the app and set data correctly.
- * @param {number} binNumber
+ * @param {number} binID
  * @param {number} sidingId
- * @param {object} runData
- * @param {object} setRunData
+ * @param {object} run
+ * @param {object} setRun
  * @param {string} binListName
  * @param {boolean} debug
  */
 export function SetIsFull(
-  binNumber,
+  binID,
   sidingId,
-  runData,
-  setRunData,
+  run,
+  setRun,
   binListName,
   debug = false
 ) {
   // Initialise New Run Data bases off old run data
-  const newRunData = runData;
+  const newRunData = run;
   let currentState;
 
   // Find and set bin to full
@@ -27,51 +27,51 @@ export function SetIsFull(
     // Get Current State
     currentState = newRunData.sidings
       .find((item) => item.id === sidingId)
-      .binsDrop.find((item) => item.binNumber === binNumber).isFull;
+      .binsDrop.find((item) => item.binNumber === binID).isFull;
 
     // Set the inverted State as new state
     newRunData.sidings
       .find((item) => item.id === sidingId)
-      .binsDrop.find((item) => item.binNumber === binNumber).isFull =
+      .binsDrop.find((item) => item.binNumber === binID).isFull =
       !currentState;
   } else if (binListName === 'binsCollect') {
     // Get Current State
     currentState = newRunData.sidings
       .find((item) => item.id === sidingId)
-      .binsCollect.find((item) => item.binNumber === binNumber).isFull;
+      .binsCollect.find((item) => item.binNumber === binID).isFull;
 
     // Set the inverted State as new state
     newRunData.sidings
       .find((item) => item.id === sidingId)
-      .binsCollect.find((item) => item.binNumber === binNumber).isFull =
+      .binsCollect.find((item) => item.binNumber === binID).isFull =
       !currentState;
   }
   // Apply changes to the state
-  setRunData(newRunData);
+  setRun(newRunData);
 
   // Debug Log
-  debug ? console.log(JSON.stringify(runData)) : null;
+  debug ? console.log(JSON.stringify(run)) : null;
 }
 
 /**
  * Used to set if a bin is burnt, Required to rerender the app and set data correctly.
- * @param {number} binNumber
+ * @param {number} binID
  * @param {number} sidingId
- * @param {RunMockData} runData
- * @param {object} setRunData
+ * @param {RunMockData} run
+ * @param {object} setRun
  * @param {string} binListName
  * @param {boolean} debug
  */
 export function SetIsBurnt(
-  binNumber,
+  binID,
   sidingId,
-  runData,
-  setRunData,
+  run,
+  setRun,
   binListName,
   debug = false
 ) {
   // Initialise New Run Data bases off old run data
-  const newRunData = runData;
+  const newRunData = run;
   let currentState;
 
   // Find and set bin to full
@@ -79,28 +79,28 @@ export function SetIsBurnt(
     // Get Current State
     currentState = newRunData.sidings
       .find((item = RunMockData) => item.id === sidingId)
-      .binsDrop.find((item) => item.binNumber === binNumber).isBurnt;
+      .binsDrop.find((item) => item.binNumber === binID).isBurnt;
 
     // Set the inverted State as new state
     newRunData.sidings
       .find((item) => item.id === sidingId)
-      .binsDrop.find((item) => item.binNumber === binNumber).isBurnt =
+      .binsDrop.find((item) => item.binNumber === binID).isBurnt =
       !currentState;
   } else if (binListName === 'binsCollect') {
     // Get Current State
     currentState = newRunData.sidings
       .find((item) => item.id === sidingId)
-      .binsCollect.find((item) => item.binNumber === binNumber).isBurnt;
+      .binsCollect.find((item) => item.binNumber === binID).isBurnt;
 
     // Set the inverted State as new state
     newRunData.sidings
       .find((item) => item.id === sidingId)
-      .binsCollect.find((item) => item.binNumber === binNumber).isBurnt =
+      .binsCollect.find((item) => item.binNumber === binID).isBurnt =
       !currentState;
   }
   // Apply changes to the state
-  setRunData(newRunData);
+  setRun(newRunData);
 
   // Debug Log
-  debug ? console.log(JSON.stringify(runData)) : null;
+  debug ? console.log(JSON.stringify(run)) : null;
 }

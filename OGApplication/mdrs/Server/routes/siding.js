@@ -22,18 +22,45 @@ router.get("/", (req, res) => {
 // potentially pointing out data entry errors.
 router.get("/:sidingId/breakdown", (req, res) => {
   const id = req.params.sidingId;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
+  const stopID = req.query.stopID;
+  console.info(stopID);
+  if (stopID != null && !isValidId(stopID, res))
+      return;
 
-  req.db.raw(`
-      SELECT b.binID, b.status, b.sidingID, s.sidingName, t.transactionTime, t.type
+  const withStopQuery = `SELECT b.binID, b.status, b.sidingID, b.full, b.burnt, s.sidingName, t.transactionTime, t.type, stopState.picked_up_in_stop, stopState.dropped_off_in_stop
+      FROM bin b
+               LEFT JOIN siding s ON b.sidingID = s.sidingID
+               LEFT JOIN (SELECT tl.*, ROW_NUMBER() OVER (PARTITION BY binID ORDER BY transactionTime DESC) AS rn
+                          FROM transactionlog tl) t ON t.binID = b.binID AND t.rn = 1
+               LEFT JOIN (SELECT binID,
+                                 IF(SUM(type = 'PICKED_UP') > 0, true, false) as 'picked_up_in_stop', 
+                                 IF(SUM(type = 'DROPPED_OFF') > 0, true, false) as 'dropped_off_in_stop'
+                          FROM transactionlog
+                          WHERE stopID = ?
+                            AND transactionTime > DATE_SUB(NOW(), INTERVAL 1 DAY)
+                          GROUP BY binID) as stopState ON stopState.binID = b.binID
+      WHERE b.sidingID = ?`;
+
+  const withoutStopQuery = `SELECT b.binID, b.status, b.sidingID, b.full, b.burnt, s.sidingName, t.transactionTime, t.type
       FROM bin b
                LEFT JOIN siding s ON b.sidingID = s.sidingID
                LEFT JOIN (SELECT tl.*, ROW_NUMBER() OVER (PARTITION BY binID ORDER BY transactionTime DESC) AS rn
                           FROM transactionlog tl) t ON t.binID = b.binID AND t.rn = 1
       WHERE b.sidingID = ?
-  `, [id])
+  `;
+
+  req.db.raw(stopID != null ? withStopQuery : withoutStopQuery, stopID != null ? [stopID, id] : [id])
       .then(processQueryResult)
       .then(data => {
+        for (const datum of data) {
+            datum.full = !!datum.full;
+            datum.burnt = !!datum.burnt;
+            if (stopID != null) {
+              datum.dropped_off_in_stop = !!datum.dropped_off_in_stop;
+              datum.picked_up_in_stop = !!datum.picked_up_in_stop;
+            }
+        }
         res.status(200).json(data);
       })
       .catch(err => {

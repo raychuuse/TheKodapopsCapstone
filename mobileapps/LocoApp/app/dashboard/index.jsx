@@ -1,5 +1,5 @@
 import { View, Animated, Text } from 'react-native';
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
 // Components
 import StatusIndicator from '../../components/statusIndicator';
@@ -12,13 +12,27 @@ import BottomBar from '../../components/bottomBar';
 import { RunMockData } from '../../data/RunMockData';
 import { NotificationsMockData } from '../../data/NotificationsMockData';
 
+import {getRunById} from "../../api/runs.api";
+import {getCurrentLoadById} from "../../api/loco.api";
+
 export default function Page() {
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const [sidingCarouselWidth, setSidingCarouselWidth] = useState(0);
 
   // Run Data for the Whole App
-  const [runData, setRunData] = useState(RunMockData);
+  const [loco, setLoco] = useState();
+  const [run, setRun] = useState();
   const [notifications, setNotifications] = useState(NotificationsMockData);
+
+  useEffect(() => {
+      getRunById(1)
+          .then(response => {
+              setRun(response);
+          })
+          .catch(err => {
+              console.error(err);
+          });
+  }, []);
 
   return (
     <>
@@ -54,7 +68,7 @@ export default function Page() {
               flexDirection: 'row',
             }}
           >
-            <Animated.FlatList
+            {run != null && loco != null && <Animated.FlatList
               contentContainerStyle={{
                 alignItems: 'center',
                 paddingVertical: 10,
@@ -70,21 +84,21 @@ export default function Page() {
               bounces={false}
               horizontal={true}
               keyExtractor={(item) => item.id}
-              data={runData.sidings}
+              data={run.stops}
               renderItem={({ item, index }) => (
                 <SidingCard
-                  isCompleted={item.isCompleted}
+                  isCompleted={false}
                   isSelected={item.isSelected}
-                  name={item.name}
-                  drop={item.binsDrop.length}
-                  collect={item.binsCollect.length}
+                  name={item.sidingName}
+                  drop={item.drop_off_quantity}
+                  collect={item.collect_quantity}
                   index={index}
                   scrollX={scrollX}
                   containerWidth={sidingCarouselWidth}
-                  listLength={runData.sidings.length}
+                  listLength={run.stops.length}
                 />
               )}
-            />
+            />}
           </View>
           <View
             style={{
@@ -96,12 +110,12 @@ export default function Page() {
         </View>
       </View>
       {/* Nav Bar */}
-      <BottomBar
-        runData={runData}
-        setRunData={setRunData}
+      {run != null && <BottomBar
+        run={run}
+        setRun={setRun}
         notifications={notifications}
         setNotifications={setNotifications}
-      />
+      />}
     </>
   );
 }

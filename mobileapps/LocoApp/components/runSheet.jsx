@@ -9,7 +9,7 @@ import { Colours } from '../styles/colours';
 // Import Components
 import RunSheetAccordion from './runSheetAccordion';
 
-const RunSheet = ({ runData, setRunData, onClose }) => {
+const RunSheet = ({ run, setRun, onClose }) => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       {/* Header */}
@@ -34,8 +34,8 @@ const RunSheet = ({ runData, setRunData, onClose }) => {
       {/* Run List */}
       <RunSheetAccordion
         style={Styles.RunListContainer}
-        runData={runData}
-        setRunData={setRunData}
+        run={run}
+        setRun={setRun}
       />
     </GestureHandlerRootView>
   );

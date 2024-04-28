@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {Link} from 'expo-router';
+import {Link, router} from 'expo-router';
 
 // Import Components
 import Button from '../components/button';
@@ -12,19 +12,18 @@ import {LargeTitle, Title1} from '../styles/typography';
 import {Colours} from '../styles/colours';
 
 // Import Mock Data
-import {SettingMockData_Run, SettingsMockData_Loco,} from '../data/settingsMockData';
 import {getAllLocos} from "../api/loco.api";
 import {getAllRunsOnDate} from "../api/runs.api";
 
 const SetupPage = () => {
     const [locos, setLocos] = useState();
+    const [selectedLoco, setSelectedLoco] = useState();
     const [runs, setRuns] = useState();
+    const [selectedRun, setSelectedRun] = useState();
 
     useEffect(() => {
-        console.info("Tent");
         getAllLocos()
             .then(response => {
-                console.info(response);
                 setLocos(response.map(loco => {
                     return {id: loco.locoID, label: loco.locoName};
                 }));
@@ -35,7 +34,6 @@ const SetupPage = () => {
 
         getAllRunsOnDate(new Date())
             .then(response => {
-                console.info(response);
                 setRuns(response.map(run => {
                     return {id: run.runID, label: run.runName};
                 }));
@@ -44,6 +42,12 @@ const SetupPage = () => {
                 console.error(err);
             });
     }, []);
+
+    const onStart = () => {
+        // if (selectedLoco != null && selectedRun != null) {
+            router.navigate('/dashboard');
+        // }
+    };
 
     return (
         <View style={styles.page}>
@@ -61,11 +65,13 @@ const SetupPage = () => {
                     {locos != undefined && <SettingsItem
                         label='Locomotive'
                         options={locos}
+                        setSelectedItem={setSelectedLoco}
                     />}
                     {/* Run Selector */}
                     {runs != undefined && <SettingsItem
                         label='Run'
                         options={runs}
+                        setSelectedItem={setSelectedRun}
                     />}
                 </View>
                 {/* Actions */}
@@ -81,16 +87,12 @@ const SetupPage = () => {
                             border
                         />
                     </Link>
-                    <Link
-                        href='/dashboard'
-                        asChild
-                    >
-                        <Button
-                            title='Start'
-                            textColor={Colours.textLevel3}
-                            style={StyleSheet.create({flex: 1})}
-                        />
-                    </Link>
+                    <Button
+                        title='Start'
+                        textColor={Colours.textLevel3}
+                        style={StyleSheet.create({flex: 1})}
+                        onPress={onStart}
+                    />
                 </View>
             </View>
         </View>

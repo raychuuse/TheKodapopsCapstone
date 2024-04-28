@@ -10,6 +10,6 @@ export function getLocoById(id) {
     return handleFetch(fetch(`${apiUrl}`), true);
 }
 
-export function getCurrentLoadById(id) {
-    return handleFetch(fetch(`${apiUrl}/${id}/load`), true);
+export function getCurrentLoadById(id, stopID) {
+    return handleFetch(fetch(`${apiUrl}/${id}/load?stopID=${stopID}`), true);
 }

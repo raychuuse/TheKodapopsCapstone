@@ -41,17 +41,51 @@ router.get("/:locoId/siding_breakdown", (req, res) => {
 
 router.get('/:locoId/load', (req, res) => {
   const id = req.params.locoId;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
+  const stopID = req.query.stopID;
+  if (stopID != null && !isValidId(stopID, res))
+    return;
 
-  req.db.raw(`
-      SELECT b.binID, b.code, b.status, l.locoID, l.locoName
-      FROM bin b
-               LEFT JOIN locomotive l ON b.locoID = l.locoID
-      WHERE b.locoID = ?
-  `, [id])
+  const withStopId = `SELECT b.binID, b.code, b.status, b.full, b.burnt, l.locoID, l.locoName, stopState.picked_up_in_stop, stopState.dropped_off_in_stop
+      FROM locomotive l
+      LEFT JOIN bin b ON b.locoID = l.locoID
+      LEFT JOIN (SELECT binID,
+                        IF(SUM(type = 'PICKED_UP') > 0, true, false) as 'picked_up_in_stop',
+                        IF(SUM(type = 'DROPPED_OFF') > 0, true, false) as 'dropped_off_in_stop'
+                 FROM transactionlog
+                 WHERE stopID = ?
+                   AND transactionTime > DATE_SUB(NOW(), INTERVAL 1 DAY)
+                 GROUP BY binID) as stopState ON stopState.binID = b.binID
+      WHERE l.locoID = ?`;
+
+  const withoutStopId = `SELECT b.binID, b.code, b.status, b.full, b.burnt, l.locoID, l.locoName
+      FROM locomotive l
+      LEFT JOIN bin b ON b.locoID = l.locoID
+      WHERE l.locoID = ?`;
+
+  req.db.raw(stopID != null ? withStopId : withoutStopId, stopID != null ? [stopID, id] : [id])
       .then(processQueryResult)
       .then(data => {
-        res.status(200).json(data);
+        const loco = {
+            locoID: data[0].locoID,
+            locoName: data[0].locoName,
+            bins: []
+        };
+        for (const bin of data) {
+            // No bin on this loco
+            if (bin.binID == null)
+                continue;
+            loco.bins.push({
+                binID: bin.binID,
+                code: bin.code,
+                status: bin.status,
+                full: !!bin.full,
+                burnt: !!bin.burnt,
+                picked_up_in_stop: !!bin.picked_up_in_stop,
+                dropped_off_in_stop: !!bin.dropped_off_in_stop
+            });
+        }
+        res.status(200).json(loco);
       })
       .catch(err => {
         console.error(err);

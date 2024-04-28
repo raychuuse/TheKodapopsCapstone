@@ -5,7 +5,7 @@ import { FlatList } from 'react-native';
 import RunSheetAccordionItem from './runSheetAccordionItem';
 import Devider from './divider';
 
-const RunSheetAccordion = ({ runData, setRunData, style }) => {
+const RunSheetAccordion = ({ run, setRun, style }) => {
   const [expandedId, setExpandedId] = useState(null);
 
   const handleToggle = (id) => {
@@ -14,9 +14,9 @@ const RunSheetAccordion = ({ runData, setRunData, style }) => {
 
   const renderItem = ({ item, index }) => (
     <RunSheetAccordionItem
-      sidingData={item}
-      runData={runData}
-      setRunData={setRunData}
+      stop={item}
+      run={run}
+      setRun={setRun}
       isExpanded={expandedId === index}
       onToggle={() => handleToggle(index)}
     />
@@ -26,7 +26,7 @@ const RunSheetAccordion = ({ runData, setRunData, style }) => {
     <FlatList
       style={{ width: '100%' }}
       contentContainerStyle={style}
-      data={runData.sidings}
+      data={run.stops}
       renderItem={renderItem}
       keyExtractor={(item, index) => index.toString()}
       extraData={expandedId} // Important for refreshing the list when state changes

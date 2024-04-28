@@ -8,24 +8,19 @@ import * as Haptics from 'expo-haptics';
 import { Headline } from '../styles/typography';
 import { Colours } from '../styles/colours';
 
+import {pickUpBin, dropOffBin} from '../api/runs.api';
+
 // Import Functions
 import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
 
-// Import Mock Data
-import { RunMockData } from '../data/RunMockData';
-
-// Import Function
-import { SetIsFull, SetIsBurnt } from '../lib/bins';
-
 const SwipeableBinItem = ({
-  binData = RunMockData[0].binsDrop[0],
-  binListName = 'binsDrop',
-  sidingId = RunMockData[0].id,
-  runData = RunMockData,
-  setRunData,
+  bin,
+  onBinSelected,
+  type
 }) => {
-  const [isChecked, setIsChecked] = useState(binData.isFull);
-  const [isBurnt, setIsBurnt] = useState(binData.isBurnt);
+  const isChecked = type === 'PICKED_UP' ? bin.dropped_off_in_stop : bin.picked_up_in_stop;
+  const message = type === 'PICKED_UP' ? 'Dropped Off' : 'Picked Up';
+  const [isBurnt, setIsBurnt] = useState(bin.burnt);
 
   // Define the right actions for swipe
   const renderRightActions = () => {
@@ -41,7 +36,7 @@ const SwipeableBinItem = ({
       >
         <TouchableOpacity
           onPress={() => {
-            RepairBinAlert(binData.binNumber);
+            RepairBinAlert(bin.binNumber);
             Haptics.selectionAsync();
           }}
           style={[styles.actionButton, { backgroundColor: '#FFA000' }]}
@@ -56,7 +51,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: '#D32F2F' }]}
           onPress={() => {
-            RemoveBinAlert(`Bin #${binData.binNumber}`);
+            RemoveBinAlert(`Bin #${bin.binNumber}`);
             Haptics.selectionAsync();
           }}
         >
@@ -90,14 +85,8 @@ const SwipeableBinItem = ({
             { width: 180 },
           ]}
           onPress={() => {
+            bin.burnt = !isBurnt;
             setIsBurnt(!isBurnt);
-            SetIsBurnt(
-              binData.binNumber,
-              sidingId,
-              runData,
-              setRunData,
-              binListName
-            );
             Haptics.selectionAsync();
           }}
         >
@@ -124,6 +113,8 @@ const SwipeableBinItem = ({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       swipeableRef.current.close();
     }
+    // TODO Remove
+    swipeableRef.current.close();
   };
 
   return (
@@ -148,14 +139,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={styles.binPressable}
           onPress={() => {
-            SetIsFull(
-              binData.binNumber,
-              sidingId,
-              runData,
-              setRunData,
-              binListName
-            );
-            setIsChecked(!isChecked);
+            onBinSelected(bin);
           }}
         >
           <Feather
@@ -180,24 +164,22 @@ const SwipeableBinItem = ({
                 : null,
             ]}
           >
-            Bin #{binData.binNumber}
+            Bin #{bin.binID}
           </Headline>
         </TouchableOpacity>
         {/* Edit Btn / Full Indicator */}
-        {isChecked ? (
-          <Headline
-            style={[
-              styles.binText,
-              isChecked
-                ? isBurnt
-                  ? styles.binItemCaneBurnt
-                  : styles.binItemCaneGreen
-                : null,
-            ]}
-          >
-            Full{isBurnt ? ' | Burnt' : ''}
-          </Headline>
-        ) : null}
+        <Headline
+          style={[
+            styles.binText,
+            isChecked
+              ? isBurnt
+                ? styles.binItemCaneBurnt
+                : styles.binItemCaneGreen
+              : null,
+          ]}
+        >
+          {(bin.dropped_off_in_stop || bin.picked_up_in_stop) && message + ' | '} {bin.full ? 'Full' : 'Empty'} {isBurnt ? ' | Burnt' : ''}
+        </Headline>
       </View>
     </Swipeable>
   );

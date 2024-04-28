@@ -16,6 +16,7 @@ const SettingsItem = ({
   label = 'label',
   options = [{ label: 'Label', id: 0 }],
   style,
+  setSelectedItem,
 }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
@@ -34,9 +35,10 @@ const SettingsItem = ({
           </Type.Title1>
           <Picker
             selectedValue={selectedOption}
-            onValueChange={(itemValue, itemIndex) =>
-              setSelectedOption(itemValue)
-            }
+            onValueChange={(itemValue, itemIndex) => {
+              setSelectedOption(itemValue);
+              setSelectedItem(itemValue);
+            }}
             style={{
               borderRadius: 16,
               backgroundColor: Colours.bgLevel6,

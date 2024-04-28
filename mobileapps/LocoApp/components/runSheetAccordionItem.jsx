@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {
   View,
   TouchableOpacity,
@@ -14,11 +14,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Colours } from '../styles/colours';
 import { Title2 } from '../styles/typography';
 
+import {getSidingBreakdown} from "../api/siding.api";
+
 // Import Components
 import BinList from './binList';
 
 // Import Mock Data
 import { RunMockData } from '../data/RunMockData';
+import { dropOffBin, getCounts, pickUpBin } from '../api/runs.api';
+import { getCurrentLoadById } from '../api/loco.api';
 
 if (
   Platform.OS === 'android' &&
@@ -32,14 +36,19 @@ const window = Dimensions.get('window');
 const calculatedHeight = Math.max(window.height * 0.3, 150);
 
 const RunSheetAccordionItem = ({
-  sidingData = RunMockData.sidings[0],
-  runData = RunMockData,
-  setRunData,
+  stop,
+  run,
+  setRun,
   isExpanded,
   onToggle,
 }) => {
   const animatedHeight = useRef(new Animated.Value(0)).current; // Initial height is 0 for collapsed state
   const rotation = useRef(new Animated.Value(0)).current; // For icon rotation
+  const [sidingBins, setSidingBins] = useState();
+  const [loco, setLoco] = useState();
+  const [locoBins, setLocoBins] = useState();
+  const [dropOffCount, setDropOffCount] = useState();
+  const [collectCount, setCollectCount] = useState();
 
   useEffect(() => {
     Animated.timing(rotation, {
@@ -53,7 +62,57 @@ const RunSheetAccordionItem = ({
       duration: 300,
       useNativeDriver: false,
     }).start();
+
+    getInfo();
   }, [isExpanded]);
+
+  const onDropOffSelected = (bin) => {
+    dropOffBin(bin.binID, 3, stop.stopID)
+      .then(response => {
+        getInfo();
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  };
+
+  const onPickupSelected = (bin) => {
+    pickUpBin(bin.binID, 3, stop.stopID)
+      .then(response => {
+        getInfo();
+      })
+      .catch(err => {
+        console.error(err);
+      })
+  };
+
+  const getInfo = () => {
+    getSidingBreakdown(stop.sidingID, stop.stopID)
+      .then(response => {
+        setSidingBins(response);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+
+    getCurrentLoadById(3, stop.stopID)
+      .then(response => {
+        setLocoBins(response.bins);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+
+    getCounts(stop.stopID)
+        .then(counts => {
+          setDropOffCount(counts.dropped_off_count);
+          setCollectCount(counts.picked_up_count);
+        })
+        .catch(err => {
+          console.error(err);
+        })
+  };
 
   const spin = rotation.interpolate({
     inputRange: [0, 1],
@@ -64,9 +123,9 @@ const RunSheetAccordionItem = ({
     <View
       style={[
         styles.itemContainer,
-        sidingData.isCompleted
+        stop.isCompleted
           ? styles.itemContatinerComplete
-          : sidingData.isSelected
+          : stop.isSelected
           ? styles.itemContatinerSelected
           : null,
       ]}
@@ -79,13 +138,13 @@ const RunSheetAccordionItem = ({
         {/* Header */}
         <View style={styles.HeaderContainer}>
           {/* Selected/Completed Siding Button */}
-          <TouchableOpacity disabled={sidingData.isCompleted}>
+          <TouchableOpacity disabled={stop.isCompleted}>
             <MaterialCommunityIcons
               size={28}
               name={
-                sidingData.isCompleted
+                stop.isCompleted
                   ? 'checkbox-marked-circle-outline'
-                  : sidingData.isSelected
+                  : stop.isSelected
                   ? 'star-circle-outline'
                   : 'checkbox-blank-circle-outline'
               }
@@ -93,17 +152,19 @@ const RunSheetAccordionItem = ({
             />
           </TouchableOpacity>
           {/* Siding Name */}
-          <Title2 style={{ flex: 1 }}>{sidingData.name}</Title2>
+          <Title2 style={{ flex: 1 }}>{stop.sidingName}</Title2>
 
           <View style={styles.binBumberContainer}>
             {/* Drop Number */}
+
+            <Title2>Total</Title2>
             <View style={styles.binNumberItem}>
               <MaterialCommunityIcons
                 name='tray-arrow-down'
                 size={24}
                 color={Colours.textLevel3}
               />
-              <Title2>{sidingData.binsDrop.length}</Title2>
+              <Title2>{stop.drop_off_quantity}</Title2>
             </View>
 
             {/* Collect Number */}
@@ -113,7 +174,27 @@ const RunSheetAccordionItem = ({
                 size={24}
                 color={Colours.textLevel3}
               />
-              <Title2>{sidingData.binsCollect.length}</Title2>
+              <Title2>{stop.collect_quantity}</Title2>
+            </View>
+
+            <Title2>Current</Title2>
+            <View style={styles.binNumberItem}>
+              <MaterialCommunityIcons
+                name='tray-arrow-down'
+                size={24}
+                color={Colours.textLevel3}
+              />
+              <Title2>{dropOffCount}</Title2>
+            </View>
+
+            {/* Collect Number */}
+            <View style={styles.binNumberItem}>
+              <MaterialCommunityIcons
+                name='tray-arrow-up'
+                size={24}
+                color={Colours.textLevel3}
+              />
+              <Title2>{collectCount}</Title2>
             </View>
           </View>
 
@@ -140,19 +221,15 @@ const RunSheetAccordionItem = ({
         >
           {/* Drop Bin List */}
           <BinList
-            BinData={sidingData.binsDrop}
-            binListName='binsDrop'
-            sidingId={sidingData.id}
-            runData={runData}
-            setRunData={setRunData}
+            bins={locoBins}
+            type={'DROPPED_OFF'}
+            onBinSelected={onDropOffSelected}
           />
           {/* Collect Bin List */}
           <BinList
-            BinData={sidingData.binsCollect}
-            binListName='binsCollect'
-            sidingId={sidingData.id}
-            runData={runData}
-            setRunData={setRunData}
+            bins={sidingBins}
+            type={'PICKED_UP'}
+            onBinSelected={onPickupSelected}
           />
         </View>
       </Animated.View>

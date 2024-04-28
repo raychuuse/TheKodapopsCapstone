@@ -1,4 +1,4 @@
-export const serverUrl = "http://10.0.0.80:8080";
+export const serverUrl = "http://10.0.0.83:8080";
 
 export function postConfig(data) {
     const b = data != null ? JSON.stringify(data) : '';

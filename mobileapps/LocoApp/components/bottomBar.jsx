@@ -14,8 +14,8 @@ import ModalSettings from './modalSettings';
 import ModalNotifications from './modalNotifications';
 
 const BottomBar = ({
-  runData,
-  setRunData,
+  run,
+  setRun,
   notifications,
   setNotifications,
 }) => {
@@ -45,8 +45,8 @@ const BottomBar = ({
       >
         <RunSheet
           onClose={() => setRouteVisible(false)}
-          runData={runData}
-          setRunData={setRunData}
+          run={run}
+          setRun={setRun}
         />
       </CustomModal>
       {/* Nav Bar */}

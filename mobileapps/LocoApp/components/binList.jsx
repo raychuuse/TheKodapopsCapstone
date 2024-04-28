@@ -6,16 +6,15 @@ import { Colours } from '../styles/colours';
 // Import Components
 import SwipeableBinItem from './swipeableBinItem';
 
-const BinList = ({ BinData, setRunData, runData, sidingId, binListName }) => {
-  const RenderItem = ({ item }) => (
+const BinList = ({ bins, onBinSelected, type }) => {
+  const RenderItem = ({ item }) => {
+      return (
     <SwipeableBinItem
-      binData={item}
-      binListName={binListName}
-      sidingId={sidingId}
-      runData={runData}
-      setRunData={setRunData}
+      bin={item}
+      onBinSelected={onBinSelected}
+      type={type}
     />
-  );
+  )};
 
   const BinListSeparator = () => (
     <View
@@ -33,7 +32,7 @@ const BinList = ({ BinData, setRunData, runData, sidingId, binListName }) => {
 
   return (
     <FlatList
-      data={BinData}
+      data={bins}
       renderItem={RenderItem}
       style={{
         flex: 1,
