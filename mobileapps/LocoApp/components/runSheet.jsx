@@ -1,17 +1,35 @@
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 //Styles
 import { Title1 } from '../styles/typography';
-import { useTheme } from '../styles/themeContext';
 
 // Import Components
-import RunSheetAccordion from './runSheetAccordion';
+import CustomModal from './modal';
+import RunSheetSidingItem from './runSheetSidingItem';
+import Divider from './divider';
 
-const RunSheet = ({ runData, setRunData, onClose }) => {
-  const { theme, toggleTheme } = useTheme();
+// Import Provider
+import { useTheme } from '../styles/themeContext';
+import { useRun } from '../context/runContext';
+
+const RunSheet = ({ onClose, isVisible }) => {
+  // Providers
+  const { theme } = useTheme();
+  const { runData } = useRun();
+
+  // List Render Item
+  const renderItem = ({ item }) => {
+    return <RunSheetSidingItem sidingId={item.id} />;
+  };
+
   return (
-    <>
+    <CustomModal
+      isVisible={isVisible}
+      onClose={onClose}
+      style={{ width: '80%', maxWidth: 800, height: '70%' }}
+      buttonIcon=''
+    >
       {/* Header */}
       <View style={[Styles.HeaderContainer, { borderColor: theme.textLevel2 }]}>
         <MaterialIcons
@@ -32,20 +50,21 @@ const RunSheet = ({ runData, setRunData, onClose }) => {
         </TouchableOpacity>
       </View>
       {/* Run List */}
-      <RunSheetAccordion
-        style={Styles.RunListContainer}
-        runData={runData}
-        setRunData={setRunData}
+      <FlatList
+        style={Styles.content}
+        data={runData.sidings}
+        renderItem={renderItem}
+        ItemSeparatorComponent={<Divider style={{ marginVertical: 10 }} />}
       />
-    </>
+    </CustomModal>
   );
 };
 
 const Styles = StyleSheet.create({
-  RunListContainer: {
+  content: {
     flex: 1,
     width: '100%',
-    paddingHorizontal: 8,
+    gap: 8,
     paddingVertical: 16,
   },
   HeaderContainer: {
