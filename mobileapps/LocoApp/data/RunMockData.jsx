@@ -6,7 +6,6 @@ export const RunMockData = {
     {
       id: 1,
       isCompleted: false,
-      isSelected: false,
       name: 'Siding #1',
       binsDrop: [
         {
@@ -26,7 +25,6 @@ export const RunMockData = {
     {
       id: 2,
       isCompleted: true,
-      isSelected: false,
       name: 'Siding #2',
       binsDrop: [
         {
@@ -121,7 +119,6 @@ export const RunMockData = {
     {
       id: 3,
       isCompleted: false,
-      isSelected: true,
       name: 'Siding #3',
       binsDrop: [
         {
