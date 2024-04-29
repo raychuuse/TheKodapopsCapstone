@@ -56,7 +56,7 @@ router.put('/:id/name', (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
     req.db('harvester').update({harvesterName: req.body.name}).where({harvesterID: id})
-        .then(result => {
+        .then(res => {
             res.status(204).send();
         })
         .catch(error => {
