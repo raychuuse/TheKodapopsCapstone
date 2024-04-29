@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
 import AsyncStorage from 'react-native';
 import useWebSocket from 'react-use-websocket';
+import NetInfo from '@react-native-community/netinfo'
 
 export const AuthContext = createContext();
 

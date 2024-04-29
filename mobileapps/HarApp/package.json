@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@react-native-community/netinfo": "11.1.0",
+    "@react-native-community/netinfo": "^11.1.0",
     "@react-native-picker/picker": "2.6.1",
     "expo": "~50.0.17",
     "expo-blur": "~12.9.2",

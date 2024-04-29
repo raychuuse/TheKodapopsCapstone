@@ -26,7 +26,7 @@ const LogInPage = () => {
   const [modalResetVisible, setModalResetVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [serverURL, signIn] = useAuth();
+  const {serverURL, signIn} = useAuth();
 
   // Was needed for a specific type error, may remove
   const getCircularReplacer = () => {
