@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { Link } from "expo-router";
 
 // Import Components
-import Button from "../components/button";
+import AltButton from "../components/altButton";
 import GreetingMessage from "../components/greetingMessage";
 import SettingsItem from "../components/settingsItem";
 import Divider from "../components/divider";
@@ -90,10 +90,10 @@ const SetupPage = () => {
       {/* Actions */}
       <View style={styles.actions}>
         <Link href="/" asChild>
-          <Button title="Log Out" textColor={Colours.textLevel2} backgroundColor="transparent" border />
+          <AltButton title="Log Out" textColor={Colours.textLevel2} backgroundColor="transparent" border />
         </Link>
         <Link href="/dashboard" asChild>
-          <Button title="Start" textColor={Colours.textLevel3} style={StyleSheet.create({ flex: 1 })} />
+          <AltButton title="Start" textColor={Colours.textLevel3} style={StyleSheet.create({ flex: 1 })} />
         </Link>
       </View>
     </View>

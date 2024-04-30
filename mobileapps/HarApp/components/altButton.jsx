@@ -1,11 +1,14 @@
-import React from "react";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { React, forwardRef } from "react";
+import { Pressable, Text, StyleSheet, View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Colours } from "./colours";
 import * as Haptics from "expo-haptics";
 
-const Button = ({
+// Alternative button as a temporary fix, uses "pressable"
+// Can alternate between this and other button if forwardRef is used
+const AltButton = ({
   title = "",
+  pressedTitle = title,
   onPress = () => alert("Button Pressed"),
   backgroundColor = "#4F12FA42",
   textColor = Colours.textLevel3,
@@ -17,7 +20,6 @@ const Button = ({
   textStyle = {},
   border = false,
   borderWidth = 2,
-  innerRef,
 }, ref) => {
   // Determine if the icon should be rendered and if title is provided
   const shouldRenderIcon = iconName !== "";
@@ -30,20 +32,28 @@ const Button = ({
     ) : null;
 
   return (
-    <TouchableOpacity 
-      ref = {ref}
-      onPress={() => {
+    <Pressable ref = {ref}
+    onPress={() => {
         onPress();
         Haptics.selectionAsync();
-      }}
-      style={[styles.button, { backgroundColor }, { borderColor: textColor }, border ? { borderStyle: "solid" } : null, border ? { borderWidth } : { borderWidth: 0 }, style]}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-      <View style={[styles.buttonContent, !shouldRenderIcon && styles.buttonContentNoIcon]}>
-        {iconPosition === "left" && renderIcon()}
-        {shouldRenderTitle && <Text style={[styles.button_text, { color: textColor }, textStyle]}>{title}</Text>}
-        {iconPosition === "right" && renderIcon()}
-      </View>
-    </TouchableOpacity>
+    }}
+    style={({pressed}) => [
+        styles.button,
+        { backgroundColor}, 
+        { borderColor: textColor }, 
+        { opacity: pressed ? 0.5 : 1},
+        border ? { borderStyle: "solid" } : null, 
+        border ? { borderWidth } : { borderWidth: 0 }, 
+        style
+    ]}>
+    {({pressed}) => (
+        <View style={[styles.buttonContent, !shouldRenderIcon && styles.buttonContentNoIcon]}>
+            {iconPosition === "left" && renderIcon()}
+            {shouldRenderTitle && <Text style={[styles.button_text, { color: textColor }, textStyle]}>{pressed ? title : pressedTitle}</Text>}
+            {iconPosition === "right" && renderIcon()}
+        </View>
+    )}
+    </Pressable>
   );
 };
 
@@ -82,5 +92,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// When passing hrefs in use forwardRef
-export default Button;
+export default forwardRef(AltButton);

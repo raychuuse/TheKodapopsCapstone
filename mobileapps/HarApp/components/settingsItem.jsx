@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
@@ -48,11 +48,14 @@ const SettingsItem = ({
               style={{ width: '100%' }}
             />
             {options.map((option) => (
-              <Picker.Item
+              //REMOVE comment Fragment used to pass in key id, just need smth unique regarding option - otherwise error
+              <Fragment key={option.value}>
+                <Picker.Item
                 value={option.value}
                 label={option.label}
                 style={{ width: '100%' }}
-              />
+                />
+              </Fragment>
             ))}
           </Picker>
         </View>

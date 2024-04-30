@@ -23,3 +23,18 @@ export const RepairBinAlert = (message) => {
     [{ text: "No, It's Fine!" }, { text: 'Yes, Request' }]
   );
 };
+
+export const issueAlert = (message) => {
+  Alert.alert(
+    'Sorry you have encountered a problem. See Details below.',
+    `\n${message}`,
+    [{ text: "OK" }]
+  );
+};
+
+export const generalAlert = (message) => {
+  Alert.alert(
+    `${message}`,
+    [{ text: "OK" }]
+  );
+};
