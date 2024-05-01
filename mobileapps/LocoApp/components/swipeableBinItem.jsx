@@ -15,7 +15,7 @@ import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
 import { useRun } from '../context/runContext';
 
 // Import Function
-import { useSetIsFull, useSetIsBurnt } from '../lib/bins';
+import { useSetIsFull, useSetIsBurnt, useSetIsDone } from '../lib/bins';
 
 const SwipeableBinItem = ({
   index,
@@ -32,6 +32,7 @@ const SwipeableBinItem = ({
   // Build Function Hooks
   const SetIsFull = useSetIsFull();
   const SetIsBurnt = useSetIsBurnt();
+  const SetIsDone = useSetIsDone();
 
   // Data
   const binsKey = binListName == 'binsDrop';
@@ -148,7 +149,7 @@ const SwipeableBinItem = ({
             paddingVertical: 4,
           },
           { backgroundColor: theme.binItemBg },
-          binData.isFull
+          binData.isDone
             ? binData.isBurnt
               ? { backgroundColor: theme.binItemBurnt }
               : { backgroundColor: theme.binItemGreen }
@@ -158,7 +159,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={styles.binPressable}
           onPress={() => {
-            SetIsFull(sidingId, binData.binNumber, binsKey);
+            SetIsDone(sidingId, binData.binNumber, binsKey);
           }}
           onLongPress={() => longPressHandler(binData.binNumber, index)}
         >
@@ -171,7 +172,7 @@ const SwipeableBinItem = ({
                   : { color: theme.binItemGreenText }
                 : null,
             ]}
-            name={binData.isFull ? 'check-circle' : 'circle'}
+            name={binData.isDone ? 'check-circle' : 'circle'}
             size={24}
           />
           <Headline
