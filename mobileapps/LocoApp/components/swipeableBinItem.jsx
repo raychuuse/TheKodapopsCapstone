@@ -94,6 +94,72 @@ const SwipeableBinItem = ({
           overflow: 'hidden',
         }}
       >
+        <TouchableOpacity
+          onPress={() => {
+            SetIsFull(sidingId, binData.binNumber, binsKey);
+            Haptics.selectionAsync();
+          }}
+          style={[
+            styles.actionButton,
+            binData.isFull
+              ? { backgroundColor: theme.spCompleteBG }
+              : { backgroundColor: theme.spPendingBG },
+            { width: 150 },
+          ]}
+        >
+          <Feather
+            name='tool'
+            size={24}
+            color={binData.isFull ? theme.spCompleteText : theme.spPendingText}
+          />
+          <Headline
+            style={{
+              color: binData.isFull
+                ? theme.spCompleteText
+                : theme.spPendingText,
+              marginLeft: 'auto',
+            }}
+          >
+            Mark {binData.isFull ? 'as Full' : 'Empty'}
+          </Headline>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.actionButton,
+            binData.isBurnt
+              ? { backgroundColor: theme.bgGreen }
+              : { backgroundColor: theme.bgBurnt },
+            { width: 138 },
+          ]}
+          onPress={() => {
+            SetIsBurnt(sidingId, binData.binNumber, binsKey);
+            Haptics.selectionAsync();
+          }}
+        >
+          <MaterialCommunityIcons
+            name={binData.isBurnt ? 'fire' : 'leaf'}
+            size={24}
+            color={theme.spAtSidingText}
+          />
+          <Headline style={{ color: theme.spAtSidingText, marginLeft: 'auto' }}>
+            Mark {binData.isBurnt ? 'Green' : 'Burnt'}
+          </Headline>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderLeftActions_old = () => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderTopLeftRadius: 8,
+          borderBottomLeftRadius: 8,
+          overflow: 'hidden',
+        }}
+      >
         <View
           style={[
             styles.actionButton,
@@ -135,7 +201,6 @@ const SwipeableBinItem = ({
       overshootLeft={false}
       overshootRight={false}
       ref={swipeableRef}
-      onSwipeableOpen={('left', (direction) => onSwipeOpen(direction))}
     >
       <View
         style={[
