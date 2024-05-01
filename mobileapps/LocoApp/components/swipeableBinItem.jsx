@@ -15,7 +15,7 @@ import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
 import { useRun } from '../context/runContext';
 
 // Import Function
-import { useSetIsFull, useSetIsBurnt } from '../lib/bins';
+import { useSetIsFull, useSetIsBurnt, useSetIsDone } from '../lib/bins';
 
 const SwipeableBinItem = ({
   index,
@@ -32,6 +32,7 @@ const SwipeableBinItem = ({
   // Build Function Hooks
   const SetIsFull = useSetIsFull();
   const SetIsBurnt = useSetIsBurnt();
+  const SetIsDone = useSetIsDone();
 
   // Data
   const binsKey = binListName == 'binsDrop';
@@ -93,6 +94,72 @@ const SwipeableBinItem = ({
           overflow: 'hidden',
         }}
       >
+        <TouchableOpacity
+          onPress={() => {
+            SetIsFull(sidingId, binData.binNumber, binsKey);
+            Haptics.selectionAsync();
+          }}
+          style={[
+            styles.actionButton,
+            binData.isFull
+              ? { backgroundColor: theme.spCompleteBG }
+              : { backgroundColor: theme.spPendingBG },
+            { width: 150 },
+          ]}
+        >
+          <MaterialCommunityIcons
+            name={binData.isFull ? 'tray-full' : 'tray'}
+            size={24}
+            color={binData.isFull ? theme.spCompleteText : theme.spPendingText}
+          />
+          <Headline
+            style={{
+              color: binData.isFull
+                ? theme.spCompleteText
+                : theme.spPendingText,
+              marginLeft: 'auto',
+            }}
+          >
+            Mark {binData.isFull ? 'as Full' : 'Empty'}
+          </Headline>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.actionButton,
+            binData.isBurnt
+              ? { backgroundColor: theme.bgGreen }
+              : { backgroundColor: theme.bgBurnt },
+            { width: 138 },
+          ]}
+          onPress={() => {
+            SetIsBurnt(sidingId, binData.binNumber, binsKey);
+            Haptics.selectionAsync();
+          }}
+        >
+          <MaterialCommunityIcons
+            name={binData.isBurnt ? 'fire' : 'leaf'}
+            size={24}
+            color={theme.spAtSidingText}
+          />
+          <Headline style={{ color: theme.spAtSidingText, marginLeft: 'auto' }}>
+            Mark {binData.isBurnt ? 'Green' : 'Burnt'}
+          </Headline>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderLeftActions_old = () => {
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          borderTopLeftRadius: 8,
+          borderBottomLeftRadius: 8,
+          overflow: 'hidden',
+        }}
+      >
         <View
           style={[
             styles.actionButton,
@@ -134,7 +201,6 @@ const SwipeableBinItem = ({
       overshootLeft={false}
       overshootRight={false}
       ref={swipeableRef}
-      onSwipeableOpen={('left', (direction) => onSwipeOpen(direction))}
     >
       <View
         style={[
@@ -148,7 +214,7 @@ const SwipeableBinItem = ({
             paddingVertical: 4,
           },
           { backgroundColor: theme.binItemBg },
-          binData.isFull
+          binData.isDone
             ? binData.isBurnt
               ? { backgroundColor: theme.binItemBurnt }
               : { backgroundColor: theme.binItemGreen }
@@ -158,7 +224,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={styles.binPressable}
           onPress={() => {
-            SetIsFull(sidingId, binData.binNumber, binsKey);
+            SetIsDone(sidingId, binData.binNumber, binsKey);
           }}
           onLongPress={() => longPressHandler(binData.binNumber, index)}
         >
@@ -171,7 +237,7 @@ const SwipeableBinItem = ({
                   : { color: theme.binItemGreenText }
                 : null,
             ]}
-            name={binData.isFull ? 'check-circle' : 'circle'}
+            name={binData.isDone ? 'check-circle' : 'circle'}
             size={24}
           />
           <Headline

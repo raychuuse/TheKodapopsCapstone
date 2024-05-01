@@ -6,13 +6,14 @@ const ModalContext = createContext();
 // Context provider component
 const ModalProvider = ({ children }) => {
   // State for modals visibility
+  const [modalAddBinVisible, setModalAddBinVisible] = useState(false);
   const [modalSidingVisible, setModalSidingVisible] = useState(false);
   const [modalSelectSidingVisible, setModalSelectSidingVisible] =
     useState(false);
 
   // State for siding IDs
   const [selectedSidingID, setSelectedSidingID] = useState(3);
-  const [sidingToViewID, setSidingToViewID] = useState(2);
+  const [sidingToViewID, setSidingToViewID] = useState(1);
 
   // Function to open siding modal and update the ID to view
   const openSidingModal = (id) => {
@@ -21,8 +22,13 @@ const ModalProvider = ({ children }) => {
   };
   const closeSidingModal = () => setModalSidingVisible(false);
 
+  // Function to open and close the Select Siding Modal
   const openSelectSidingModal = () => setModalSelectSidingVisible(true);
   const closeSelectSidingModal = () => setModalSelectSidingVisible(false);
+
+  // Function to open and close the Add Bin Modal
+  const openAddBinModal = () => setModalAddBinVisible(true);
+  const closeAddBinModal = () => setModalAddBinVisible(false);
 
   // Function to update the selected siding ID
   const updateSelectedSidingID = (id) => setSelectedSidingID(id);
@@ -31,12 +37,15 @@ const ModalProvider = ({ children }) => {
   const value = {
     modalSidingVisible,
     modalSelectSidingVisible,
+    modalAddBinVisible,
     selectedSidingID,
     sidingToViewID,
     openSidingModal,
     closeSidingModal,
     openSelectSidingModal,
     closeSelectSidingModal,
+    openAddBinModal,
+    closeAddBinModal,
     updateSelectedSidingID,
   };
 
@@ -53,16 +62,20 @@ const ModalProvider = ({ children }) => {
  * @returns {{
  *   modalSidingVisible: boolean,
  *   modalSelectSidingVisible: boolean,
+ *   modalAddBinVisible: boolean,
  *   selectedSidingID: number,
  *   sidingToViewID: number,
  *   openSidingModal: (id: number) => void,
  *   closeSidingModal: () => void,
  *   openSelectSidingModal: () => void,
  *   closeSelectSidingModal: () => void,
+ *   openAddBinModal: () => void,
+ *   closeAddBinModal: () => void,
  *   updateSelectedSidingID: (id: number) => void,
  * }} Returns an object containing:
  * - `modalSidingVisible`: Indicates if the siding modal is visible.
  * - `modalSelectSidingVisible`: Indicates if the select siding modal is visible.
+ * - `modalAddBinVisible`: Indicates if the add bin modal is visible.
  * - `selectedSidingID`: The currently selected siding ID.
  * - `sidingToViewID`: The ID of the siding to view in the modal.
  *
@@ -74,6 +87,10 @@ const ModalProvider = ({ children }) => {
  * - `openSelectSidingModal`: Opens the select siding modal.
  *
  * - `closeSelectSidingModal`: Closes the select siding modal.
+ *
+ * - `openAddBinModal`: Opens the add bin modal.
+ *
+ * - `closeAddBinModal`: Closes the add bin modal.
  *
  * - `updateSelectedSidingID`: Updates the selected siding ID.
  *   @param {number} id The new ID to set as selected.

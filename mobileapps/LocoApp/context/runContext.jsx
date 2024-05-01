@@ -47,6 +47,34 @@ function runReducer(state, action) {
             : siding
         ),
       };
+    case 'ADD_BIN':
+      // Adds a new bin to the specified bins array in a siding.
+      return {
+        ...state,
+        sidings: state.sidings.map((siding) =>
+          siding.id === action.sidingId
+            ? {
+                ...siding,
+                [action.binsKey]: [...siding[action.binsKey], action.payload],
+              }
+            : siding
+        ),
+      };
+    case 'REMOVE_BIN':
+      // Removes a bin from the specified bins array in a siding.
+      return {
+        ...state,
+        sidings: state.sidings.map((siding) =>
+          siding.id === action.sidingId
+            ? {
+                ...siding,
+                [action.binsKey]: siding[action.binsKey].filter(
+                  (bin) => bin.binNumber !== action.binNumber
+                ),
+              }
+            : siding
+        ),
+      };
     default:
       // Throws an error if an action type is not handled
       throw new Error(`Unhandled action type: ${action.type}`);
@@ -92,6 +120,24 @@ export const RunProvider = ({ children }) => {
     return siding[binsKey].find((bin) => bin.binNumber === binNumber);
   };
 
+  // Function to add a new bin to a siding, specifying whether it's a drop or collect bin.
+  const addBin = (sidingId, binNumber, isDrop = true) => {
+    const binsKey = isDrop ? 'binsDrop' : 'binsCollect';
+    // Construct the payload within the function
+    const newBin = {
+      binNumber: binNumber,
+      isFull: false, // Default value
+      isBurnt: false, // Default value
+    };
+    dispatch({ type: 'ADD_BIN', sidingId, binsKey, payload: newBin });
+  };
+
+  // Function to remove a bin from a siding, specifying whether it's from the drop or collect array.
+  const removeBin = (sidingId, binNumber, isDrop = true) => {
+    const binsKey = isDrop ? 'binsDrop' : 'binsCollect';
+    dispatch({ type: 'REMOVE_BIN', sidingId, binsKey, binNumber });
+  };
+
   return (
     <RunContext.Provider
       value={{
@@ -103,6 +149,8 @@ export const RunProvider = ({ children }) => {
         updateRun,
         updateSiding,
         updateBin,
+        addBin,
+        removeBin,
       }}
     >
       {children}
@@ -120,10 +168,12 @@ export const RunProvider = ({ children }) => {
  *   getRun: () => object,
  *   getSiding: (id: number) => object | undefined,
  *   getBins: (sidingId: number, isDrop: boolean) => array,
- *   getBin: (sidingId, binNumber, isDrop) => object | undefined
+ *   getBin: (sidingId: number, binNumber: number, isDrop: boolean) => object | undefined,
  *   updateRun: (updates: object) => void,
  *   updateSiding: (id: number, updates: object) => void,
- *   updateBin: (sidingId: number, binNumber: number, updates: object, isDrop: boolean) => void
+ *   updateBin: (sidingId: number, binNumber: number, updates: object, isDrop: boolean) => void,
+ *   addBin: (sidingId: number, binNumber: number, isDrop: boolean) => void,
+ *   removeBin: (sidingId: number, binNumber: number, isDrop: boolean) => void
  * }} Returns an object containing:
  * - `runData`: The entire run data state object.
  *
@@ -143,6 +193,7 @@ export const RunProvider = ({ children }) => {
  *
  * - `updateRun`: Updates the global run properties.
  *   @param {object} updates An object containing the updates to apply to the run.
+ *
  * - `updateSiding`: Updates specific properties of a siding.
  *   @param {number} id The ID of the siding to update.
  *   @param {object} updates An object containing the updates to apply to the siding.
@@ -153,8 +204,18 @@ export const RunProvider = ({ children }) => {
  *   @param {object} updates An object containing the updates to apply to the bin.
  *   @param {boolean} isDrop Specifies whether the bin is in the 'drop' array or 'collect' array.
  *
+ * - `addBin`: Adds a new bin to a specific siding.
+ *   @param {number} sidingId The ID of the siding where the bin is added.
+ *   @param {number} binNumber The number of the new bin.
+ *   @param {boolean} isDrop Specifies whether the new bin is in the 'drop' array or 'collect' array.
+ *
+ * - `removeBin`: Removes a bin from a specific siding.
+ *   @param {number} sidingId The ID of the siding where the bin is removed.
+ *   @param {number} binNumber The number of the bin to remove.
+ *   @param {boolean} isDrop Specifies whether the bin to be removed is from the 'drop' array or 'collect' array.
+ *
  * @example
- * const { runData, getRun, updateRun, getSiding, getBins, updateSiding, updateBin } = useRun();
+ * const { runData, getRun, updateRun, getSiding, getBins, updateSiding, updateBin, addBin, removeBin } = useRun();
  *
  * Example of using `getSiding`:
  * const siding = getSiding(1);
@@ -164,6 +225,7 @@ export const RunProvider = ({ children }) => {
  *
  * This hook abstracts away the complexity of the context API and provides direct access to the state and functions.
  */
+
 export const useRun = () => {
   const {
     state,
@@ -174,6 +236,8 @@ export const useRun = () => {
     updateRun,
     updateSiding,
     updateBin,
+    addBin,
+    removeBin,
   } = useContext(RunContext);
   return {
     runData: state,
@@ -184,5 +248,7 @@ export const useRun = () => {
     updateRun,
     updateSiding,
     updateBin,
+    addBin,
+    removeBin,
   };
 };

@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Import Styles
 import { Title2 } from '../styles/typography';
@@ -13,12 +14,13 @@ import SwipeableBinItem from './swipeableBinItem';
 import { useRun } from '../context/runContext';
 import { useTheme } from '../styles/themeContext';
 import { useModal } from '../context/modalContext';
+import AddBinCamera from './addBinCamera';
 
 const BinList = ({ sidingId, binListName }) => {
   // Provider
   const { theme } = useTheme();
   const { runData, getBins, updateRun, getSiding } = useRun();
-  const { selectedSidingID } = useModal();
+  const { selectedSidingID, openAddBinModal } = useModal();
 
   // Data
   const binsKey = binListName == 'binsDrop';
@@ -32,7 +34,6 @@ const BinList = ({ sidingId, binListName }) => {
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
-  // TODO: Fix this to use the context right and the re-render issue after updates
   // Function to handle long press range selection on bins.
   const LongPressRangeSelect = (binNumber, index) => {
     // Clone the current selection to avoid direct state mutation.
@@ -77,11 +78,11 @@ const BinList = ({ sidingId, binListName }) => {
         const maxIndex = Math.max(...indices);
 
         // Determine the desired 'full' state based on the first selected bin.
-        const toSet = !_binData[newSelection[0].index].isFull;
+        const toSet = !_binData[newSelection[0].index].isDone;
 
         // Loop through the range of indices and set each bin's 'full' state.
         for (let i = minIndex; i <= maxIndex; i++) {
-          _binData[i].isFull = toSet;
+          _binData[i].isDone = toSet;
         }
 
         _runData.sidings = _runData.sidings.map((siding) => {
@@ -141,6 +142,11 @@ const BinList = ({ sidingId, binListName }) => {
     <GestureHandlerRootView
       style={{ flex: 1, width: '100%', position: 'relative' }}
     >
+      {/* Add Bin Modal */}
+      <AddBinCamera
+        sidingID={sidingId}
+        isDrop={binsKey}
+      />
       {/* List Header */}
       <View
         style={[
@@ -171,6 +177,36 @@ const BinList = ({ sidingId, binListName }) => {
         </Title2>
         <Title2>{BinData.length}</Title2>
         <Title2>{BinData.length > 1 ? 'Bins' : 'Bin'} at Siding</Title2>
+        <TouchableOpacity
+          onPress={() => {
+            openAddBinModal();
+            Haptics.selectionAsync();
+          }}
+          style={[
+            {
+              padding: 8,
+              borderRadius: 8,
+              marginLeft: 'auto',
+            },
+            siding.isCompleted
+              ? { backgroundColor: theme.spCompleteBG }
+              : siding.id == selectedSidingID
+              ? { backgroundColor: theme.spSelectedBG }
+              : { backgroundColor: theme.bgModal },
+          ]}
+        >
+          <MaterialCommunityIcons
+            name={'plus-circle-outline'}
+            size={24}
+            color={
+              siding.isCompleted
+                ? theme.spCompleteText
+                : siding.id == selectedSidingID
+                ? theme.spSelectedText
+                : theme.spPendingText
+            }
+          />
+        </TouchableOpacity>
       </View>
       {/* Bin List */}
       <FlatList
