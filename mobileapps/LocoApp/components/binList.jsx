@@ -78,11 +78,11 @@ const BinList = ({ sidingId, binListName }) => {
         const maxIndex = Math.max(...indices);
 
         // Determine the desired 'full' state based on the first selected bin.
-        const toSet = !_binData[newSelection[0].index].isFull;
+        const toSet = !_binData[newSelection[0].index].isDone;
 
         // Loop through the range of indices and set each bin's 'full' state.
         for (let i = minIndex; i <= maxIndex; i++) {
-          _binData[i].isFull = toSet;
+          _binData[i].isDone = toSet;
         }
 
         _runData.sidings = _runData.sidings.map((siding) => {
