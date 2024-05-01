@@ -107,8 +107,8 @@ const SwipeableBinItem = ({
             { width: 150 },
           ]}
         >
-          <Feather
-            name='tool'
+          <MaterialCommunityIcons
+            name={binData.isFull ? 'tray-full' : 'tray'}
             size={24}
             color={binData.isFull ? theme.spCompleteText : theme.spPendingText}
           />
