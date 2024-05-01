@@ -18,11 +18,31 @@ import { Colours } from '../components/colours';
 import BinList from '../components/binList';
 import { useBins } from '../context/binContext';
 
+
+// Import Contexts
+import { useAuth } from '../context/authContext';
+import { useSelections } from '../context/selectionContext';
+
 const MainPage = () => {
   const { binData } = useBins();
 
-  const [addBinVisable, setAddBinVisable] = useState(false);
+  const {selectedSiding} = useSelections();
 
+  const {signOut, sendJsonMessage, readyState, lastJsonMessage, mockMode} = useAuth();
+  const [addBinVisable, setAddBinVisable] = useState(false);
+  if (lastJsonMessage) {
+    // Get msg
+  }
+
+  const handleDone = () => {
+    if (!mockMode) {
+      // Checks etc b4
+      FinishedAlert();
+    }
+    else {
+      FinishedAlert();
+    }
+  }
   return (
     <View style={styles.body}>
       {/* Add Bin Modal */}
@@ -56,7 +76,7 @@ const MainPage = () => {
       {/* Page Content */}
       <View style={styles.content}>
         {/* Selected Siding */}
-        <SelectedSiding sidingName='Old Creek Rd' />
+        <SelectedSiding sidingName='Old Creek Rd' /* selectedSiding*/ />
         {/* Bin List */}
         <BinList
           BinData={binData}
@@ -66,7 +86,7 @@ const MainPage = () => {
       <Button
         title='Done'
         style={StyleSheet.create({ width: '100%' })}
-        onPress={FinishedAlert}
+        onPress={handleDone}
       />
     </View>
   );

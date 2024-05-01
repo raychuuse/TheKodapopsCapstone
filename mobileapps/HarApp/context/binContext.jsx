@@ -10,20 +10,34 @@ import React, { createContext, useState, useContext } from 'react';
  * @property {boolean} isBurnt - Indicates whether the bin is burnt.
  */
 const initialBinData = [
-  { isFull: false, binNum: 2141, isBurnt: false },
-  { isFull: true, binNum: 2123, isBurnt: true },
-  { isFull: false, binNum: 1232, isBurnt: false },
-  { isFull: true, binNum: 1234, isBurnt: false },
-  { isFull: true, binNum: 5637, isBurnt: false },
-  { isFull: false, binNum: 5633, isBurnt: false },
-  { isFull: false, binNum: 654, isBurnt: false },
-  { isFull: false, binNum: 12, isBurnt: false },
-  { isFull: false, binNum: 2345, isBurnt: false },
-  { isFull: false, binNum: 7545, isBurnt: false },
-  { isFull: false, binNum: 8765, isBurnt: false },
-  { isFull: false, binNum: 2334, isBurnt: false },
-  { isFull: false, binNum: 4632, isBurnt: false },
+  { isFull: false, binNum: 2141, isBurnt: false},
+  { isFull: true, binNum: 2123, isBurnt: true},
+  { isFull: false, binNum: 1232, isBurnt: false},
+  { isFull: true, binNum: 1234, isBurnt: false},
+  { isFull: true, binNum: 5637, isBurnt: false},
+  { isFull: false, binNum: 5633, isBurnt: false},
+  { isFull: false, binNum: 654, isBurnt: false},
+  { isFull: false, binNum: 12, isBurnt: false},
+  { isFull: false, binNum: 2345, isBurnt: false},
+  { isFull: false, binNum: 7545, isBurnt: false},
+  { isFull: false, binNum: 8765, isBurnt: false},
+  { isFull: false, binNum: 2334, isBurnt: false},
+  { isFull: false, binNum: 4632, isBurnt: false},
 ];
+
+/**
+ * exceptionBinData represents initial state of exception bins, while this could be empty for proof of concept, initial
+ * values are stored within. This is particularly useful for offline and queues of flagged bins in sending one json
+ *
+ * @type {Array<Object>}
+ * @property {number} binNum - A unique identifier for the bin.
+ * @property {boolean} isRepairNeeded - Indicates whether the bin is in need of repair.
+ * @property {boolean} isMissing - Indicates whether the bin is missing.
+ */
+const initialExceptionBinData = [
+  {binNum: 999997, isRepairNeeded: false, isMissing: false},
+  {binNum: 999998, isRepairNeeded: false, isMissing: false}
+]
 
 /**
  * createContext creates a context for the bin data, which includes the bin array and functions for interacting with this data.
@@ -35,15 +49,23 @@ const initialBinData = [
  * @property {Function} getBinData - Function to retrieve the data of a specific bin.
  * @property {Function} setBinFull - Function to update the 'isFull' property of a specific bin.
  * @property {Function} setBinBurnt - Function to update the 'isBurnt' property of a specific bin.
+ * @property {Function} setBinMissing - Function to update the 'isMissing' property of a specific bin.
+ * @property {Function} setBinToRepair - Function to update the 'isRepairNeeded' property of a specific bin.
  */
 
 const BinContext = createContext({
   binData: initialBinData,
+  exceptionBinData: initialExceptionBinData,
   setBinData: () => {},
+  setExceptionBinData: () => {},
   updateBin: () => {},
+  updateExceptionBin: () => {},
   getBinData: () => {},
+  getExceptionBinData: () => {},
   setBinFull: () => {},
   setBinBurnt: () => {},
+  setBinToRepair: () => {},
+  setBinMissing: () => {}
 });
 
 /**
@@ -57,7 +79,7 @@ const BinContext = createContext({
  */
 export const BinProvider = ({ children }) => {
   const [binData, _setBinData] = useState(initialBinData);
-
+  const [exceptionBinData, _setExceptionBinData] = useState(initialExceptionBinData);
   /**
    * Replaces the current bin data with a new array of bin data.
    * This function should be used when you need to refresh the entire list of bins or set an entirely new state.
@@ -68,6 +90,16 @@ export const BinProvider = ({ children }) => {
   const setBinData = (newData) => {
     _setBinData(newData);
   };
+
+  /**
+   * Same as prior function but for the exception data
+   *
+   * @param {Array<Object>} newData - The new data that will replace the current exception bin data array. Each object should
+   * contain at least the properties `binNum`, `isRepairNeeded`, and `isMissing`.
+   */
+    const setExceptionBinData = (newData) => {
+      _setExceptionBinData(newData);
+    };
 
   /**
    * updateBin updates specific properties of a bin identified by its bin number. This is a general-purpose function
@@ -84,15 +116,20 @@ export const BinProvider = ({ children }) => {
     setBinData(updatedData);
   };
 
+
   /**
-   * setBinFull is a specific function to set the 'isFull' status of a bin. It uses the `updateBin` function to change the status.
+   * updateExceptionBin does the same as the former, but for missing and repair bins that have been flagged. Note
+   * the update bin functionality uses a ternary function in mind of existent bins.
    *
    * @function
-   * @param {number} binNum - The unique identifier of the bin to update.
-   * @param {boolean} isFull - The new 'isFull' status to be set for the bin.
+   * @param {number} binNum - The unique identifier of the bin to be updated.
+   * @param {Object} updates - An object containing the properties to update and their new values.
    */
-  const setBinFull = (binNum, isFull) => {
-    updateBin(binNum, { isFull });
+  const updateExceptionBin = (binNum, updates) => {
+    const updatedData = exceptionBinData.map((bin) =>
+      bin.binNum === binNum ? { ...bin, ...updates } : bin
+    );
+    setExceptionBinData(updatedData);
   };
 
   /**
@@ -104,6 +141,39 @@ export const BinProvider = ({ children }) => {
    */
   const setBinBurnt = (binNum, isBurnt) => {
     updateBin(binNum, { isBurnt });
+  };
+
+  /**
+   * setBinFull is a specific function to set the 'isFull' status of a bin. It uses the `updateBin` function to change the status.
+   *
+   * @function
+   * @param {number} binNum - The unique identifier of the bin to update.
+   * @param {boolean} isFull - The new 'isFull' status to be set for the bin.
+   */
+  const setBinFull = (binNum, isFull) => {
+    updateBin(binNum, { isFull });
+  };
+  
+  /**
+   * setBinMissing is a specific function to set the 'isMissing' status of a bin. It uses the `updateExceptionBin` function to change the status.
+   *
+   * @function
+   * @param {number} binNum - The unique identifier of the bin to update.
+   * @param {boolean} isMissing - The new 'isMissing' status to be set for the bin.
+   */
+  const setBinMissing = (binNum, isMissing) => {
+    updateExceptionBin(binNum, { isMissing });
+  };
+
+  /**
+   * setBinToRepair is a specific function to set the 'isRepairNeeded' status of a bin. It uses the `updateBin` function to change the status.
+   *
+   * @function
+   * @param {number} binNum - The unique identifier of the bin to update.
+   * @param {boolean} isRe - The new 'isRepairNeeded' status to be set for the bin.
+   */
+  const setBinToRepair = (binNum, isRepairNeeded) => {
+    updateExceptionBin(binNum, { isRepairNeeded });
   };
 
   /**
@@ -119,6 +189,18 @@ export const BinProvider = ({ children }) => {
   };
 
   /**
+   * getExceptionBinData does the same as 'getBinData' but for the exception cases, i.e. missing and repair needing bins.
+   *
+   * @function
+   * @param {number} binNum - The unique identifier of the bin whose data is to be retrieved.
+   * @returns {Object|null} The bin object if found, or null if there is no flagged bin with the given identifier.
+   */
+  const getExceptionBinData = (binNum) => {
+    return exceptionBinData.find((bin) => bin.binNum === binNum);
+  };
+
+
+  /**
    * Adds a new bin to the current bin data array.
    * This function allows dynamically adding new bins with specific attributes to the bin list.
    *
@@ -128,16 +210,32 @@ export const BinProvider = ({ children }) => {
     setBinData((prevBins) => [...prevBins, newBin]);
   };
 
+ /**
+   * flagBin is the same as 'CreateBin' but for dynamically adding to a flagged bin list.
+   *
+   * @param {Object} flaggedBin - The bin object to add to the bin exception data. 
+   * It should contain properties like `binNum`, `setBinMissing`
+   */
+ const flagBin = (flaggedBin) => {
+  setBinData((prevBins) => [...prevBins, flaggedBin]);
+};
+
   return (
     <BinContext.Provider
       value={{
         binData,
         setBinData,
+        setExceptionBinData,
         updateBin,
+        updateExceptionBin,
         getBinData,
+        getExceptionBinData,
         setBinFull,
         setBinBurnt,
+        setBinToRepair,
+        setBinMissing,
         createBin,
+        flagBin
       }}
     >
       {children}
@@ -151,7 +249,7 @@ export const BinProvider = ({ children }) => {
  * This hook is central to interacting with the bin data, facilitating both retrieval and update operations.
  *
  * @hook
- * @returns {{binData, setBinData, updateBin, getBinData, setBinFull, setBinBurnt, createBin}} The context object containing bin data and utility functions.
+ * @returns {{binData, exceptionBinData, setBinData, setExceptionBinData,updateBin, getBinData, getExceptionBinData, setBinFull, setBinBurnt, setBinToRepair, setBinMissing, createBin, flagBin}} The context object containing bin data and utility functions.
  */
 
 export const useBins = () => useContext(BinContext);

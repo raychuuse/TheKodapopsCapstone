@@ -9,17 +9,19 @@ import Modal from './modal';
 // Import Style Components
 import * as Type from './typography';
 import { Colours } from './colours';
+import { useSelections } from '../context/selectionContext';
 
 const SettingsItem = ({
   type = '',
   startOption = 0,
   label = 'label',
   options = [{ label: 'Label', value: 0 }],
-  style,
+  style
 }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
-
+  const {updateSelection} = useSelections();
+  
   return (
     <>
       <Modal
@@ -48,14 +50,12 @@ const SettingsItem = ({
               style={{ width: '100%' }}
             />
             {options.map((option) => (
-              //REMOVE comment Fragment used to pass in key id, just need smth unique regarding option - otherwise error
-              <Fragment key={option.value}>
-                <Picker.Item
-                value={option.value}
-                label={option.label}
-                style={{ width: '100%' }}
-                />
-              </Fragment>
+              <Picker.Item
+              key = {option.value}
+              value={option.value}
+              label={option.label}
+              style={{ width: '100%' }}
+              />
             ))}
           </Picker>
         </View>
@@ -78,7 +78,11 @@ const SettingsItem = ({
           borderWidth={1}
           iconSize={28}
           style={styles.button}
-          onPress={() => setPickerVisable(!pickerVisable)}
+          onPress={() => {
+            // Delete: showcase to andrew of how context is used to move data up from a child to a parent.
+            updateSelection(label, selectedOption);
+            setPickerVisable(!pickerVisable);
+          }}
         />
       </View>
     </>

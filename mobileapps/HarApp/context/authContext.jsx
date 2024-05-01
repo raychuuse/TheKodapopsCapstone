@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, useRef } from 'react';
+import React, { createContext, useState, useEffect, useContext} from 'react';
 import AsyncStorage from 'react-native';
 import useWebSocket from 'react-use-websocket';
 import NetInfo from '@react-native-community/netinfo'
@@ -6,15 +6,33 @@ import NetInfo from '@react-native-community/netinfo'
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const [mockMode, setMockMode] = useState(true);
+
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
 
   const [isReady, setIsReady] = useState(false);
   const [val, setVal] = useState(null);
-  const ws = useRef(null);
+  const [jToken, setToken] =  useState('');
 
+  
   const serverURL = "localhost:8080";
   const wsURL = "ws://localhost:8000"
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
+    wsURL,
+    {
+      share: true,
+      token: getToken,
+      shouldReconnect: (closeEvent) => true,
+      reconnectAttempts: 10,
+      reconnectInterval: 3000
+    },
+  )
+
+
+  const getToken = async () => {
+    return await AsyncStorage.getItem('token');
+  }
 
   const signIn = () => {
     setIsSignedIn(true);
@@ -28,6 +46,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Set an effect that renders a permanent way to check for internet (when the provider is in use)
+  // still testing utility vs just using netinfo
   useEffect(() => {
     NetInfo.fetch().then((state) => {
         
@@ -37,42 +56,32 @@ export const AuthProvider = ({ children }) => {
     //Internet connection listener
     NetInfo.addEventListener((state) => {
 
-      console.warn('called');
-      console.warn(state.isInternetReachable);
+      //console.warn('called');
+      //console.warn(state.isInternetReachable);
       setIsOnline(state.isInternetReachable);
     });
   }, []);
 
-  // Effect for managing socket, put here but websocket is primarily only used
-  // in main, though same for netinfo.
+
+  // Effect that detects a message (for notifications)
   useEffect(() => {
-    const socket = new WebSocket(wsURL)
-
-    socket.onopen = () => setIsReady(true)
-    socket.onclose = () => setIsReady(false)
-    socket.onmessage = (event) => setVal(event.data)
-
-    ws.current = socket
-
-    return () => {
-      socket.close()
-    }
-  }, [])
-
-  const ret = [isReady, val, ws.current?.send.bind(ws.current)]
+    console.log(`Got a new message: ${lastJsonMessage}`)
+  }, [lastJsonMessage])
 
   // How websocket would be used... may want to have a seperate
   // WS context
   /*
   export const WsConsumer = () => {
-    const [ready, val, send] = useContext(AuthContext/ WSContext); 
+    const [ready, val, send] = useContext(AuthContext); or useAuth, pref second
   
     useEffect(() => {
-      if (ready) {
+      if (lastJsonMessage) {
         send("message");
       }
     }, [ready, send]);
 }*/
+
+// if just needing to recieve data, use if (lastJsonMessage)
   const globalValues = {
     isSignedIn,
     signIn,
@@ -80,7 +89,10 @@ export const AuthProvider = ({ children }) => {
     isOnline,
     serverURL,
     wsURL,
-    ret
+    mockMode,
+    sendJsonMessage,
+    lastJsonMessage,
+    readyState
   };
 
   return (

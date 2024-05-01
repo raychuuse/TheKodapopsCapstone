@@ -33,8 +33,5 @@ export const issueAlert = (message) => {
 };
 
 export const generalAlert = (message) => {
-  Alert.alert(
-    `${message}`,
-    [{ text: "OK" }]
-  );
+  Alert.alert(`See message below`, `\n${message}`, [{text: "OK"}]);
 };

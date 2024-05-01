@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
-import { Link, router } from "expo-router";
+import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 
 // Import Components
@@ -11,7 +11,7 @@ import { errorAlert, issueAlert, generalAlert } from '../lib/alerts';
 import { Title1, Body, Subhead } from "../components/typography";
 
 // Import Context
-import { AuthContext, useAuth } from "../context/authContext";
+import { useAuth } from "../context/authContext";
 
 const LogInPage = () => {
   const [email, setEmail] = useState('');
@@ -25,28 +25,19 @@ const LogInPage = () => {
   const [modalForgotVisible, setModalForgotVisible] = useState(false);
   const [modalResetVisible, setModalResetVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const setupPageRef = "dashboard/setup";
 
-  const {serverURL, signIn} = useAuth();
-
-  // Was needed for a specific type error, may remove
-  const getCircularReplacer = () => {
-    const seen = new WeakSet();
-    return (key, value) => {
-    if (typeof value === "object" && value !== null) {
-        if (seen.has(value)) {
-            return;
-        }
-        seen.add(value);
-    }
-    return value;
-    };
-  };
+  const {serverURL, signIn, mockMode} = useAuth();
 
   const handleResetCode = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
     if (!codeEmail) {
-      generalAlert("Please provide email.")
+      generalAlert("Please provide email.");
       return;
+    }
+    if (mockMode) {
+        generalAlert("Code has been sent successfully");
+        return;
     }
     try {
       const options = {
@@ -61,27 +52,32 @@ const LogInPage = () => {
       };
       const res = await fetch(`${serverURL}/har/reset-code`, options)
       if (res.ok) {
-        generalAlert("Code has been sent successfully.")
+        generalAlert("Code has been sent successfully.");
       }
       else {
         issueAlert(res.message);
-        setLoading(false);
+        //setLoading(false);
       }
     }
     catch (err) {
         errorAlert(err)
-        console.error(err.message)
+        console.log(err.message)
     }
   }
 
   const handleReset = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
     if (!resetPass || !resetCode || !resetPassConfirm || !resetEmail) {
-      generalAlert("Please provide details required.")
+      generalAlert("Please provide details required.");
       return;
     }
     if (resetPass != resetPassConfirm) {
-      generalAlert("Passwords do not match.")
+      generalAlert("Passwords do not match.");
+      return;
+    }
+    // Add further logic if desired for mock
+    if (mockMode) {
+      generalAlert("Password has been reset successfully");
       return;
     }
     try {
@@ -103,12 +99,12 @@ const LogInPage = () => {
       }
       else {
         issueAlert(res.message);
-        setLoading(false);
+        //setLoading(false);
       }
     }
     catch (err) {
         errorAlert(err)
-        console.error(err.message)
+        console.log(err.message)
     }
   }
   
@@ -116,18 +112,20 @@ const LogInPage = () => {
   const handleSubmit = async() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
     if (!email || !password) {
-      generalAlert("Please provide details required.")
+      generalAlert("Please provide details required.");
       return;
     }
     if (resetPass != resetPassConfirm) {
-      generalAlert("Passwords do not match.")
+      generalAlert("Passwords do not match.");
       return;
     }
     /*
     console.log(email);
     console.log(password);
     */
-    router.navigate("dashboard/setup")
+    if (mockMode) {
+      router.navigate(setupPageRef)
+    }
     try {
       const options = {
         method: "POST",
@@ -149,18 +147,20 @@ const LogInPage = () => {
           signIn();
         }
         catch (err) {
-          console.error(err);
+          issueAlert("Failed to login.");
+          console.log(err);
+          return;
         }
-        router.navigate("dashboard/setup")
+        router.navigate(setupPageRef);
       }
       else {
         issueAlert(res.status);
-        setLoading(false);
+        //setLoading(false);
       }
     }
     catch (err) {
-        errorAlert(err)
-        console.error(err.message)
+        //errorAlert(err.message);
+        console.log(err.message);
     }
   }
 
