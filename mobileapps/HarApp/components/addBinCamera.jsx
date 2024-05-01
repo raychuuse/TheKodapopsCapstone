@@ -6,12 +6,14 @@ import {
   View,
 } from 'react-native';
 import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera';
-import { useRef, useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 
 // Import Components
 import Button from './button';
 import { LargeTitle } from './typography';
+import { useBins } from '../context/binContext';
+import { issueAlert } from '../lib/alerts';
 
 const AddBinCamera = ({ modalCloser }) => {
   const [type, setType] = useState(CameraType.back);
@@ -20,6 +22,7 @@ const AddBinCamera = ({ modalCloser }) => {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const cameraRef = useRef(null);
   const [imageUri, setImageUri] = useState(null);
+  const {binData, createBin, getBinData} = useBins();
 
   const [binNumber, setBinNumber] = useState();
   const inputRef = useRef(null);
@@ -54,6 +57,37 @@ const AddBinCamera = ({ modalCloser }) => {
       current === FlashMode.off ? FlashMode.torch : FlashMode.off
     );
     setFlash(!flash);
+  }
+
+  function VerifyBinNumber(num) {
+
+    // Regex from stack overflow, \d for digits
+    if (/^\d+$/.test(num)) {
+
+      // check for undefined/ null
+      valIfExists = getBinData(num) == null;
+      if (valIfExists == null) {
+        issueAlert("An invalid number has been entered.")
+        return false;
+      }
+      else {
+        return true;
+      }
+    }
+  }
+
+  function handleSubmit() {
+    if (VerifyBinNumber(binNumber)) {
+      try {
+        createBin({isFull: false, binNum: binNumber, isBurnt: false});
+        Alert.alert('Bin Creation Successful.');
+        return;
+      }
+      catch (err) {
+        console.log(err);
+      }
+    }
+    Alert.alert('Bin Creation Failed, please enter a valid bin number.');
   }
 
   if (!permission) requestPermission();
@@ -160,7 +194,7 @@ const AddBinCamera = ({ modalCloser }) => {
         </View>
       </Camera>
       <Button
-        onPress={() => Alert.alert('Submit Button Pressed')}
+        onPress={handleSubmit}
         iconName='check-circle-outline'
         iconColor='white'
         iconSize={56}

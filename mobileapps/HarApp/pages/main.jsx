@@ -5,7 +5,7 @@ import { View, StyleSheet } from 'react-native';
 import GreetingMessage from '../components/greetingMessage';
 import Button from '../components/button';
 import CustomModal from '../components/modal';
-import SelectedSiding from '../components/selectedSiding';
+import SidingSelector from '../components/SidingSelector';
 import AddBinCamera from '../components/addBinCamera';
 import NetworkIndicator from '../components/networkIndicator';
 
@@ -26,21 +26,20 @@ import { useSelections } from '../context/selectionContext';
 const MainPage = () => {
   const { binData } = useBins();
 
-  const {selectedSiding} = useSelections();
+  const {getSiding, resetSelectData} = useSelections();
 
   const {signOut, sendJsonMessage, readyState, lastJsonMessage, mockMode} = useAuth();
   const [addBinVisable, setAddBinVisable] = useState(false);
-  if (lastJsonMessage) {
-    // Get msg
-  }
+
 
   const handleDone = () => {
     if (!mockMode) {
-      // Checks etc b4
+      // Checks etc before
       FinishedAlert();
     }
     else {
       FinishedAlert();
+      resetSelectData();
     }
   }
   return (
@@ -76,7 +75,7 @@ const MainPage = () => {
       {/* Page Content */}
       <View style={styles.content}>
         {/* Selected Siding */}
-        <SelectedSiding sidingName='Old Creek Rd' /* selectedSiding*/ />
+        <SidingSelector sidingName= {getSiding()}/>
         {/* Bin List */}
         <BinList
           BinData={binData}

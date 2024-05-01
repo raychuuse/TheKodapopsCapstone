@@ -1,57 +1,126 @@
 import { createContext, useState, useContext} from 'react';
 
 // initial dummy values
-const initialValues = ["Babinda", "Green Valley Farm", "", "", "", "No"];
+const initialValues = {Siding: "", Farm: "", Block:"", Sub: "", Pad: "", Burnt: "Neutral"};
 
-export const selectionContext = createContext({updateSelection: () => {}});
+export const SelectionContext = createContext({
+    selectionData: initialValues,
+    setSelectionData: () => {},
+    updateSelection: () => {},
+    getSiding: () => {},
+    getFarm: () => {},
+    getBlock: () => {},
+    getSub: () => {},
+    getPad: () => {},
+    getBurnt: () => {},
+    updateSiding: () => {},
+    updateFarm: () => {},
+    updateBlock: () => {},
+    updateSub: () => {},
+    updatePad: () => {},
+    updateBurnt: () => {},
+    resetSelectData: () => {}
+});
 
 // Need a way to transport data from child components to parents can use asyncStorage (esp for peristence), 
 // in this case will just reload 
-export const selectionProvider = ({ children }) => {
-    const [selectedFarm, selectFarm] = useState(initialValues[0])
-    const [selectedSiding, selectSiding] = useState(initialValues[1])
-    const [selectedBlock, selectBlock] = useState(initialValues[2])
-    const [selectedSub, selectSub] = useState(initialValues[3])
-    const [selectedPad, selectPad] = useState(initialValues[4])
-    const [selectedAsBurnt, selectBurnt] = useState(initialValues[5]);
+export const SelectionProvider = ({ children }) => {
+    // Refactored to one set of data
+    const [selectionData, _setSelectionData] = useState(initialValues);
 
-    // Updates selections based on child changes
-    // Note val is not 1 or 2, but the name of the element
-    const updateSelection = (type, newVal) => {
-        switch (type) {
-            case "Siding":
-                selectSiding(newVal);
-            case "Farm":
-                selectFarm(newVal);
-            case "Block":
-                selectBlock(newVal);
-            case "Sub":
-                selectSub(newVal);
-            case "Pad":
-                selectPad(newVal);
-            case "Burnt":
-                selectBurnt(newVal);
-        }
+    const setSelectionData = (newData) => {
+        _setSelectionData(newData);
     }
 
+    const updateSelection = (update) => {
+        setSelectionData({ ...selectionData, ...update });
+    }
+    const getSiding = () => {
+        return selectionData.Siding;
+    }
 
+    const getFarm = () => {
+        return selectionData.Farm;
+    }
 
-    // if just needing to recieve data, use if (lastJsonMessage)
-    const selectedValues = {
-        selectedSiding,
-        selectedFarm,
-        selectedBlock,
-        selectedSub,
-        selectedPad,
-        selectedAsBurnt,
-        updateSelection
-  };
+    const getBlock = () => {
+        return selectionData.Block;
+    }
+
+    const getSub = () => {
+        return selectionData.Sub;
+    }
+
+    const getPad = () => {
+        return selectionData.Pad;
+    }
+
+    const getBurnt = () => {
+        return selectionData.Burnt;
+    }
+
+    // Functionality seperate since it's only one property difference, and ts isn't in use
+    const updateSiding = (newVal) => {
+        _selectionData = selectionData;
+        _selectionData.Siding = newVal;
+        setSelectionData(_selectionData);
+    }
+
+    const updateFarm = (newVal) => {
+        _selectionData = selectionData;
+        _selectionData.Farm = newVal;
+        setSelectionData(_selectionData);
+    }
+
+    const updateBlock = (newVal) => {
+        _selectionData = selectionData;
+        _selectionData.Block = newVal;
+        setSelectionData(_selectionData);
+    }
+
+    const updateSub = (newVal) => {
+        _selectionData = selectionData;
+        _selectionData.Sub = newVal;
+        setSelectionData(_selectionData);
+    }
+
+    const updatePad = (newVal) => {
+        _selectionData = selectionData;
+        _selectionData.Pad = newVal;
+        setSelectionData(_selectionData);
+    }
+
+    const updateBurnt = (newVal) => {
+        _selectionData = selectionData;
+        _selectionData.Burnt = newVal;
+        setSelectionData(_selectionData);
+    }
+
+    const resetSelectData = () => {
+        _setSelectionData(initialValues);
+    }
 
   return (
-    <selectionContext.Provider value={selectedValues}>
+    <SelectionContext.Provider value={
+        {selectionData,
+        setSelectionData,
+        updateSelection,
+        getSiding,
+        getFarm,
+        getBlock,
+        getSub,
+        getPad,
+        getBurnt,
+        updateSiding,
+        updateFarm,
+        updateBlock,
+        updateSub,
+        updatePad,
+        updateBurnt,
+        resetSelectData}}>
       {children}
-    </selectionContext.Provider>
+    </SelectionContext.Provider>
   );
 };
 
-export const useSelections = () => useContext(selectionContext);
+export const useSelections = () => useContext(SelectionContext);

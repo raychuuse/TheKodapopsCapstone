@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
+import { useBins } from '../context/binContext';
 
 export const FinishedAlert = () => {
   Alert.alert('Finished?', "\nAre you sure you're finished at this Siding?", [
@@ -8,19 +9,19 @@ export const FinishedAlert = () => {
   ]);
 };
 
-export const RemoveBinAlert = (message) => {
+export const RemoveBinAlert = (message, binNum, func) => {
   Alert.alert(
     'Confirm Missing Bin?',
     `\nAre you sure you want to report ${message} as missing?`,
-    [{ text: "No, It's Here!" }, { text: 'Yes, Report' }]
+    [{ text: "No, It's Here!"}, { text: 'Yes, Report', onPress: () => {func(binNum)} }]
   );
 };
 
-export const RepairBinAlert = (message) => {
+export const RepairBinAlert = (message, binNum, func) => {
   Alert.alert(
     'Confirm Bin Repair?',
     `\nAre you sure you want to request a repair for Bin #${message}?`,
-    [{ text: "No, It's Fine!" }, { text: 'Yes, Request' }]
+    [{ text: "No, It's Fine!"}, { text: 'Yes, Request', onPress: () => {func(binNum)}}]
   );
 };
 

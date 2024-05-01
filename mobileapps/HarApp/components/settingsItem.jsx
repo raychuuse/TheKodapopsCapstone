@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useContext, useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
@@ -9,24 +9,48 @@ import Modal from './modal';
 // Import Style Components
 import * as Type from './typography';
 import { Colours } from './colours';
-import { useSelections } from '../context/selectionContext';
+import {useSelections } from '../context/selectionContext';
 
 const SettingsItem = ({
   type = '',
   startOption = 0,
-  label = 'label',
+  label = "label",
   options = [{ label: 'Label', value: 0 }],
   style
 }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
-  const {updateSelection} = useSelections();
-  
+  const {updateSiding, updateFarm, updateBlock, updateSub, updatePad, updateBurnt} = useSelections();
+
+
+  const changeData = (values) => {
+    newVal = getCurItem(values);
+    switch (label) {
+      case "Siding":
+        updateSiding(newVal);
+      case "Farm":
+        updateFarm(newVal);
+      case "Block":
+        updateBlock(newVal);
+      case "Sub":
+        updateSub(newVal);
+      case "Pad":
+        updatePad(newVal);
+      case "Burnt":
+        updateBurnt(newVal);
+  }
+}
+
+  const getCurItem = (values) => {
+    return (values.find((item) => item.value == selectedOption)?.label);
+  }
   return (
     <>
       <Modal
         isVisible={pickerVisable}
-        onClose={() => setPickerVisable(!pickerVisable)}
+        onClose={() => {
+          setPickerVisable(!pickerVisable);
+          changeData(options);}}
         buttonIcon='check-circle-outline'
       >
         <View style={{ gap: 16, width: '100%' }}>
@@ -66,7 +90,7 @@ const SettingsItem = ({
           style={[Type.styles.body, styles.body]}
           numberOfLines={1}
         >
-          {options.find((item) => item.value == selectedOption)?.label}
+          {getCurItem(options)}
         </Text>
 
         <Button
@@ -79,8 +103,6 @@ const SettingsItem = ({
           iconSize={28}
           style={styles.button}
           onPress={() => {
-            // Delete: showcase to andrew of how context is used to move data up from a child to a parent.
-            updateSelection(label, selectedOption);
             setPickerVisable(!pickerVisable);
           }}
         />

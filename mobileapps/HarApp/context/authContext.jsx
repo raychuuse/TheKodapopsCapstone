@@ -3,7 +3,9 @@ import AsyncStorage from 'react-native';
 import useWebSocket from 'react-use-websocket';
 import NetInfo from '@react-native-community/netinfo'
 
-export const AuthContext = createContext();
+export const AuthContext = createContext({
+  setMockMode: () => {},
+});
 
 export const AuthProvider = ({ children }) => {
   const [mockMode, setMockMode] = useState(true);
@@ -14,16 +16,25 @@ export const AuthProvider = ({ children }) => {
   const [isReady, setIsReady] = useState(false);
   const [val, setVal] = useState(null);
   const [jToken, setToken] =  useState('');
-
   
   const serverURL = "localhost:8080";
   const wsURL = "ws://localhost:8000"
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     wsURL,
     {
-      share: true,
+      share: true,  
       token: getToken,
-      shouldReconnect: (closeEvent) => true,
+      shouldReconnect: (closeEvent) => {
+        if (mockMode) {
+          return false;
+        }
+        if (isSignedIn) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      },
       reconnectAttempts: 10,
       reconnectInterval: 3000
     },
@@ -63,10 +74,11 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
-  // Effect that detects a message (for notifications)
-  useEffect(() => {
+  // Effect that detects a message (for notifications) can be done here or locally in 
+  //components
+  /*useEffect(() => {
     console.log(`Got a new message: ${lastJsonMessage}`)
-  }, [lastJsonMessage])
+  }, [lastJsonMessage])*/
 
   // How websocket would be used... may want to have a seperate
   // WS context
@@ -92,7 +104,8 @@ export const AuthProvider = ({ children }) => {
     mockMode,
     sendJsonMessage,
     lastJsonMessage,
-    readyState
+    readyState,
+    setMockMode
   };
 
   return (

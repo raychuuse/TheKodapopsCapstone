@@ -65,7 +65,9 @@ const BinContext = createContext({
   setBinFull: () => {},
   setBinBurnt: () => {},
   setBinToRepair: () => {},
-  setBinMissing: () => {}
+  setBinMissing: () => {},
+  deleteBin: () => {},
+  setBurn: () => {}
 });
 
 /**
@@ -198,7 +200,11 @@ export const BinProvider = ({ children }) => {
   const getExceptionBinData = (binNum) => {
     return exceptionBinData.find((bin) => bin.binNum === binNum);
   };
-
+  
+  const deleteBin = (binNum) => {
+    var filtered = binData.filter(function(func) { return func.binNum != binNum; }); 
+    setBinData(filtered);
+  }
 
   /**
    * Adds a new bin to the current bin data array.
@@ -220,6 +226,10 @@ export const BinProvider = ({ children }) => {
   setBinData((prevBins) => [...prevBins, flaggedBin]);
 };
 
+const setBurn = (bool) => {
+  setBinData(binData.map((bin) => {bin.isBurnt = bool; return bin}));
+}
+
   return (
     <BinContext.Provider
       value={{
@@ -235,7 +245,9 @@ export const BinProvider = ({ children }) => {
         setBinToRepair,
         setBinMissing,
         createBin,
-        flagBin
+        flagBin,
+        deleteBin,
+        setBurn
       }}
     >
       {children}

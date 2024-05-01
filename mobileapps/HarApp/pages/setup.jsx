@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { router } from "expo-router";
 
@@ -14,6 +14,9 @@ import { Colours } from "../components/colours";
 
 // Import Contexts
 import { useAuth } from "../context/authContext";
+import { useSelections } from "../context/selectionContext";
+import { useBins } from "../context/binContext";
+import { issueAlert } from "../lib/alerts";
 
 const initialFarmOptions = [
   { label: "Green Valley Farm", value: 1 },
@@ -70,13 +73,14 @@ const burntOptions = [
 const SetupPage = () => {
   const loginRef = "/";
   const dashboardRef = "/dashboard";
-  const {signOut, lastJsonMessage, mockMode} = useAuth();
+  const {signOut, lastJsonMessage, mockMode, setMockMode} = useAuth();
   const [farmOptions, setFarmOptions]  = useState(initialFarmOptions);
   const [sidingOptions, setSidingOptions]  = useState(initialSidingOptions);
   const [blockOptions, setBlockOptions]  = useState(initialBlockOptions);
   const [subBlockOptions, setSubOptions]  = useState(initialSubBlockOptions);
   const [padOptions, setPadOptions]  = useState(initialPadOptions);
-
+  const {setBurn} = useBins();
+  const {getSiding, getFarm} = useSelections();
 
   const handleLogout = () => {
     if (mockMode) {
@@ -91,10 +95,20 @@ const SetupPage = () => {
     }
     router.navigate(loginRef);
   }
-
+  
   const handleStart = () => {
+    siding = getSiding();
+    if (siding == "" || siding == null) {
+      issueAlert("It is required that a siding option is selected.")
+      return;
+    }
+    /*
+    const burnOption = getBurnt();
+    if (burnOption != "neutral") {
+        setBurn(burnOption == "Yes");
+    }*/
     if (mockMode) {
-      router.navigate(dashboardRef)
+      router.navigate(dashboardRef);
       return;
     }
     try {
@@ -128,7 +142,7 @@ const SetupPage = () => {
   
       }
     }
-  })
+  }, [lastJsonMessage]);
   
 
   return (
