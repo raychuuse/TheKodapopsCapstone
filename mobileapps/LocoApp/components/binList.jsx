@@ -34,7 +34,6 @@ const BinList = ({ sidingId, binListName }) => {
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
-  // TODO: Fix this to use the context right and the re-render issue after updates
   // Function to handle long press range selection on bins.
   const LongPressRangeSelect = (binNumber, index) => {
     // Clone the current selection to avoid direct state mutation.
@@ -144,7 +143,10 @@ const BinList = ({ sidingId, binListName }) => {
       style={{ flex: 1, width: '100%', position: 'relative' }}
     >
       {/* Add Bin Modal */}
-      <AddBinCamera />
+      <AddBinCamera
+        sidingID={sidingId}
+        isDrop={binsKey}
+      />
       {/* List Header */}
       <View
         style={[
@@ -190,12 +192,19 @@ const BinList = ({ sidingId, binListName }) => {
               ? { backgroundColor: theme.spCompleteBG }
               : siding.id == selectedSidingID
               ? { backgroundColor: theme.spSelectedBG }
-              : { backgroundColor: theme.spPendingBG },
+              : { backgroundColor: theme.bgModal },
           ]}
         >
           <MaterialCommunityIcons
             name={'plus-circle-outline'}
             size={24}
+            color={
+              siding.isCompleted
+                ? theme.spCompleteText
+                : siding.id == selectedSidingID
+                ? theme.spSelectedText
+                : theme.spPendingText
+            }
           />
         </TouchableOpacity>
       </View>

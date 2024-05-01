@@ -17,10 +17,12 @@ import CustomModal from './modal';
 
 // Import Provider
 import { useModal } from '../context/modalContext';
+import { useRun } from '../context/runContext';
 
-const AddBinCamera = () => {
+const AddBinCamera = ({ sidingID, isDrop }) => {
   // Providers
   const { modalAddBinVisible, closeAddBinModal } = useModal();
+  const { addBin } = useRun();
 
   const [type, setType] = useState(CameraType.back);
   const [flashMode, setFlashMode] = useState(FlashMode.off);
@@ -29,7 +31,7 @@ const AddBinCamera = () => {
   const cameraRef = useRef(null);
   const [imageUri, setImageUri] = useState(null);
 
-  const [binNumber, setBinNumber] = useState();
+  const [binNumber, setBinNumber] = useState('');
   const inputRef = useRef(null);
   const MAX_LENGTH = 6;
 
@@ -51,6 +53,13 @@ const AddBinCamera = () => {
     }
   };
 
+  const addBinHandeler = () => {
+    addBin(sidingID, binNumber, isDrop);
+    setBinNumber('');
+    closeAddBinModal();
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
   function toggleCameraType() {
     setType((current) =>
       current === CameraType.back ? CameraType.front : CameraType.back
@@ -69,7 +78,10 @@ const AddBinCamera = () => {
   return (
     <CustomModal
       isVisible={modalAddBinVisible}
-      onClose={closeAddBinModal}
+      onClose={() => {
+        setBinNumber('');
+        closeAddBinModal();
+      }}
       buttonIcon='close-circle-outline'
       style={{ height: '60%', marginTop: 56, width: 600 }}
     >
@@ -173,7 +185,23 @@ const AddBinCamera = () => {
         </View>
       </Camera>
       <Button
-        onPress={() => Alert.alert('Submit Button Pressed')}
+        onPress={() => {
+          if (binNumber.length < MAX_LENGTH) {
+            Alert.alert(
+              'Missing Bin Number!',
+              `Please ensure there is a Bin Number with a length of ${MAX_LENGTH} digits.`
+            );
+          } else {
+            Alert.alert(
+              'Are you sure?',
+              `Are you sure you waould like to add Bin ${binNumber} to this siding?`,
+              [
+                { text: "No, Don't!" },
+                { text: 'Yes, Add it.', onPress: addBinHandeler },
+              ]
+            );
+          }
+        }}
         iconName='check-circle-outline'
         iconColor='white'
         iconSize={56}
