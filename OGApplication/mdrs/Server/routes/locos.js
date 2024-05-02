@@ -46,12 +46,12 @@ router.get('/:locoId/load', (req, res) => {
   if (stopID != null && !isValidId(stopID, res))
     return;
 
-  const withStopId = `SELECT b.binID, b.code, b.status, b.full, b.burnt, l.locoID, l.locoName, stopState.picked_up_in_stop, stopState.dropped_off_in_stop
+  const withStopId = `SELECT b.binID, b.code, b.status, b.full, b.burnt, l.locoID, l.locoName, stopState.pickedUpInStop, stopState.droppedOffInStop
       FROM locomotive l
       LEFT JOIN bin b ON b.locoID = l.locoID
       LEFT JOIN (SELECT binID,
-                        IF(SUM(type = 'PICKED_UP') > 0, true, false) as 'picked_up_in_stop',
-                        IF(SUM(type = 'DROPPED_OFF') > 0, true, false) as 'dropped_off_in_stop'
+                        IF(SUM(type = 'PICKED_UP') > 0, true, false) as 'pickedUpInStop',
+                        IF(SUM(type = 'DROPPED_OFF') > 0, true, false) as 'droppedOffInStop'
                  FROM transactionlog
                  WHERE stopID = ?
                    AND transactionTime > DATE_SUB(NOW(), INTERVAL 1 DAY)
@@ -81,8 +81,8 @@ router.get('/:locoId/load', (req, res) => {
                 status: bin.status,
                 full: !!bin.full,
                 burnt: !!bin.burnt,
-                picked_up_in_stop: !!bin.picked_up_in_stop,
-                dropped_off_in_stop: !!bin.dropped_off_in_stop
+                pickedUpInStop: !!bin.pickedUpInStop,
+                droppedOffInStop: !!bin.droppedOffInStop
             });
         }
         res.status(200).json(loco);

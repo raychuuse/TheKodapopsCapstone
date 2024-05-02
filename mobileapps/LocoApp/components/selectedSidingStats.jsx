@@ -13,12 +13,14 @@ import { useModal } from '../context/modalContext';
 export default function SelectedSiddingStats() {
   // Porviders
   const { theme } = useTheme();
-  const { getSiding } = useRun();
+  const { getStop } = useRun();
   const { openSelectSidingModal, selectedSidingID, openSidingModal } =
     useModal();
 
+  if (selectedSidingID == null) return;
   // Data
-  const siding = getSiding(selectedSidingID);
+  const stop = getStop(selectedSidingID);
+  console.info('Hello', stop, selectedSidingID);
 
   return (
     <Container
@@ -45,7 +47,7 @@ export default function SelectedSiddingStats() {
             Drop Off
           </Headline>
         </View>
-        <Title3>{siding.binsDrop.length}</Title3>
+        <Title3>{stop.dropOffQuantity}</Title3>
       </TouchableOpacity>
 
       {/* Vertical Rule */}
@@ -75,7 +77,7 @@ export default function SelectedSiddingStats() {
             color={theme.textLevel3}
           />
         </View>
-        <Title3>{siding.name}</Title3>
+        <Title3>{stop.sidingName}</Title3>
         {/* <Footnote style={{ color: theme.textLevel3 }}>ETA: 12:05 PM</Footnote> */}
       </TouchableOpacity>
 
@@ -106,7 +108,7 @@ export default function SelectedSiddingStats() {
             color={theme.textLevel3}
           />
         </View>
-        <Title3>{siding.binsCollect.length}</Title3>
+        <Title3>{stop.collectQuantity}</Title3>
       </TouchableOpacity>
     </Container>
   );

@@ -16,7 +16,7 @@ import { useModal } from '../context/modalContext';
 const ModalSidingDetails = () => {
   // Providers
   const { theme } = useTheme();
-  const { getSiding } = useRun();
+  const { getStop, getLoco } = useRun();
   const {
     sidingToViewID,
     modalSidingVisible,
@@ -24,16 +24,21 @@ const ModalSidingDetails = () => {
     selectedSidingID,
   } = useModal();
 
+  if (sidingToViewID == null) return;
+
   // Data
-  const siding = getSiding(sidingToViewID);
+  const stop = getStop(sidingToViewID);
+  console.info('modelSidingDetails', sidingToViewID, stop);
+  const loco = getLoco();
+
   return (
     <CustomModal
       onClose={closeSidingModal}
       isVisible={modalSidingVisible}
       style={[
         { width: '85%', height: '90%' },
-        siding.isCompleted && { backgroundColor: theme.spCompleteBG },
-        siding.id === selectedSidingID && {
+        stop.isCompleted && { backgroundColor: theme.spCompleteBG },
+        stop.stopID === selectedSidingID && {
           backgroundColor: theme.spSelectedBG,
         },
       ]}
@@ -46,24 +51,24 @@ const ModalSidingDetails = () => {
           name='pin-drop'
           size={28}
           color={
-            siding.isCompleted
+            stop.isCompleted
               ? theme.spCompleteBGText
-              : siding.id === selectedSidingID
+              : stop.stopID === selectedSidingID
               ? theme.spSelectedBGText
               : theme.textLevel2
           }
         />
         <Title1
           style={[
-            siding.isCompleted
+            stop.isCompleted
               ? { color: theme.spCompleteBGText }
               : theme.spPendingText,
-            siding.id === selectedSidingID
+            stop.stopID === selectedSidingID
               ? { color: theme.spSelectedBGText }
               : theme.textLevel2,
           ]}
         >
-          {siding.name}
+          {stop.sidingName}
         </Title1>
         <TouchableOpacity
           style={Styles.closeButton}
@@ -73,9 +78,9 @@ const ModalSidingDetails = () => {
             name='close-circle-outline'
             size={36}
             color={
-              siding.isCompleted
+              stop.isCompleted
                 ? theme.spCompleteBGText
-                : siding.id === selectedSidingID
+                : stop.stopID === selectedSidingID
                 ? theme.spSelectedBGText
                 : theme.textLevel2
             }
@@ -97,15 +102,13 @@ const ModalSidingDetails = () => {
       >
         {/* Drop */}
         <BinList
-          BinData={siding.binsDrop}
-          binListName='binsDrop'
-          sidingId={sidingToViewID}
+          type={'LOCO'}
+          stopID={sidingToViewID}
         />
         {/* Collect */}
         <BinList
-          BinData={siding.binsCollect}
-          binListName='binsCollect'
-          sidingId={sidingToViewID}
+          type={'SIDING'}
+          stopID={sidingToViewID}
         />
       </View>
     </CustomModal>

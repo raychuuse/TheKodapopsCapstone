@@ -11,8 +11,8 @@ const ModalProvider = ({ children }) => {
     useState(false);
 
   // State for siding IDs
-  const [selectedSidingID, setSelectedSidingID] = useState(3);
-  const [sidingToViewID, setSidingToViewID] = useState(2);
+  const [selectedSidingID, setSelectedSidingID] = useState();
+  const [sidingToViewID, setSidingToViewID] = useState();
 
   // Function to open siding modal and update the ID to view
   const openSidingModal = (id) => {

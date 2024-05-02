@@ -1,7 +1,10 @@
-import React, { createContext, useReducer, useContext } from 'react';
+import React, { createContext, useReducer, useContext, useState, useEffect } from 'react';
 
 // Import Mock Data from a relative path
 import { RunMockData } from '../data/RunMockData';
+import { dropOffBin, getRunById, pickUpBin } from '../api/runs.api';
+import { getCurrentLoadById, getLocoById } from '../api/loco.api';
+import { getSidingBreakdown } from '../api/siding.api';
 
 // Create a React context for storing and managing run data
 const RunContext = createContext();
@@ -56,6 +59,119 @@ function runReducer(state, action) {
 // Context provider component that makes the run data accessible throughout the component tree
 export const RunProvider = ({ children }) => {
   const [state, dispatch] = useReducer(runReducer, RunMockData);
+  const [run, setRun] = useState();
+  const [loco, setLoco] = useState();
+
+  useEffect(() => {
+    getRunById(1)
+        .then(response => {
+          console.info('Ready', response);
+
+          const promises = [];
+          for (const stop of response.stops)
+              promises.push(getSidingBreakdown(stop.sidingID, stop.stopID));
+
+          Promise.allSettled(promises)
+              .then(responses => {
+                  for (let i = 0; i < responses.length; i++) {
+                      response.stops[i].bins = responses[i].value;
+                  }
+                  console.info('Ready again', responses);
+              })
+              .catch(err => {
+                  console.error(err);
+              });
+            setRun(response);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+
+    getCurrentLoadById(3)
+        .then(response => {
+          setLoco(response);
+          console.info('Ready', response);
+        })
+        .catch(err => {
+          console.error(err);
+        })
+  }, []);
+
+  const handlePickUpBin = (binID, stopID) => {
+    // pickUpBin(binID, loco.locoID, stopID)
+    //     .then(response => {
+      const stop = run.stops.find(s => s.stopID === stopID);
+      if (stop == null) return console.warn('No stop');
+
+      const binIdx = stop.bins.findIndex(b => b.binID === binID);
+      const bin = stop.bins[binIdx];
+      if (bin == null) return console.warn('No bin');
+      stop.bins.splice(binIdx, 1);
+
+      if (bin.droppedOffInStop) {
+          stop.dropOffCount--;
+          bin.droppedOffInStop = false;
+      } else {
+          stop.collectCount++;
+          bin.pickedUpInStop = true;
+      }
+      loco.bins.push(bin);
+
+      setLoco({
+          ...loco,
+          bins: loco.bins,
+      });
+      setRun({
+          ...run,
+          stops: run.stops
+      });
+        // })
+        // .catch(err => {
+        //   console.error(err);
+        // });
+  };
+
+  const handleDropOffBin = (binID, stopID) => {
+      // dropOffBin(binID, loco.locoID, stopID)
+      //     .then(response => {
+      const binIdx = loco.bins.findIndex(b => b.binID === binID);
+      const bin = loco.bins[binIdx];
+      if (bin == null) return console.warn('No bin');
+      loco.bins.splice(binIdx, 1);
+
+      const stop = run.stops.find(s => s.stopID === stopID);
+      if (stop == null) return console.warn('No stop');
+
+      if (bin.pickedUpInStop) {
+          stop.collectCount--;
+          bin.pickedUpInStop = false;
+      } else {
+          stop.dropOffCount++;
+          bin.droppedOffInStop = true;
+      }
+      stop.bins.push(bin);
+
+      setLoco({
+          ...loco,
+          bins: loco.bins,
+      });
+      setRun({
+          ...run,
+          stops: run.stops
+      });
+  };
+
+  const getStop = (stopID) => {
+    return run.stops.find(stop => stop.stopID === stopID);
+  }
+
+  const getStops = () => {
+      return run.stops;
+  }
+
+  const getLoco = () => {
+      return loco;
+  }
 
   // Dispatches an action to update the entire run object
   const updateRun = (updates) =>
@@ -103,6 +219,11 @@ export const RunProvider = ({ children }) => {
         updateRun,
         updateSiding,
         updateBin,
+        getStop,
+        getStops,
+        getLoco,
+        handlePickUpBin,
+        handleDropOffBin,
       }}
     >
       {children}
@@ -174,6 +295,11 @@ export const useRun = () => {
     updateRun,
     updateSiding,
     updateBin,
+    getStop,
+    getStops,
+    getLoco,
+    handlePickUpBin,
+    handleDropOffBin
   } = useContext(RunContext);
   return {
     runData: state,
@@ -184,5 +310,10 @@ export const useRun = () => {
     updateRun,
     updateSiding,
     updateBin,
+    getStop,
+    getStops,
+    getLoco,
+    handlePickUpBin,
+    handleDropOffBin
   };
 };

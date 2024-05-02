@@ -15,7 +15,7 @@ import { useRun } from '../context/runContext';
 
 const ModalSelectSiding = () => {
   const { theme } = useTheme();
-  const { runData, getSiding } = useRun();
+  const { getStops } = useRun();
   const {
     modalSelectSidingVisible,
     closeSelectSidingModal,
@@ -23,26 +23,23 @@ const ModalSelectSiding = () => {
     updateSelectedSidingID,
   } = useModal();
 
-  const SidingListItem = ({ sidingId }) => {
-    // Data
-    const sidingData = getSiding(sidingId);
-
+  const SidingListItem = ({ stop }) => {
     // Background Color for the Siding, this is base on the siding data
-    const backgroundColor = sidingData.isCompleted
+    const backgroundColor = stop.isCompleted
       ? theme.spCompleteBG
-      : sidingData.id == selectedSidingID
+      : stop.stopID == selectedSidingID
       ? theme.spSelectedBG
       : theme.spPendingBG;
     // Text Color for the Siding, this is base on the siding data
-    const TextColor = sidingData.isCompleted
+    const TextColor = stop.isCompleted
       ? theme.spCompleteText
-      : sidingData.id == selectedSidingID
+      : stop.stopID == selectedSidingID
       ? theme.spSelectedText
       : theme.spPendingText;
     // Icon Name for the Siding Icon, this is base on the siding data
-    const Icon = sidingData.isCompleted
+    const Icon = stop.isCompleted
       ? 'checkbox-marked-circle-outline'
-      : sidingData.id == selectedSidingID
+      : stop.stopID == selectedSidingID
       ? 'star-circle-outline'
       : 'checkbox-blank-circle-outline';
     return (
@@ -57,8 +54,8 @@ const ModalSelectSiding = () => {
           alignItems: 'center',
           backgroundColor: backgroundColor,
         }}
-        onPress={() => updateSelectedSidingID(sidingId)}
-        disabled={sidingData.isCompleted}
+        onPress={() => updateSelectedSidingID(stop.stopID)}
+        disabled={stop.isCompleted}
       >
         {/* Siding State Icon */}
         <MaterialCommunityIcons
@@ -68,11 +65,11 @@ const ModalSelectSiding = () => {
         />
         {/* Siding Name */}
         <Title2 style={{ color: TextColor, marginRight: 'auto' }}>
-          {sidingData.name}
+          {stop.name}
         </Title2>
 
         {/* Bin Details */}
-        {sidingData.isCompleted ? (
+        {stop.isCompleted ? (
           <Title2 style={{ color: TextColor, marginRight: 8 }}>
             Completed
           </Title2>
@@ -95,7 +92,7 @@ const ModalSelectSiding = () => {
             />
             {/* Label */}
             <Headline style={{ color: TextColor, width: 14 }}>
-              {sidingData.binsDrop.length}
+              {stop.dropOffQuantity}
             </Headline>
             {/* Vertical Rule */}
             <View
@@ -116,7 +113,7 @@ const ModalSelectSiding = () => {
             />
             {/* Label */}
             <Headline style={{ color: TextColor, width: 14 }}>
-              {sidingData.binsCollect.length}
+              {stop.collectQuantity}
             </Headline>
           </View>
         )}
@@ -125,7 +122,7 @@ const ModalSelectSiding = () => {
   };
 
   const renderItem = ({ item }) => {
-    return <SidingListItem sidingId={item.id} />;
+    return <SidingListItem stop={item} />;
   };
 
   return (
@@ -142,12 +139,12 @@ const ModalSelectSiding = () => {
           size={28}
           color={theme.textLevel2}
         />
-        <Title1>Select a Siding</Title1>
+        <Title1>Select a Stop</Title1>
       </View>
       {/* Modal Content */}
       <FlatList
         style={styles.content}
-        data={runData.sidings}
+        data={getStops()}
         renderItem={renderItem}
         ItemSeparatorComponent={<Divider style={{ marginVertical: 10 }} />}
       />

@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useRef } from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Swipeable } from 'react-native-gesture-handler';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -8,36 +8,28 @@ import * as Haptics from 'expo-haptics';
 import { Headline } from '../styles/typography';
 import { useTheme } from '../styles/themeContext';
 
-import {pickUpBin, dropOffBin} from '../api/runs.api';
-
 // Import Functions
 import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
-
-// Import Provider
 import { useRun } from '../context/runContext';
 
+// Import Provider
+
 // Import Function
-import { useSetIsFull, useSetIsBurnt } from '../lib/bins';
 
 const SwipeableBinItem = ({
   index,
-  isSelected,
-  binNumber,
-  binListName = 'binsDrop',
-  sidingId,
+  longPressedIndex,
+  bin,
+  type,
+  stopID,
   longPressHandler,
 }) => {
   // Providers
   const { theme } = useTheme();
-  const { getBin } = useRun();
+  const { handlePickUpBin, handleDropOffBin } = useRun();
 
-  // Build Function Hooks
-  const SetIsFull = useSetIsFull();
-  const SetIsBurnt = useSetIsBurnt();
-
-  // Data
-  const binsKey = binListName == 'binsDrop';
-  const binData = getBin(sidingId, binNumber, binsKey);
+  const message = type === 'SIDING' ? 'Dropped Off' : 'Picked Up';
+  const isSelected = bin.pickedUpInStop || bin.pickedUpInStop;
 
   // Define the right actions for swipe
   const renderRightActions = () => {
@@ -98,19 +90,19 @@ const SwipeableBinItem = ({
         <View
           style={[
             styles.actionButton,
-            binData.isBurnt
+            bin.burnt
               ? { backgroundColor: theme.bgGreen }
               : { backgroundColor: theme.bgBurnt },
             { width: 180 },
           ]}
         >
           <MaterialCommunityIcons
-            name={binData.isBurnt ? 'fire' : 'leaf'}
+            name={bin.burnt ? 'fire' : 'leaf'}
             size={24}
             color={theme.spAtSidingText}
           />
           <Headline style={{ color: theme.spAtSidingText }}>
-            Mark as {binData.isBurnt ? 'Green' : 'Burnt'}
+            Mark as {bin.burnt ? 'Green' : 'Burnt'}
           </Headline>
         </View>
       </View>
@@ -123,7 +115,7 @@ const SwipeableBinItem = ({
   // OnSwipeOpen Handler
   const onSwipeOpen = (direction) => {
     if (direction == 'left') {
-      SetIsBurnt(sidingId, binNumber, binsKey);
+      // SetIsBurnt(sidingId, binNumber, binsKey);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       swipeableRef.current.close();
     }
@@ -141,7 +133,7 @@ const SwipeableBinItem = ({
       <View
         style={[
           styles.binItem,
-          isSelected == index && {
+          longPressedIndex === index && {
             borderColor: theme.spAtSidingText,
             borderWidth: 4,
             borderStyle: 'solid',
@@ -150,8 +142,8 @@ const SwipeableBinItem = ({
             paddingVertical: 4,
           },
           { backgroundColor: theme.binItemBg },
-          binData.isFull
-            ? binData.isBurnt
+          isSelected
+            ? bin.burnt
               ? { backgroundColor: theme.binItemBurnt }
               : { backgroundColor: theme.binItemGreen }
             : null,
@@ -160,27 +152,32 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={styles.binPressable}
           onPress={() => {
-            SetIsFull(sidingId, binData.binNumber, binsKey);
+            // SetIsFull(sidingId, binData.binNumber, binsKey);
+              console.info('Yo', type);
+              if (type === 'SIDING')
+                  handlePickUpBin(bin.binID, stopID);
+              else
+                  handleDropOffBin(bin.binID, stopID);
           }}
-          onLongPress={() => longPressHandler(binData.binNumber, index)}
+          onLongPress={() => longPressHandler(bin.binID, index)}
         >
           <Feather
             style={[
               { color: theme.spAtSidingText },
-              binData.isFull
-                ? binData.isBurnt
+              isSelected
+                ? bin.burnt
                   ? { color: theme.binItemBurntText }
                   : { color: theme.binItemGreenText }
                 : null,
             ]}
-            name={binData.isFull ? 'check-circle' : 'circle'}
+            name={isSelected ? 'check-circle' : 'circle'}
             size={24}
           />
           <Headline
             style={[
               { color: theme.spAtSidingText },
-              binData.isFull
-                ? binData.isBurnt
+              isSelected
+                ? bin.burnt
                   ? { color: theme.binItemBurntText }
                   : { color: theme.binItemGreenText }
                 : null,
@@ -190,20 +187,19 @@ const SwipeableBinItem = ({
           </Headline>
         </TouchableOpacity>
         {/* Edit Btn / Full Indicator */}
-        {binData.isFull ? (
-          <Headline
-            style={[
-              { color: theme.spAtSidingText },
-              binData.isFull
-                ? binData.isBurnt
-                  ? { color: theme.binItemBurntText }
-                  : { color: theme.binItemGreenText }
-                : null,
-            ]}
-          >
-            Full{binData.isBurnt ? ' | Burnt' : ''}
-          </Headline>
-        ) : null}
+        <Headline
+          style={[
+            { color: theme.spAtSidingText },
+            isSelected
+              ? bin.burnt
+                ? { color: theme.binItemBurntText }
+                : { color: theme.binItemGreenText }
+              : null,
+          ]}
+        >
+        {(bin.droppedOffInStop || bin.pickedUpInStop) && message + ' | '} {bin.full ? 'Full' : 'Empty'} {bin.burnt ? ' |' +
+            ' Burnt' : ''}
+        </Headline>
       </View>
     </Swipeable>
   );

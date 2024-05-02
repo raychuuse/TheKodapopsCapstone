@@ -32,8 +32,8 @@ router.get('/:id', (req, res) => {
             const run = runsResult[0];
             req.db.raw(`SELECT rs.*,
                                s.sidingName,
-                               CAST(COALESCE(t.picked_up_count, 0) AS UNSIGNED)   as 'collect_count',
-                               CAST(COALESCE(t.dropped_off_count, 0) AS UNSIGNED) as 'drop_off_count'
+                               CAST(COALESCE(t.picked_up_count, 0) AS UNSIGNED)   as 'collectCount',
+                               CAST(COALESCE(t.dropped_off_count, 0) AS UNSIGNED) as 'dropOffCount'
                         FROM run_stops rs
                                  LEFT JOIN siding s ON rs.sidingID = s.sidingID
                                  LEFT JOIN (SELECT stopID,
@@ -317,7 +317,7 @@ router.get('/counts/:stopID', (req, res) => {
     if (!isValidId(stopID, res)) return;
 
     req.db.raw(`
-        SELECT CAST(COALESCE(SUM(type = 'PICKED_UP'), 0) AS UNSIGNED) AS picked_up_count, CAST(COALESCE(SUM(type = 'DROPPED_OFF'), 0) AS UNSIGNED) AS dropped_off_count
+        SELECT CAST(COALESCE(SUM(type = 'PICKED_UP'), 0) AS UNSIGNED) AS collectCount, CAST(COALESCE(SUM(type = 'DROPPED_OFF'), 0) AS UNSIGNED) AS dropOffCount
         FROM transactionlog
         WHERE stopID = ?
     `, [stopID])
@@ -326,7 +326,7 @@ router.get('/counts/:stopID', (req, res) => {
             const row = rows[0];
             if (row == null)
                 return res.status(404).json({message: 'No stop found with stop id ' + stopID});
-            return res.status(200).json({picked_up_count: row.picked_up_count, dropped_off_count: row.dropped_off_count});
+            return res.status(200).json({collectCount: row.collectCount, dropOffCount: row.dropOffCount});
         })
         .catch(err => {
             console.error(err);

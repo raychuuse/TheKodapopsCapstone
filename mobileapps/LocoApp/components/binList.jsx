@@ -14,20 +14,22 @@ import { useRun } from '../context/runContext';
 import { useTheme } from '../styles/themeContext';
 import { useModal } from '../context/modalContext';
 
-const BinList = ({ sidingId, binListName }) => {
+const BinList = ({ stopID, type }) => {
   // Provider
   const { theme } = useTheme();
-  const { runData, getBins, updateRun, getSiding } = useRun();
+  const { getStop, getLoco } = useRun();
   const { selectedSidingID } = useModal();
 
   // Data
-  const binsKey = binListName == 'binsDrop';
-  const BinData = getBins(sidingId, binsKey);
-  const siding = getSiding(sidingId);
+  const loco = getLoco();
+  const stop = getStop(stopID);
+  console.info('Stop', stop, stopID, loco);
+  const bins = type === 'SIDING' ? stop.bins : loco.bins;
+  const runData = [];
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
   const [selectedIndices, setSelectedIndices] = useState([]);
-  const [isSelected, setIsSelected] = useState(null);
+  const [longPressedIndex, setLongPressedIndex] = useState(null);
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
 
@@ -45,7 +47,7 @@ const BinList = ({ sidingId, binListName }) => {
       // Update the state to reflect the new selection.
       setSelectedIndices(newSelection);
       // Set the is selected indicator
-      setIsSelected(index);
+      setLongPressedIndex(index);
       // Provide haptic feedback to indicate successful selection.
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
@@ -56,7 +58,7 @@ const BinList = ({ sidingId, binListName }) => {
         // Clear the selection if the same bin is selected again.
         setSelectedIndices([]);
         // Unset the is selected indicator
-        setIsSelected(null);
+        setLongPressedIndex(null);
         // Provide haptic feedback to indicate removal.
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
@@ -67,8 +69,8 @@ const BinList = ({ sidingId, binListName }) => {
         const _runData = runData;
         // Temporary copy of bin data for mutation.
         const _binData = runData.sidings.find(
-          (siding) => siding.id == sidingId
-        )[binListName];
+          (siding) => siding.id == stopID
+        )[type];
 
         // Extract indices from the selected objects for range calculation.
         const indices = newSelection.map((selection) => selection.index);
@@ -85,7 +87,7 @@ const BinList = ({ sidingId, binListName }) => {
         }
 
         _runData.sidings = _runData.sidings.map((siding) => {
-          if (siding.id == sidingId) {
+          if (siding.id == stopID) {
             // Create a new object combining the existing siding data with the new data
             return { ...siding, binListName: _binData };
           } else {
@@ -98,7 +100,7 @@ const BinList = ({ sidingId, binListName }) => {
         // Clear the selection after the action is completed.
         setSelectedIndices([]);
         // Unset the is selected indicator
-        setIsSelected(null);
+        setLongPressedIndex(null);
         // Provide haptic feedback to indicate successful processing.
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
@@ -115,10 +117,10 @@ const BinList = ({ sidingId, binListName }) => {
   const listRenderItem = ({ item, index }) => (
     <SwipeableBinItem
       index={index}
-      isSelected={isSelected}
-      binNumber={item.binNumber}
-      binListName={binListName}
-      sidingId={sidingId}
+      longPressedIndex={longPressedIndex}
+      bin={item}
+      type={type}
+      stopID={stopID}
       longPressHandler={LongPressRangeSelect}
     />
   );
@@ -155,26 +157,26 @@ const BinList = ({ sidingId, binListName }) => {
             alignItems: 'center',
             paddingHorizontal: 8,
           },
-          siding.isCompleted
+          stop.isCompleted
             ? { backgroundColor: theme.spComplete }
-            : siding.id == selectedSidingID
+            : stop.stopID == selectedSidingID
             ? { backgroundColor: theme.spSelected }
             : { backgroundColor: theme.spPending },
         ]}
       >
         <Title2>
-          {binListName == 'binsDrop'
+          {type == 'LOCO'
             ? 'Drop Off:'
-            : binListName == 'binsCollect'
+            : type == 'SIDING'
             ? 'Collect:'
             : null}
         </Title2>
-        <Title2>{BinData.length}</Title2>
-        <Title2>{BinData.length > 1 ? 'Bins' : 'Bin'} at Siding</Title2>
+        <Title2>{bins.length}</Title2>
+        <Title2>{bins.length > 1 ? 'Bins' : 'Bin'} at Siding</Title2>
       </View>
       {/* Bin List */}
       <FlatList
-        data={BinData}
+        data={bins}
         style={{
           width: '100%',
           backgroundColor: theme.bgOverlay,

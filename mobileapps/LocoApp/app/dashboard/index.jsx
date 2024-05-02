@@ -24,7 +24,7 @@ import {getCurrentLoadById} from "../../api/loco.api";
 
 export default function Page() {
   // Providers
-  const { runData, updateRun } = useRun();
+  const { getStops } = useRun();
   const { theme } = useTheme();
 
   const scrollX = React.useRef(new Animated.Value(0)).current;
@@ -32,6 +32,9 @@ export default function Page() {
 
   // Run Data for the Whole App
   const [notifications, setNotifications] = useState(NotificationsMockData);
+  const stops = getStops();
+
+  console.info('Index', stops);
 
   return (
     <View
@@ -91,16 +94,18 @@ export default function Page() {
               )}
               bounces={false}
               horizontal={true}
-              keyExtractor={(item) => item.id}
-              data={runData.sidings}
-              renderItem={({ item, index }) => (
+              keyExtractor={(item) => item.stopID}
+              data={stops}
+              renderItem={({ item, index }) => {
+                  console.info('item', item);
+                  return (
                 <SidingCard
-                  sidingID={item.id}
+                  stopID={item.stopID}
                   index={index}
                   scrollX={scrollX}
                   containerWidth={sidingCarouselWidth}
                 />
-              )}
+              );}}
             />
           </View>
           <View
@@ -114,8 +119,6 @@ export default function Page() {
       </View>
       {/* Nav Bar */}
       <BottomBar
-        runData={runData}
-        setRunData={updateRun}
         notifications={notifications}
         setNotifications={setNotifications}
       />

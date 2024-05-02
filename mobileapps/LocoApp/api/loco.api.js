@@ -7,9 +7,9 @@ export function getAllLocos() {
 }
 
 export function getLocoById(id) {
-    return handleFetch(fetch(`${apiUrl}`), true);
+    return handleFetch(fetch(`${apiUrl}/${id}`), true);
 }
 
 export function getCurrentLoadById(id, stopID) {
-    return handleFetch(fetch(`${apiUrl}/${id}/load?stopID=${stopID}`), true);
+    return handleFetch(fetch(`${apiUrl}/${id}/load` + (stopID != null ? `?stopID=${stopID}` : '')), true);
 }

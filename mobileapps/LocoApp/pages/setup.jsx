@@ -15,9 +15,10 @@ import {Colours} from '../styles/colours';
 // Import Mock Data
 import {getAllLocos} from "../api/loco.api";
 import {getAllRunsOnDate} from "../api/runs.api";
+import { SettingMockData_Run, SettingsMockData_Loco } from '../data/settingsMockData';
 
 const SetupPage = () => {
-    const [locos, setLocos] = useState();
+/*    const [locos, setLocos] = useState();
     const [selectedLoco, setSelectedLoco] = useState();
     const [runs, setRuns] = useState();
     const [selectedRun, setSelectedRun] = useState();
@@ -53,29 +54,28 @@ const SetupPage = () => {
     return (
         <View style={styles.page}>
             <View style={styles.body}>
-                {/* Page Headings */}
+                {/!* Page Headings *!/}
                 <View style={styles.page_heading}>
                     <LargeTitle>
                         <GreetingMessage/>
                     </LargeTitle>
                     <Title1>John Smith</Title1>
                 </View>
-                {/* Page Content */}
+                {/!* Page Content *!/}
                 <View style={styles.content}>
-                    {/* Locomotive Selector */}
+                    {/!* Locomotive Selector *!/}
                     {locos != undefined && <SettingsItem
                         label='Locomotive'
                         options={locos}
                         setSelectedItem={setSelectedLoco}
                     />}
-                    {/* Run Selector */}
                     {runs != undefined && <SettingsItem
                         label='Run'
                         options={runs}
                         setSelectedItem={setSelectedRun}
                     />}
                 </View>
-                {/* Actions */}
+                {/!* Actions *!/}
                 <View style={styles.actions}>
                     <Link
                         href='/'
@@ -97,7 +97,7 @@ const SetupPage = () => {
                 </View>
             </View>
         </View>
-    );
+    )*/;
   const { theme } = useTheme();
   return (
     <View style={[styles.page, { backgroundColor: theme.appBG }]}>
