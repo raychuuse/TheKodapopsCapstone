@@ -46,7 +46,7 @@ const LogInPage = () => {
             inputMode='email'
             autoComplete='email'
             clearButtonMode='always'
-            onChange={setResetEmail}
+            onChange={e => setResetEmail(e.nativeEvent.text)}
             value={resetEmail}
           />
           <TouchableOpacity
@@ -68,7 +68,7 @@ const LogInPage = () => {
           inputMode='email'
           autoComplete='email'
           clearButtonMode='always'
-          onChange={setEmail}
+          onChange={e => setEmail(e.nativeEvent.text)}
           value={email}
         />
         <TextInput
@@ -80,7 +80,7 @@ const LogInPage = () => {
           secureTextEntry
           clearButtonMode='always'
           value={password}
-          onChange={setPassword}
+          onChange={e => setPassword(e.nativeEvent.text)}
         />
         <View style={styles.button_container}>
           <Link

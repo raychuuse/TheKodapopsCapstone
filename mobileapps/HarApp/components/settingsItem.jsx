@@ -50,6 +50,7 @@ const SettingsItem = ({
         isVisible={pickerVisable}
         onClose={() => {
           setPickerVisable(!pickerVisable);
+          // Make it so this modal isnt needed
           changeData(options);}}
         buttonIcon='check-circle-outline'
       >
