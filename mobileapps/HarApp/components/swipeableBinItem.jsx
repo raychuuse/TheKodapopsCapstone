@@ -20,7 +20,8 @@ const SwipeableBinItem = ({
   isSelected,
 }) => {
   // Providers
-  const { getBinData, setBinFull, setBinBurnt, deleteBin } = useBins();
+  const { getBinData, setBinFull, setBinBurnt, deleteBin, flagBin, 
+    setBinMissing, setBinToRepair, checkRepair, getExceptionBinData } = useBins();
 
   // ~ ~ ~ ~ ~ ~ ~ ~ Reference ~ ~ ~ ~ ~ ~ ~ ~ //
   // Swipeable Reference
@@ -43,7 +44,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           onPress={() => {
             Haptics.selectionAsync();
-            RepairBinAlert(`Bin #${binNumber}`, binNumber, deleteBin);}
+            RepairBinAlert(`Bin #${binNumber}`, binNumber, setBinToRepair, getBinData);}
           }
           style={[styles.actionButton, { backgroundColor: '#FFA000' }]}
         >
@@ -176,6 +177,13 @@ const SwipeableBinItem = ({
             Bin #{binNumber}
           </Headline>
         </TouchableOpacity>
+        {getBinData(binNumber).isRepairNeeded ? (
+          <Headline
+            style={[styles.binText]}
+          >
+            Repair!
+          </Headline>
+        ) : null}
         {/* Edit Btn / Full Indicator */}
         {getBinData(binNumber).isFull ? (
           <Headline

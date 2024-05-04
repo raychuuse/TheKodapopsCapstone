@@ -131,8 +131,6 @@ const SetupPage = () => {
 
         else {
 
-          // Basically a list of these, where the query flag is set for this websocket transmission
-          // Since we are using JSON messages, can freely add keys for differentiation
           if (lastJsonMessage.query == "Siding") {
               // data is a stringified json, use as needed
               setSidingOptions(lastJsonMessage.data);
@@ -156,7 +154,7 @@ const SetupPage = () => {
       </View>
       {/* Page Content */}
       <View style={styles.content}>
-        <SettingsItem type="location" label="Siding" options={sidingOptions} />
+        <SettingsItem type="location" label= "Siding" options={sidingOptions} />
         <Divider />
         <SettingsItem type="select" label="Farm" options={farmOptions} />
         <SettingsItem type="select" label="Block" options={blockOptions} />

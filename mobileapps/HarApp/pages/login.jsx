@@ -141,14 +141,11 @@ const LogInPage = () => {
         }),
       };
       const res = await fetch(`${serverURL}/har/login`, options)
-      console.log(email);
-      console.log(password);
-      console.log(res.status);
-      console.log(res.Message);
       if (res.ok) {
         try {
           await AsyncStorage.setItem('isSignedIn', 'true');
           await AsyncStorage.setItem('email', email);
+          await AsyncStorage.setItem('token', res[0].userID);
           await AsyncStorage.setItem('token', res[0].token);
           signIn();
         }

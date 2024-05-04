@@ -32,7 +32,7 @@ function GenerateUniqueID() {
 }
 
 const {validateUserBody} = require("../middleware/validateUser")
-const {processQueryResult, validationErrorToError} = require("../utils");
+const {processQueryResult, validationErrorToError, checkIfExpired} = require("../utils");
 const {isNumeric} = require("validator");
 
 const loginValidationRulesID = [
@@ -41,10 +41,15 @@ const loginValidationRulesID = [
 ];
 
 // Add specific regex for email validation
+// Temporarily removed during testing
 const loginValidationRulesEmail = [
     body('email').notEmpty().withMessage('Please provide your password'),
     body('password').notEmpty().withMessage('Please provide your password')
 ];
+
+function checkJWT(jwt) {
+    return jwt.verify(token, "secretkeyappearshere");
+  }
 
 const sendCode = async (userEmail, resetCode) => {
     try {
@@ -112,19 +117,15 @@ router.post("/har/login", (req, res) => {
     if (!errors.isEmpty()) {
         return res.status(400).json({errors: errors.array()});
     }
-    
+
     const email = req.body.id;
     const password = req.body.password;
-    res.status(300).json({Message: "hm"});
-    return;
     req.db.raw(`SELECT u.*, h.harvesterName
                 FROM users u
                 LEFT JOIN harvester h ON h.harvesterID = u.userID
                 WHERE email = ? AND userRole = ${harvesterRole}`, [email])
         .then(processQueryResult)
         .then((res) => {
-            res.status(300).json({Message: "hm"});
-            return ;
             if (res.length === 0) {
                 return res.status(404).json({message: "User doesn't exist"});
             }
@@ -418,5 +419,182 @@ router.put('/', updateValidationRules, (req, res) => {
             res.status(500).json(err);
         });
 });
+
+
+router.get("user/:id/sidings", (req, res) => {
+    if (!req[0].token) {
+        res.status(200)
+            .json({success: false, message: "Token was not provided."});
+    }
+    const decode = checkJWT(req[0].token);
+    if (checkIfExpired(decode.exp)) {
+        res.status(400)
+            .json({success: false, message: "Error! Login Invalid, token expired."});
+    }
+    // Haven't introduced restriction based on user in db
+    req.db.raw(`SELECT *
+                FROM siding`)
+        .then(processQueryResult)
+        .then((sidings) => {
+          res.status(200).json(sidings);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+});
+
+router.get("user/:id/farms", (req, res) => {
+    if (!req[0].token) {
+        res.status(200)
+            .json({success: false, message: "Token was not provided."});
+    }
+    const decode = checkJWT(req[0].token);
+    if (checkIfExpired(decode.exp)) {
+        res.status(400)
+            .json({success: false, message: "Error! Login Invalid, token expired."});
+    }
+    // Haven't introduced restriction based on user in db?
+    if (!req[0].id) {
+        req.db.raw(`SELECT *
+                FROM farms`)
+        .then(processQueryResult)
+        .then((farms) => {
+          res.status(200).json(farms);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+    }
+    else {
+        req.db.raw(`SELECT *
+            FROM farms
+        WHERE sidingID = ?`, [id])
+        .then(processQueryResult)
+        .then((farms) => {
+          res.status(200).json(farms);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+    }
+});
+
+router.get("farms/:id/blocks", (req, res) => {
+    if (!req[0].token) {
+        res.status(200)
+            .json({success: false, message: "Token was not provided."});
+    }
+    const decode = checkJWT(req[0].token);
+    if (checkIfExpired(decode.exp)) {
+        res.status(400)
+            .json({success: false, message: "Error! Login Invalid, token expired."});
+    }
+
+    if (!id) {
+        req.db.raw(`SELECT *
+                FROM blocks`)
+        .then(processQueryResult)
+        .then((blocks) => {
+          res.status(200).json(blocks);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+    }
+    else {
+        req.db.raw(`SELECT *
+        FROM blocks
+        WHERE farmID = ?`, [id])
+        .then(processQueryResult)
+        .then((blocks) => {
+          res.status(200).json(blocks);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+    }
+});
+
+router.get("blocks/:id/subs", (req, res) => {
+    if (!req[0].token) {
+        res.status(200)
+            .json({success: false, message: "Token was not provided."});
+    }
+    const decode = checkJWT(req[0].token);
+    if (checkIfExpired(decode.exp)) {
+        res.status(400)
+            .json({success: false, message: "Error! Login Invalid, token expired."});
+    }
+
+    if (!id) {
+        req.db.raw(`SELECT *
+                FROM subs`)
+        .then(processQueryResult)
+        .then((subs) => {
+          res.status(200).json(subs);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+    }
+    else {
+        req.db.raw(`SELECT *
+        FROM subs
+        WHERE blockID = ?`, [id])
+        .then(processQueryResult)
+        .then((subs) => {
+          res.status(200).json(subs);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+    }
+});
+
+router.get("subs/:id/pads", (req, res) => {
+    if (!req[0].token) {
+        res.status(200)
+            .json({success: false, message: "Token was not provided."});
+    }
+    const decode = checkJWT(req[0].token);
+    if (checkIfExpired(decode.exp)) {
+        res.status(400)
+            .json({success: false, message: "Error! Login Invalid, token expired."});
+    }
+    
+    if (!id) {
+        req.db.raw(`SELECT *
+                FROM pads
+                WHERE subBlockID = ?`, [id])
+        .then(processQueryResult)
+        .then((subs) => {
+          res.status(200).json(subs);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+    }
+    else {
+        req.db.raw(`SELECT *
+                FROM pads`)
+        .then(processQueryResult)
+        .then((subs) => {
+          res.status(200).json(subs);
+        })
+        .catch((err) => {
+          console.error(err);
+          res.status(500).json(err);
+        });
+    }
+});
+
 
 module.exports = router;

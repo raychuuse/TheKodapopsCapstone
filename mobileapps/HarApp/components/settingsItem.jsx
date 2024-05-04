@@ -20,7 +20,8 @@ const SettingsItem = ({
 }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
-  const {updateSiding, updateFarm, updateBlock, updateSub, updatePad, updateBurnt} = useSelections();
+  const {updateSiding, updateFarm, updateBlock, updateSub, updatePad, updateBurnt,
+  getSiding, getFarm, getBlock, getSub, getPad, getBurnt} = useSelections();
 
 
   const changeData = (values) => {
@@ -38,8 +39,25 @@ const SettingsItem = ({
         updatePad(newVal);
       case "Burnt":
         updateBurnt(newVal);
-  }
-}
+      }
+    }
+
+    const getCur = (label) => {
+      switch (label) {
+        case "Siding":
+          return getSiding();
+        case "Farm":
+          return getFarm();
+        case "Block":
+          return getBlock();
+        case "Sub":
+          return getSub();
+        case "Pad":
+          return getPad();
+        case "Burnt":
+          return getBurnt();
+        }
+      }
 
   const getCurItem = (values) => {
     return (values.find((item) => item.value == selectedOption)?.label);
@@ -91,7 +109,7 @@ const SettingsItem = ({
           style={[Type.styles.body, styles.body]}
           numberOfLines={1}
         >
-          {getCurItem(options)}
+          {label == "Siding" ? getSiding(): getCurItem(options)}
         </Text>
 
         <Button

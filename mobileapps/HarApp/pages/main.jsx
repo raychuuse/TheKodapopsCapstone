@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
 
 // Import Components
 import GreetingMessage from '../components/greetingMessage';
@@ -8,6 +9,7 @@ import CustomModal from '../components/modal';
 import SidingSelector from '../components/SidingSelector';
 import AddBinCamera from '../components/addBinCamera';
 import NetworkIndicator from '../components/networkIndicator';
+import { Alert } from 'react-native';
 
 //Import Functions
 import { FinishedAlert } from '../lib/alerts';
@@ -26,20 +28,19 @@ import { useSelections } from '../context/selectionContext';
 const MainPage = () => {
   const { binData } = useBins();
 
-  const {getSiding, resetSelectData} = useSelections();
+  const {getSiding, setSelectionData} = useSelections();
+  const setupPageRef = "dashboard/setup";
 
   const {signOut, sendJsonMessage, readyState, lastJsonMessage, mockMode} = useAuth();
   const [addBinVisable, setAddBinVisable] = useState(false);
 
-
   const handleDone = () => {
     if (!mockMode) {
       // Checks etc before
-      FinishedAlert();
+      FinishedAlert(null, null);
     }
     else {
-      FinishedAlert();
-      resetSelectData();
+      FinishedAlert({Siding: getSiding(), Farm: "", Block:"", Sub: "", Pad: "", Burnt: "Neutral"},setSelectionData);
     }
   }
   return (

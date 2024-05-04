@@ -10,19 +10,19 @@ import React, { createContext, useState, useContext } from 'react';
  * @property {boolean} isBurnt - Indicates whether the bin is burnt.
  */
 const initialBinData = [
-  { isFull: false, binNum: 2141, isBurnt: false},
-  { isFull: true, binNum: 2123, isBurnt: true},
-  { isFull: false, binNum: 1232, isBurnt: false},
-  { isFull: true, binNum: 1234, isBurnt: false},
-  { isFull: true, binNum: 5637, isBurnt: false},
-  { isFull: false, binNum: 5633, isBurnt: false},
-  { isFull: false, binNum: 654, isBurnt: false},
-  { isFull: false, binNum: 12, isBurnt: false},
-  { isFull: false, binNum: 2345, isBurnt: false},
-  { isFull: false, binNum: 7545, isBurnt: false},
-  { isFull: false, binNum: 8765, isBurnt: false},
-  { isFull: false, binNum: 2334, isBurnt: false},
-  { isFull: false, binNum: 4632, isBurnt: false},
+  { isFull: false, binNum: 2141, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: true, binNum: 2123, isBurnt: true, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 1232, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: true, binNum: 1234, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: true, binNum: 5637, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 5633, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 654, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 12, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 2345, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 7545, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 8765, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 2334, isBurnt: false, isRepairNeeded: false, isMissing: false},
+  { isFull: false, binNum: 4632, isBurnt: false, isRepairNeeded: false, isMissing: false},
 ];
 
 /**
@@ -67,7 +67,8 @@ const BinContext = createContext({
   setBinToRepair: () => {},
   setBinMissing: () => {},
   deleteBin: () => {},
-  setBurn: () => {}
+  setBurn: () => {},
+  checkRepair: () => {}
 });
 
 /**
@@ -164,7 +165,7 @@ export const BinProvider = ({ children }) => {
    * @param {boolean} isMissing - The new 'isMissing' status to be set for the bin.
    */
   const setBinMissing = (binNum, isMissing) => {
-    updateExceptionBin(binNum, { isMissing });
+    updateBin(binNum, { isMissing });
   };
 
   /**
@@ -175,7 +176,7 @@ export const BinProvider = ({ children }) => {
    * @param {boolean} isRe - The new 'isRepairNeeded' status to be set for the bin.
    */
   const setBinToRepair = (binNum, isRepairNeeded) => {
-    updateExceptionBin(binNum, { isRepairNeeded });
+    updateBin(binNum, { isRepairNeeded });
   };
 
   /**
@@ -200,6 +201,16 @@ export const BinProvider = ({ children }) => {
   const getExceptionBinData = (binNum) => {
     return exceptionBinData.find((bin) => bin.binNum === binNum);
   };
+
+  const checkRepair = (binNum) => {
+    const val = exceptionBinData.find((bin) => bin.binNum === binNum)
+    if (!val) {
+      return false;
+    }
+    else {
+      return val.isRepairNeeded;
+    }
+  };
   
   const deleteBin = (binNum) => {
     var filtered = binData.filter(function(func) { return func.binNum != binNum; }); 
@@ -222,8 +233,8 @@ export const BinProvider = ({ children }) => {
    * @param {Object} flaggedBin - The bin object to add to the bin exception data. 
    * It should contain properties like `binNum`, `setBinMissing`
    */
- const flagBin = (flaggedBin) => {
-  setBinData((prevBins) => [...prevBins, flaggedBin]);
+ const flagBin = (bin) => {
+  setBinData(binData.map((bin) => {bin.isBurnt = bool; return bin}));
 };
 
 const setBurn = (bool) => {
@@ -247,7 +258,8 @@ const setBurn = (bool) => {
         createBin,
         flagBin,
         deleteBin,
-        setBurn
+        setBurn,
+        checkRepair
       }}
     >
       {children}
