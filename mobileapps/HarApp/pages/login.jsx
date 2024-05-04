@@ -1,5 +1,7 @@
 import { useContext, useState } from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 
@@ -139,9 +141,13 @@ const LogInPage = () => {
         }),
       };
       const res = await fetch(`${serverURL}/har/login`, options)
+      console.log(email);
+      console.log(password);
+      console.log(res.status);
+      console.log(res.Message);
       if (res.ok) {
         try {
-          await AsyncStorage.setItem('isSignedIn', true);
+          await AsyncStorage.setItem('isSignedIn', 'true');
           await AsyncStorage.setItem('email', email);
           await AsyncStorage.setItem('token', res[0].token);
           signIn();

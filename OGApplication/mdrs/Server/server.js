@@ -6,8 +6,10 @@ const app = express();
 const router = express.Router();
 const WebSocket = require('ws');
 
+const port = 8080;
+
 const server = http.createServer(app);
-const wss = new WebSocket.Server({server});
+const ws = new WebSocket.Server({server});
 const clients = {}
 
 // Websocket integration
@@ -34,11 +36,11 @@ const knex = require("knex")(options);
 app.use(cors());
 // for parsing application/json
 app.use(express.json());
-
+/*
 app.use((req, res, next) => {
   req.db = knex;
   next();
-});
+});*/
 
 //Routers
 app.use("/bins?", binRouter)
@@ -62,9 +64,13 @@ app.get("/knex", function (req, res, next) {
 });
 
 
+// Useful but doesn't have option to pause errors in dev
 // catch 404 and forward to error handler
+
 app.use(function(req, res, next) {
-  next(createError(404));
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
 // error handler
@@ -79,9 +85,10 @@ app.use(function(err, req, res, next) {
   // res.status(err.status || 500);
   res.json({ Error: true, Message: err.message });
 
+  res.status(err.status || 500);
 });
 
-wss.on('connection', (ws, req) => {
+ws.on('connection', (ws, req) => {
   const userId = uuidv4();
 
   // May want to use req to specificy client difference more
@@ -120,4 +127,4 @@ function broadcastMessage(data) {
   };
 }
 
-server.listen(8080, () => console.log("API runs on http:localhost:8080"));
+server.listen(port, () => console.log(`API runs on http:localhost:${port}`));

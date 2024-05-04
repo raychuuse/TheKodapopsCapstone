@@ -37,7 +37,7 @@ export default function Harvester() {
                 <div className="row">
                     <div className="col-sm-3">
                         <div className="container-fluid">
-                            <ItemList onItemSelected={changeState} itemName={'Harvesters'}
+                            <ItemList onItemSelected={changeState} itemName={'Harvester'}
                                       getAllItemApi={getAllHarvesters} createItemApi={createHarvester}
                                       updateItemApi={updateHarvester} deleteItemApi={deleteHarvester}/>
                         </div>

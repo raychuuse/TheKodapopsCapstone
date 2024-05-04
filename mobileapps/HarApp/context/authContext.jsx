@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext} from 'react';
-import AsyncStorage from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import useWebSocket from 'react-use-websocket';
 import NetInfo from '@react-native-community/netinfo'
 
@@ -8,17 +9,18 @@ export const AuthContext = createContext({
 });
 
 export const AuthProvider = ({ children }) => {
-  const [mockMode, setMockMode] = useState(true);
+  // Set this for testing
+  const [mockMode, setMockMode] = useState(false);
 
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState('false');
   const [isOnline, setIsOnline] = useState(false);
 
   const [isReady, setIsReady] = useState(false);
   const [val, setVal] = useState(null);
   const [jToken, setToken] =  useState('');
   
-  const serverURL = "localhost:8080";
-  const wsURL = "ws://localhost:8000"
+  const serverURL = "http://10.0.0.195:8080";
+  const wsURL = "ws://10.0.195:8080"
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     wsURL,
     {

@@ -43,7 +43,7 @@ router.get("/:harvesterId/siding_breakdown", (req, res) => {
 
 router.post('/', (req, res) => {
     req.db.insert({harvesterName: req.body.name}).into('harvester')
-        .then((result) => {
+        .then((res) => {
             res.status(201).send();
         })
         .catch(error => {

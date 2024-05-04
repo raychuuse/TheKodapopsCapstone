@@ -218,7 +218,7 @@ const UserView = () => {
                             />
                             {formErrors.lastName && <span className="text-danger">Please enter a valid last name</span>}
                         </FormGroup>
-                        {role === 'Harvester' && harvesters != undefined &&
+                        {role === 'Harvester' && harvesters !== undefined &&
                             <FormGroup>
                                 <Label for="harvester">Harvester</Label>
                                 <Input

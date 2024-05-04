@@ -34,3 +34,14 @@ export function handleFetch(promise, hasJson=true) {
             }
         });
 }
+
+export const Status = {
+    1: 'Empty At Mill',
+    2: 'Empty On Loco',
+    3: 'Empty At Siding',
+    4: 'Full At Siding',
+    5: 'Full On Loco',
+    6: 'Full At Mill',
+    7: 'Missing',
+    8: 'Error Unknown'
+}

@@ -107,20 +107,24 @@ router.post("/login", loginValidationRulesID, (req, res) => {
         });
 });
 
-router.post("/har/login", loginValidationRulesEmail, (req, res) => {
+router.post("/har/login", (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({errors: errors.array()});
     }
+    
     const email = req.body.id;
     const password = req.body.password;
-
+    res.status(300).json({Message: "hm"});
+    return;
     req.db.raw(`SELECT u.*, h.harvesterName
                 FROM users u
                 LEFT JOIN harvester h ON h.harvesterID = u.userID
                 WHERE email = ? AND userRole = ${harvesterRole}`, [email])
         .then(processQueryResult)
         .then((res) => {
+            res.status(300).json({Message: "hm"});
+            return ;
             if (res.length === 0) {
                 return res.status(404).json({message: "User doesn't exist"});
             }

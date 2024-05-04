@@ -14,13 +14,20 @@ export async function getDashboard() {
     return body.data;
 }
 
+// Have had no version provided with these modifications
+/*
 export function filterByStatus(bins, query) {
     return bins.filter(bin => bin.statusID === query)
+}
+*/
+
+export function filterByStatus(bins, isFull,) {
+    return bins.filter(bin => bin.status === isFull);
 }
 
 export async function getDashboardMetrics() {
     const res = await fetch(`${serverUrl}/bins`);
-    const body = await res.json();
+    const body = res.json();
 
     //check for db error
     if (body.Error) {
@@ -30,16 +37,18 @@ export async function getDashboardMetrics() {
 
     return {
         mill:{
-            empty: filterByStatus(body.data, 1).length,
-            full:  filterByStatus(body.data, 6).length
+            empty: filterByStatus(body.data, true).filter((bin => bin.sidingID === 1)).length,
+            full:  filterByStatus(body.data, false).filter((bin => bin.sidingID === 1)).length
         },
         locos: {
-            empty: filterByStatus(body.data, 2).length,
-            full:  filterByStatus(body.data, 5).length
+            empty: filterByStatus(body.data, true).filter((bin => bin.locoID !== null)).length,
+            full:  filterByStatus(body.data, false).filter((bin => bin.locoID !== null)).length
         },
         sidings: {
-            empty: filterByStatus(body.data, 3).length,
-            full:  filterByStatus(body.data, 4).length
+            empty: filterByStatus(body.data, true).filter((bin => bin.sidingID !== 1))
+            .filter((bin => bin.sidingID !== null)).length,
+            full:  filterByStatus(body.data, false).filter((bin => bin.sidingID !== 1))
+            .filter((bin => bin.sidingID !== null)).length
         }
     };
 }

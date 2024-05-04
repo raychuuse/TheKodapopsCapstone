@@ -50,10 +50,10 @@ export const List = ({ data = [], onClick, onEdit, onDelete, loading }) => {
             >
               {name}
               {/* Only render the edit and delete buttons if onEdit and onDelete have been provided */}
-              {onEdit != null &&
+              {onDelete != null &&
                 <button type='button' className={'btn btn-danger'} onClick={() => onDelete(id)} style={{float: 'right'}}>Delete</button>
               }
-              { onDelete != null &&
+              {onEdit != null &&
                 <button type='button' className={'btn btn-primary'} onClick={() => onEdit(id)} style={{float: 'right', marginRight: '1rem'}}>Edit</button>
               }
             </button>
@@ -62,6 +62,3 @@ export const List = ({ data = [], onClick, onEdit, onDelete, loading }) => {
       </div >
     )
   }
-
-
-

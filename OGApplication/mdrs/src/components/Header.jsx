@@ -69,6 +69,11 @@ const Header = () => {
                 Users
               </a>
             </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/maintenance">
+                Maintenance
+              </a>
+            </li>
           </ul>
         </div>
 

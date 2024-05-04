@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, ListInlineItem } from 'reactstrap';
-import {serverUrl, postConfig, putConfig} from "./utils";
-
+import {serverUrl, postConfig, putConfig, Status} from "./utils";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const apiUrl = `${serverUrl}/bins`;
-
-const Status = {
-    1: 'Empty At Mill',
-    2: 'Empty On Loco',
-    3: 'Empty At Siding',
-    4: 'Full At Siding',
-    5: 'Full On Loco',
-    6: 'Full At Mill'
-}
 
 // Original group attempted to transition to functions seemingly, switching to async funcs in api gets etc
 /** 
@@ -72,42 +62,71 @@ export function useAllBins(){
 }
 */
 
-export async function getAllBins(){
-    const res = await fetch(apiUrl);
-    const body = await res.json();
-    //check for db error
-    if (body.Error) {
-       console.log(body.Message);
-       throw Error(`${body.Message}`);
-   }
-   const data = body.data;
-   return data.map((bin) => ({
-       binsID: bin.binsID,
-       transactionTime: bin.transactionTime,
-       transactionNumber: bin.transactionNumber,
-       statusID: bin.statusID,
-        status: (Status[parseInt(bin.statusID)]),
-        sidingID: bin.sidingID,
-       locoID: bin.locoID,
-       harvesterID: bin.harvesterID,
-       sidingName: bin.sidingName,
-       harvesterName: bin.harvesterName,
-       locoName: bin.locoName,
-   }));
+export function getAllBins(){
+    return fetch(`${apiUrl}`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
-export async function createBin(binID) {
-    const response = await fetch(apiUrl, postConfig({id: binID}));
-    return response.json();
+export function getDashBins(){
+    return fetch(`${apiUrl}/dash`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        });
 }
 
-export async function updateBin(binID, binData) {
-    // With reworked database, alter binData contents
-    const response = await fetch(`${apiUrl}`, putConfig({id: binID, data: binData}));
-    return response.json();
+export function getSidingBreakdown(id) {
+    return fetch(`${apiUrl}/${id}/siding_breakdown`)
+        .then((body) => body.json())
+        .then((data) =>{
+            // Data formatting
+            return data.map((transaction) => ({
+                type: transaction.type,
+                sidingName: transaction.sidingName,
+            }))
+        })
 }
 
-export async function deleteBin(binID) {
-    const response = await fetch(`${apiUrl}/${binID}`, {method: 'DELETE'});
-    return response.json();
+export function getBin(binID) {
+    return fetch(`${apiUrl}/${binID}`)
+        .then(response => {
+            if (response.ok)
+                return response.json();
+            throw new Error();
+        })
+}
+
+export function createBin(binID) {
+    return fetch(`${apiUrl}`, postConfig({binID: binID}))
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
+}
+
+export function deleteBin(binID) {
+    return fetch(`${apiUrl}/${binID}`, {method: 'DELETE'})
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+        });
+}
+
+export function getMaintenanceBreakdown() {
+    return fetch(`${apiUrl}/maintenance_breakdown`)
+        .then((body) => body.json())
+        .then((data) =>{
+            // Data formatting
+            return data.map((obj) => ({
+                id: obj.binID,
+                issue: obj.flag,
+            }))
+        })
 }

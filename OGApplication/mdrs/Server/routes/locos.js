@@ -44,7 +44,7 @@ router.get('/:locoId/load', (req, res) => {
   if (!isValidId(id)) return;
 
   req.db.raw(`
-      SELECT b.binID, b.code, b.status, l.locoID, l.locoName
+      SELECT b.binID, b.status, l.locoID, l.locoName
       FROM bin b
                LEFT JOIN locomotive l ON b.locoID = l.locoID
       WHERE b.locoID = ?
