@@ -178,11 +178,11 @@ const SwipeableBinItem = ({
           </Headline>
         </TouchableOpacity>
         {getBinData(binNumber).isRepairNeeded ? (
-          <Headline
-            style={[styles.binText]}
-          >
-            Repair!
-          </Headline>
+          <Feather
+          name='tool'
+          size={24}
+          color='#fff'
+          />
         ) : null}
         {/* Edit Btn / Full Indicator */}
         {getBinData(binNumber).isFull ? (
