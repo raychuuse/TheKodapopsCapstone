@@ -263,6 +263,7 @@ CREATE TABLE `users` (
   `firstName` varchar(255) DEFAULT NULL,
   `lastName` varchar(255) DEFAULT NULL,
   `userRole` varchar(255) DEFAULT NULL,
+  `harvesterID` int DEFAULT NULL,
   PRIMARY KEY (`userID`),
   UNIQUE KEY `idUsers_UNIQUE` (`userID`),
   UNIQUE (`email`, `userRole`)
@@ -275,7 +276,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'raychuuse@gmail.com','$2a$08$wkJZiX0D.FPOVbsCuDmiBe14L6UFWAKkaYfALcHlv9saXPztybcvm',1,'Dough','Henry','Mill'),(2,'example2@gmail.com','$2a$08$HgTEhro2.iteq26ORrQ6fekeD56OsqAbjYHPUj37TgHDHcX1vkLta',2,'Mathew','Satler','Loco Operator'),(3,'example3@gmail.com','$2a$08$vuM7du751UzTRsJYY3ri2uH2LqdhCx24dG4s3dsD4mtB/tfXOjnwa',3,'Cass','Young','locoIDlocoIDuserIDHarvester Operator'),(4,'example4@gmail.com','root',1,'Jarrod','Stout','Mill'),(5,'example5@gmail.com','root',3,'Doubt','Young','Harvester Operator'),(6,'example6@gmail.com','root',2,'Harry','Brown','Loco Operator'),(7,'example7@gmail.com','root',2,'Jack','Smith','Loco Operator'),(8,'example8@gmail.com','root',2,'Ron','Falcon','Loco Operator');
+INSERT INTO `users` VALUES (1,'raychuuse@gmail.com','$2a$08$wkJZiX0D.FPOVbsCuDmiBe14L6UFWAKkaYfALcHlv9saXPztybcvm',1,'Dough','Henry','Mill', NULL),(2,'example2@gmail.com','$2a$08$HgTEhro2.iteq26ORrQ6fekeD56OsqAbjYHPUj37TgHDHcX1vkLta',2,'Mathew','Satler','Loco Operator', NULL),(3,'example3@gmail.com','$2a$08$vuM7du751UzTRsJYY3ri2uH2LqdhCx24dG4s3dsD4mtB/tfXOjnwa',3,'Cass','Young','Harvester Operator', 3),(4,'example4@gmail.com','root',1,'Jarrod','Stout','Mill', NULL),(5,'example5@gmail.com','root',3,'Doubt','Young','Harvester Operator', 2),(6,'example6@gmail.com','root',2,'Harry','Brown','Loco Operator', NULL),(7,'example7@gmail.com','root',2,'Jack','Smith','Loco Operator', NULL),(8,'example8@gmail.com','root',2,'Ron','Falcon','Loco Operator', NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 

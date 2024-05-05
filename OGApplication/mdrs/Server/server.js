@@ -36,11 +36,11 @@ const knex = require("knex")(options);
 app.use(cors());
 // for parsing application/json
 app.use(express.json());
-/*
+
 app.use((req, res, next) => {
   req.db = knex;
   next();
-});*/
+});
 
 //Routers
 app.use("/bins?", binRouter)
@@ -64,9 +64,6 @@ app.get("/knex", function (req, res, next) {
 });
 
 
-// Useful but doesn't have option to pause errors in dev
-// catch 404 and forward to error handler
-
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
@@ -83,9 +80,6 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   // res.status(err.status || 500);
-  res.json({ Error: true, Message: err.message });
-
-  res.status(err.status || 500);
 });
 
 ws.on('connection', (ws, req) => {

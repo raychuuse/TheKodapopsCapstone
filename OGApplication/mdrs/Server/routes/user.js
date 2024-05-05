@@ -421,7 +421,7 @@ router.put('/', updateValidationRules, (req, res) => {
 });
 
 
-router.get("user/:id/sidings", (req, res) => {
+router.get("/:id/sidings", (req, res) => {
     if (!req[0].token) {
         res.status(200)
             .json({success: false, message: "Token was not provided."});
@@ -444,7 +444,7 @@ router.get("user/:id/sidings", (req, res) => {
         });
 });
 
-router.get("user/:id/farms", (req, res) => {
+router.get("/:id/farms", (req, res) => {
     if (!req[0].token) {
         res.status(200)
             .json({success: false, message: "Token was not provided."});
@@ -454,8 +454,8 @@ router.get("user/:id/farms", (req, res) => {
         res.status(400)
             .json({success: false, message: "Error! Login Invalid, token expired."});
     }
-    // Haven't introduced restriction based on user in db?
-    if (!req[0].id) {
+
+    if (!req.params.id) {
         req.db.raw(`SELECT *
                 FROM farms`)
         .then(processQueryResult)
@@ -482,7 +482,7 @@ router.get("user/:id/farms", (req, res) => {
     }
 });
 
-router.get("farms/:id/blocks", (req, res) => {
+router.get("/farms/:id/blocks", (req, res) => {
     if (!req[0].token) {
         res.status(200)
             .json({success: false, message: "Token was not provided."});
@@ -493,7 +493,7 @@ router.get("farms/:id/blocks", (req, res) => {
             .json({success: false, message: "Error! Login Invalid, token expired."});
     }
 
-    if (!id) {
+    if (!req.params.id) {
         req.db.raw(`SELECT *
                 FROM blocks`)
         .then(processQueryResult)
@@ -520,7 +520,7 @@ router.get("farms/:id/blocks", (req, res) => {
     }
 });
 
-router.get("blocks/:id/subs", (req, res) => {
+router.get("/blocks/:id/subs", (req, res) => {
     if (!req[0].token) {
         res.status(200)
             .json({success: false, message: "Token was not provided."});
@@ -531,7 +531,7 @@ router.get("blocks/:id/subs", (req, res) => {
             .json({success: false, message: "Error! Login Invalid, token expired."});
     }
 
-    if (!id) {
+    if (!req.params.id) {
         req.db.raw(`SELECT *
                 FROM subs`)
         .then(processQueryResult)
@@ -558,7 +558,7 @@ router.get("blocks/:id/subs", (req, res) => {
     }
 });
 
-router.get("subs/:id/pads", (req, res) => {
+router.get("/subs/:id/pads", (req, res) => {
     if (!req[0].token) {
         res.status(200)
             .json({success: false, message: "Token was not provided."});
@@ -569,7 +569,7 @@ router.get("subs/:id/pads", (req, res) => {
             .json({success: false, message: "Error! Login Invalid, token expired."});
     }
     
-    if (!id) {
+    if (!req.params.id) {
         req.db.raw(`SELECT *
                 FROM pads
                 WHERE subBlockID = ?`, [id])
