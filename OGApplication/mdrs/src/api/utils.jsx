@@ -45,3 +45,13 @@ export const Status = {
     7: 'Missing',
     8: 'Error Unknown'
 }
+
+export const fullConverter = (val) => {
+    if (val == 0) {
+        return 'Empty'
+    }
+    else if (val == 1) {
+        return 'Full';
+    }
+    return null;
+}

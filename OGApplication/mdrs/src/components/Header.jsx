@@ -13,8 +13,10 @@ const Header = () => {
   const toggleNavbar = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  if (auth.token == null)
+  if (auth.token == null) {
+    // add leaving functionality
     return;
+  }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">

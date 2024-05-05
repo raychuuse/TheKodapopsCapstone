@@ -33,6 +33,7 @@ router.get("/:harvesterId/siding_breakdown", (req, res) => {
   `, [id])
       .then(processQueryResult)
       .then(data => {
+        console.log(data);
         res.status(200).json(data);
       })
       .catch(err => {
@@ -43,8 +44,8 @@ router.get("/:harvesterId/siding_breakdown", (req, res) => {
 
 router.post('/', (req, res) => {
     req.db.insert({harvesterName: req.body.name}).into('harvester')
-        .then((res) => {
-            res.status(201).send();
+        .then((response) => {
+            res.status(201).send(response);
         })
         .catch(error => {
             console.error(error);
@@ -56,8 +57,8 @@ router.put('/:id/name', (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
     req.db('harvester').update({harvesterName: req.body.name}).where({harvesterID: id})
-        .then(res => {
-            res.status(204).send();
+        .then(response => {
+            res.status(204).send(response);
         })
         .catch(error => {
             console.error(error);
@@ -70,8 +71,8 @@ router.delete('/:id', (req, res) => {
     if (!isValidId(id)) return;
 
     req.db('harvester').where({harvesterID: id}).del()
-        .then(result => {
-            res.status(204).send();
+        .then(response => {
+            res.status(204).send(response);
         })
         .catch(error => {
             console.error(error);

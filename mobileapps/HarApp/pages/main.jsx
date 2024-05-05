@@ -37,7 +37,7 @@ const MainPage = () => {
   const handleDone = () => {
     if (!mockMode) {
       // Checks etc before
-      FinishedAlert(null, null);
+      FinishedAlert({Siding: getSiding(), Farm: "", Block:"", Sub: "", Pad: "", Burnt: "Neutral"},setSelectionData);
     }
     else {
       FinishedAlert({Siding: getSiding(), Farm: "", Block:"", Sub: "", Pad: "", Burnt: "Neutral"},setSelectionData);

@@ -67,7 +67,6 @@ const ItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi, updat
     const onEditItem = (itemId) => {
         for (const item of selectedItem) {
             if (item.id === itemId) {
-                console.info("yooo");
                 setState('EDIT');
                 setFormTitle(`Update ${itemName}'s Name`);
                 console.info(formInput, item, item.name);
@@ -279,7 +278,6 @@ const NoEditItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi,
                 setInterval(() => setSuccess(null), 2500);
                 setStateCreate();
             }).catch(err => {
-                console.error(err);
                 setError(err);
             });
         } 
@@ -300,6 +298,8 @@ const NoEditItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi,
             <h2 className="search-header">
                 {itemName}s
             </h2>
+            {error && <ErrorAlert message={error.message} />}
+            {success && <SuccessAlert message={success.message} />}
             <hr />
         </div>
         <div className="list-wrapper" style={{ flex: 1, overflowY: 'auto' }}>

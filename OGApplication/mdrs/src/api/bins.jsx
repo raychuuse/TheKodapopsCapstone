@@ -102,12 +102,18 @@ export function getBin(binID) {
 }
 
 export function createBin(binID) {
-    return fetch(`${apiUrl}`, postConfig({binID: binID}))
+    if (!isNaN(binID) && !isNaN(parseFloat(binID))) {
+        return fetch(`${apiUrl}`, postConfig({binID: binID}))
         .then(response => {
             if (response.ok)
                 return response;
             throw new Error();
         });
+    }
+    else {
+        throw new Error("Must be a number");
+    }
+    
 }
 
 export function deleteBin(binID) {

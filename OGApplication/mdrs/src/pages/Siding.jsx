@@ -61,6 +61,7 @@ const SidingDetails = ({id}) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        setLoading(true);
         getSiding(id)
             .then(data => {
                 setSidingData(data);
@@ -72,12 +73,11 @@ const SidingDetails = ({id}) => {
                 setSidingData(null);
                 setLoading(false);
             })
-    });
+    }, [id]);
 
     return (<>
-        {loading && <LoadingSpinner/>}
         {error && <ErrorAlert message={error.message}/>}
-        {!loading && !error && (<section className="data-table">
+        {!error && (<section className="data-table">
             <div className="container-fluid">
                 <div className="row">
                     <div className="table-wrapper">
@@ -139,21 +139,21 @@ const SidingBreakdown = ({id}) => {
         getSidingBreakdown(id)
             .then(data => {
                 setData(data);
-                setFullBins(data.reduce((sum, bin) => sum + (bin.status === 'FULL' ? 1 : 0), 0));
+                setFullBins(data.reduce((sum, bin) => sum + (bin.status === 'Full' ? 1 : 0), 0));
                 setError(null);
             })
             .catch(err => {
                 setError(err);
             });
-    });
+    }, [id]);
 
 
     const columns = [
-        {headerName: "Bin", field: "binCode"},
+        {headerName: "Bin", field: "binID"},
         {headerName: "Status", field: "status"},
         {
             headerName: 'Stale For',
-            valueGetter: rowParams => calculateDifference(new Date(), new Date(rowParams.data.transactionTime))
+            valueGetter: rowParams => calculateDifference(new Date(), new Date(rowParams.data.time))
         }
     ];
 
@@ -218,7 +218,7 @@ const SidingHarvesterBreakdown = ({id}) => {
             .catch(err => {
                 setError(err);
             })
-    });
+    }, [id]);
 
     return (<div className="col">
         <section className="metric">
@@ -261,7 +261,7 @@ const SidingLocoBreakdown = ({id}) => {
             .catch(err => {
                 setError(err);
             });
-    });
+    }, [id]);
 
 
     const columns = [

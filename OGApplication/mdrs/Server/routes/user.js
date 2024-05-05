@@ -118,29 +118,28 @@ router.post("/har/login", (req, res) => {
         return res.status(400).json({errors: errors.array()});
     }
 
-    const email = req.body.id;
+    const email = req.body.email;
     const password = req.body.password;
+
     req.db.raw(`SELECT u.*, h.harvesterName
                 FROM users u
-                LEFT JOIN harvester h ON h.harvesterID = u.userID
-                WHERE email = ? AND userRole = ${harvesterRole}`, [email])
+                LEFT JOIN harvester h ON h.harvesterID = u.harvesterID
+                WHERE email = "${email}" AND userRole = "${harvesterRole}"`)
         .then(processQueryResult)
-        .then((res) => {
-            if (res.length === 0) {
+        .then((response) => {
+            if (response.length === 0) {
                 return res.status(404).json({message: "User doesn't exist"});
             }
-
-            bcrypt.compare(password, res[0].password, (err, result) => {
+            bcrypt.compare(password, response[0].password, (err, result) => {
                 if (err) {
                     console.error(err);
                     return res.status(500).json({message: 'An unknown error occurred. Please try again.'});
                 }
-
                 if (!result) {
                     return res.status(401).json({message: "No matching user ID and password"});
                 }
                 
-                const user = res[0];
+                const user = response[0];
 
                 // Remove inappropriate info from user object so that it is not sent to client.
                 delete user.password;
@@ -150,12 +149,12 @@ router.post("/har/login", (req, res) => {
                 const expires_in = 60 * 60 * 24
                 const exp = Date.now() + expires_in * 1000
                 const token = jwt.sign({email, exp}, secretKey,);
-                res.status(200).json({token: token, user: user})
+                return res.status(200).json(JSON.stringify({token: token, user: user}));
             });
         })
         .catch((err) => {
             console.error(err);
-            res.status(401).json({message: err.message});
+            return res.status(520).json({message: err.message});
         });
 });
 
@@ -211,9 +210,12 @@ router.post('/', createValidationRules, (req, res) => {
         return res.status(400).json(validationErrorToError(errors));
     }
 
-    const {password, firstName, lastName, role} = req.body;
+    const {password, firstName, lastName, email, role} = req.body;
     const selectedHarvester = role === 'Harvester' ? req.body.selectedHarvester : null;
-    console.info(selectedHarvester);
+    if (role === 'Locomotive') {
+        // Current dummy data uses Loco Operator, calibrate with zac on db finalisation...
+        role = 'Loco Operator';
+    }
     if (role === 'Harvester' && selectedHarvester == undefined) {
         console.error("Need selected harvester");
         return res.status(400).json({message: 'Please select the harvesting company this user works for'});
@@ -230,7 +232,8 @@ router.post('/', createValidationRules, (req, res) => {
             lastName: lastName,
             userRole: role,
             password: hashPassword,
-            harvesterID: selectedHarvester
+            harvesterID: selectedHarvester,
+            email: email
         })
             .then(result => {
                 res.status(201).json({userID: result});

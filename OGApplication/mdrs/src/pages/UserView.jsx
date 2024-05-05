@@ -15,6 +15,7 @@ const UserView = () => {
     const [userID, setUserID] = useState();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
     const [role, setRole] = useState('');
     const [password, setPassword] = useState('');
     const [active, setActive] = useState();
@@ -52,6 +53,7 @@ const UserView = () => {
                 setRole(user.userRole);
                 setActive(user.active);
                 setSelectedHarvester(user.harvesterID);
+                setEmail(user.email);
             })
             .catch(err => {
                 console.error(err);
@@ -87,7 +89,7 @@ const UserView = () => {
     const handleUpdate = () => {
         if (!validateFormData()) return;
 
-        const data = {userID: userID, firstName: firstName, lastName: lastName, role: role, selectedHarvester: selectedHarvester};
+        const data = {userID: userID, firstName: firstName, lastName: lastName, role: role, email: email, selectedHarvester: selectedHarvester};
         console.info(data);
         update(data)
             .then(response => {
@@ -102,7 +104,7 @@ const UserView = () => {
 
     const handleCreate = () => {
         if (!validateFormData()) return;
-        const data = {firstName: firstName, lastName: lastName, role: role, password: password, selectedHarvester: selectedHarvester};
+        const data = {firstName: firstName, lastName: lastName, role: role, password: password, selectedHarvester: selectedHarvester, email: email};
         create(data)
             .then(response => {
                 setSuccess('User Sucecssfully Created');
@@ -136,6 +138,7 @@ const UserView = () => {
         t.role = role == null || role.trim() === '' || role.trim() === 'Choose Role...';
         t.password = type === 'CREATE' && password.trim() === '';
         t.selectedHarvester = role === 'Harvester' && (selectedHarvester == null || selectedHarvester === '');
+        t.email = email.trim() === '';
         // Return true if all formErrors keys are false or formErrors has no keys.
         let ret = true;
         for (const formErrorsKey in t)
@@ -217,6 +220,16 @@ const UserView = () => {
                                 onChange={(e) => setLastName(e.target.value)}
                             />
                             {formErrors.lastName && <span className="text-danger">Please enter a valid last name</span>}
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="email">Email </Label>
+                            <Input
+                                type="text"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                            {formErrors.email && <span className="text-danger">Please enter a valid email</span>}
                         </FormGroup>
                         {role === 'Harvester' && harvesters !== undefined &&
                             <FormGroup>

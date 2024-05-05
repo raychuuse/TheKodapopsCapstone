@@ -131,6 +131,7 @@ const LogInPage = () => {
     try {
       const options = {
         method: "POST",
+        mode: "cors",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -140,13 +141,16 @@ const LogInPage = () => {
           password: password,
         }),
       };
-      const res = await fetch(`${serverURL}/har/login`, options)
+      
+      const res = await fetch(`${serverURL}/user/har/login`, options)
       if (res.ok) {
         try {
+          const data = await res.json();
+          const parsedData = JSON.parse(data);
           await AsyncStorage.setItem('isSignedIn', 'true');
+          await AsyncStorage.setItem('userID', toString(parsedData.user.userID));
           await AsyncStorage.setItem('email', email);
-          await AsyncStorage.setItem('token', res[0].userID);
-          await AsyncStorage.setItem('token', res[0].token);
+          await AsyncStorage.setItem('token', parsedData.token);
           signIn();
         }
         catch (err) {

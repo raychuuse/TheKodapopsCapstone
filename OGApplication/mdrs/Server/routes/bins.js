@@ -80,7 +80,7 @@ router.post('/', (req, res) => {
 
 router.put('/:binID', (req, res) => {
   req.db('bin').update({binData: req.body.data}).where({binID: req.params.id})
-      .then(res => {
+      .then(response => {
         res.json({Error: false, Message: 'Success'});
       })
       .catch(error => {
@@ -95,7 +95,7 @@ router.delete('/:binID', (req, res) => {
   const id = req.params.binID;
   if (!isValidId(id)) return;
   req.db('bin').where({binID: id}).del()
-      .then(res => {
+      .then(response => {
         res.json({Error: false, Message: 'Success'});
       })
       .catch(error => {
@@ -107,7 +107,7 @@ router.post('/missing/:id'), (req, res) => {
   const id = req.params.id;
   if (!isValidId(id)) return;
   req.db('bin').update({binData: req.body.data}).where({binID: req.params.id})
-      .then(res => {
+      .then(response => {
         res.json({Error: false, Message: 'Success'});
       })
       .catch(error => {
