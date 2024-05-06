@@ -12,9 +12,7 @@ import { Colours } from './colours';
 import SwipeableBinItem from './swipeableBinItem';
 import { useBins } from '../context/binContext';
 
-const BinList = ({ BinData, openAddBinModal }) => {
-  // Provider
-  const { binData, setBinData, getBinData } = useBins();
+const BinList = ({ bins, openAddBinModal }) => {
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
   const [selectedIndices, setSelectedIndices] = useState([]);
@@ -95,7 +93,7 @@ const BinList = ({ BinData, openAddBinModal }) => {
       <SwipeableBinItem
         index={index}
         isSelected={isSelected}
-        binNumber={item.binNum}
+        bin={item}
         longPressHandler={LongPressRangeSelect}
         style={{
           position: 'relative',
@@ -151,8 +149,8 @@ const BinList = ({ BinData, openAddBinModal }) => {
             alignItems: 'center',
           }}
         >
-          <Title3>{BinData.length}</Title3>
-          <Headline>{BinData.length > 1 ? 'Bins' : 'Bin'} at Siding</Headline>
+          <Title3>{bins.length}</Title3>
+          <Headline>{bins.length > 1 ? 'Bins' : 'Bin'} at Siding</Headline>
         </View>
         <TouchableOpacity
           onLongPress={() => toggleLock()}
@@ -235,7 +233,7 @@ const BinList = ({ BinData, openAddBinModal }) => {
       {isLocked && <LockView />}
       {/* Bin List Body */}
       <FlatList
-        data={BinData}
+        data={bins}
         renderItem={listRenderItem}
         style={{
           position: 'relative',

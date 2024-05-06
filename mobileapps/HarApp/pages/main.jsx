@@ -26,13 +26,15 @@ import { useAuth } from '../context/authContext';
 import { useSelections } from '../context/selectionContext';
 
 const MainPage = () => {
-  const { binData } = useBins();
+  const { getBins } = useBins();
 
   const {getSiding, setSelectionData} = useSelections();
   const setupPageRef = "dashboard/setup";
 
   const {signOut, sendJsonMessage, readyState, lastJsonMessage, mockMode} = useAuth();
   const [addBinVisable, setAddBinVisable] = useState(false);
+
+  const bins = getBins();
 
   const handleDone = () => {
     if (!mockMode) {
@@ -79,7 +81,7 @@ const MainPage = () => {
         <SidingSelector sidingName= {getSiding()}/>
         {/* Bin List */}
         <BinList
-          BinData={binData}
+          bins={bins}
           openAddBinModal={setAddBinVisable}
         />
       </View>

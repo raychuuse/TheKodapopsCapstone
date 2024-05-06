@@ -1,4 +1,6 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { consignBin } from '../api/bins.api';
+import {getBinsFromSiding}  from '../api/siding.api'
 
 /**
  * initialBinData represents the initial state of bins in an array format. Each bin object contains the bin number,
@@ -68,7 +70,9 @@ const BinContext = createContext({
   setBinMissing: () => {},
   deleteBin: () => {},
   setBurn: () => {},
-  checkRepair: () => {}
+  checkRepair: () => {},
+  getBins: () => {},
+  handleConsignBin: () => {},
 });
 
 /**
@@ -83,6 +87,40 @@ const BinContext = createContext({
 export const BinProvider = ({ children }) => {
   const [binData, _setBinData] = useState(initialBinData);
   const [exceptionBinData, _setExceptionBinData] = useState(initialExceptionBinData);
+  const [bins, setBins] = useState();
+
+  useEffect(() => {
+    getBinsFromSiding(1)
+        .then(response => {
+          setBins(response);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+  }, []);
+
+  const getBins = () => {
+    return bins;
+  };
+
+  const handleConsignBin = (bin) => {
+    consignBin(bin.binID, !bin.full)
+        .then(response => {
+          bin.full = !bin.full;
+          const index = bins.findIndex(b => b.binID === bin.binID);
+          if (index >= 0) {
+            bins[index] = bin;
+            setBins([...bins]);
+          } else {
+            // rip
+            console.error('Shouldn\'t be here');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+        });
+  };
+
   /**
    * Replaces the current bin data with a new array of bin data.
    * This function should be used when you need to refresh the entire list of bins or set an entirely new state.
@@ -259,7 +297,9 @@ const setBurn = (bool) => {
         flagBin,
         deleteBin,
         setBurn,
-        checkRepair
+        checkRepair,
+        getBins,
+        handleConsignBin,
       }}
     >
       {children}

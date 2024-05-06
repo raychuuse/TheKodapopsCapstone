@@ -15,13 +15,13 @@ import { useBins } from '../context/binContext';
 
 const SwipeableBinItem = ({
   index,
-  binNumber,
+  bin,
   longPressHandler,
   isSelected,
 }) => {
   // Providers
-  const { getBinData, setBinFull, setBinBurnt, deleteBin, flagBin, 
-    setBinMissing, setBinToRepair, checkRepair, getExceptionBinData } = useBins();
+  const { setBinFull, setBinBurnt, deleteBin, flagBin,
+    setBinMissing, setBinToRepair, checkRepair, getExceptionBinData, handleConsignBin } = useBins();
 
   // ~ ~ ~ ~ ~ ~ ~ ~ Reference ~ ~ ~ ~ ~ ~ ~ ~ //
   // Swipeable Reference
@@ -87,20 +87,20 @@ const SwipeableBinItem = ({
         <View
           style={[
             styles.actionButton,
-            getBinData(binNumber).isBurnt
+            bin.burnt
               ? styles.actionButtonGreen
               : styles.actionButtonBurnt,
             { width: 180 },
           ]}
-          onPress={() => setBinBurnt(binNumber, !getBinData(binNumber).isBurnt)}
+          onPress={() => setBinBurnt(bin.binID, !bin.burnt)}
         >
           <MaterialCommunityIcons
-            name={!getBinData(binNumber).isBurnt ? 'fire' : 'leaf'}
+            name={!bin.burnt ? 'fire' : 'leaf'}
             size={24}
             color='#fff'
           />
           <Headline style={styles.binText}>
-            Mark as {getBinData(binNumber).isBurnt ? 'Green' : 'Burnt'}
+            Mark as {bin.burnt ? 'Green' : 'Burnt'}
           </Headline>
         </View>
       </View>
@@ -111,7 +111,7 @@ const SwipeableBinItem = ({
   // OnSwipeOpen Handler
   const onSwipeOpen = (direction) => {
     if (direction == 'left') {
-      setBinBurnt(binNumber, !getBinData(binNumber).isBurnt);
+      setBinBurnt(bin.binID, !bin.burn);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       swipeableRef.current.close();
     }
@@ -137,8 +137,8 @@ const SwipeableBinItem = ({
             paddingRight: 14,
             paddingVertical: 4,
           },
-          getBinData(binNumber).isFull
-            ? getBinData(binNumber).isBurnt
+          bin.full
+            ? bin.burnt
               ? styles.binItemCaneBurnt
               : styles.binItemCaneGreen
             : null,
@@ -147,7 +147,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={styles.binPressable}
           onPress={() => {
-            setBinFull(binNumber, !getBinData(binNumber).isFull);
+            handleConsignBin(bin);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }}
           onLongPress={() => longPressHandler(binNumber, index)}
@@ -155,48 +155,41 @@ const SwipeableBinItem = ({
           <Feather
             style={[
               styles.binCheckBox,
-              getBinData(binNumber).isFull
-                ? getBinData(binNumber).isBurnt
+              bin.full
+                ? bin.burnt
                   ? styles.binItemCaneBurnt
                   : styles.binItemCaneGreen
                 : null,
             ]}
-            name={getBinData(binNumber).isFull ? 'check-circle' : 'circle'}
+            name={bin.full ? 'check-circle' : 'circle'}
             size={24}
           />
           <Headline
             style={[
               styles.binText,
-              getBinData(binNumber).isFull
-                ? getBinData(binNumber).isBurnt
+              bin.full
+                ? bin.burnt
                   ? styles.binItemCaneBurnt
                   : styles.binItemCaneGreen
                 : null,
             ]}
           >
-            Bin #{binNumber}
+            Bin #{bin.binID}
           </Headline>
         </TouchableOpacity>
-        {getBinData(binNumber).isRepairNeeded ? (
-          <Feather
-          name='tool'
-          size={24}
-          color='#fff'
-          />
-        ) : null}
         {/* Edit Btn / Full Indicator */}
-        {getBinData(binNumber).isFull ? (
+        {bin.full ? (
           <Headline
             style={[
               styles.binText,
-              getBinData(binNumber).isFull
-                ? getBinData(binNumber).isBurnt
+              bin.full
+                ? bin.burnt
                   ? styles.binItemCaneBurnt
                   : styles.binItemCaneGreen
                 : null,
             ]}
           >
-            Full{getBinData(binNumber).isBurnt ? ' | Burnt' : ''}
+            Full{bin.burnt ? ' | Burnt' : ''}
           </Headline>
         ) : null}
       </View>
