@@ -149,7 +149,7 @@ const SetupPage = () => {
       <View style={styles.content}>
         <SettingsItem
           type='location'
-          label='Siding / Pad'
+          label='Siding'
           options={sidingOptions}
         />
         <Divider />
