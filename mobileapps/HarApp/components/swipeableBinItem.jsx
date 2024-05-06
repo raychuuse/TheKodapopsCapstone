@@ -16,8 +16,8 @@ import { useBins } from '../context/binContext';
 const SwipeableBinItem = ({
   index,
   bin,
+  rangeSelectIndex,
   longPressHandler,
-  isSelected,
 }) => {
   // Providers
   const { handleConsignBin, handleUpdateBinState } = useBins();
@@ -136,7 +136,7 @@ const SwipeableBinItem = ({
       <View
         style={[
           styles.binItem,
-          isSelected == index && {
+          rangeSelectIndex == index && {
             borderColor: Colours.spAtSidingText,
             borderWidth: 4,
             borderStyle: 'solid',
@@ -157,7 +157,7 @@ const SwipeableBinItem = ({
             handleConsignBin(bin);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           }}
-          onLongPress={() => longPressHandler(binNumber, index)}
+          onLongPress={() => longPressHandler(index)}
         >
           <Feather
             style={[

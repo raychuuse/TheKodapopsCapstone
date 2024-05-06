@@ -73,6 +73,7 @@ const BinContext = createContext({
   checkRepair: () => {},
   getBins: () => {},
   handleConsignBin: () => {},
+  handleConsignRange: () => {},
   handleUpdateBinState: () => {},
   handleFindBin: () => {},
 });
@@ -105,22 +106,55 @@ export const BinProvider = ({ children }) => {
     return bins;
   };
 
+  const handleConsignRange = (startIndex, endIndex) => {
+      // I'm lazy
+      const promises = [];
+      for (let i = startIndex; i <= endIndex; i++) {
+          promises.push(consignBin(bins[i].binID, !bins[i].full));
+      }
+
+      Promise.allSettled(promises)
+          .then(responses => {
+              for (let i = 0 + startIndex; i < responses.length + startIndex; i++) {
+                  const response = responses[i - startIndex];
+                  if (response.status === 'rejected') {
+                      console.error(response.reason);
+                      continue;
+                  }
+
+                  const bin = bins[i];
+                  if (bin == null) {
+                      console.error('Shouldn\'t be here');
+                      continue;
+                  }
+                  onBinConsigned(bin);
+              }
+              setBins([...bins]);
+          })
+          .catch(err => {
+              console.error(err);
+          });
+  };
+
   const handleConsignBin = (bin) => {
     consignBin(bin.binID, !bin.full)
         .then(response => {
-          bin.full = !bin.full;
-          const index = bins.findIndex(b => b.binID === bin.binID);
-          if (index >= 0) {
-            bins[index] = bin;
-            setBins([...bins]);
-          } else {
-            // rip
-            console.error('Shouldn\'t be here');
-          }
+            if (onBinConsigned(bin))
+                setBins([...bins]);
         })
         .catch(err => {
           console.error(err);
         });
+  };
+
+  const onBinConsigned = (bin) => {
+      bin.full = !bin.full;
+      const index = bins.findIndex(b => b.binID === bin.binID);
+      if (index >= 0) {
+          bins[index] = bin;
+          return true;
+      }
+      return false;
   };
 
   const handleUpdateBinState = (bin, field, state) => {
@@ -335,6 +369,7 @@ const setBurn = (bool) => {
         checkRepair,
         getBins,
         handleConsignBin,
+        handleConsignRange,
         handleUpdateBinState,
         handleFindBin
       }}
