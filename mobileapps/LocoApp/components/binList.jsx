@@ -117,7 +117,7 @@ const BinList = ({ stopID, type }) => {
   const listRenderItem = ({ item, index }) => (
     <SwipeableBinItem
       index={index}
-      longPressedIndex={longPressedIndex}
+      longPressedIndex={isSelected}
       bin={item}
       type={type}
       stopID={stopID}
@@ -144,10 +144,10 @@ const BinList = ({ stopID, type }) => {
       style={{ flex: 1, width: '100%', position: 'relative' }}
     >
       {/* Add Bin Modal */}
-      <AddBinCamera
-        sidingID={sidingId}
+      {/*<AddBinCamera
+        sidingID={stop.stopID}
         isDrop={binsKey}
-      />
+      />*/}
       {/* List Header */}
       <View
         style={[

@@ -70,7 +70,7 @@ const sendCode = async (userEmail, resetCode) => {
 router.post("/login", loginValidationRulesID, (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({errors: errors.array()});
+        return res.status(400).json(validationErrorToError(errors));
     }
     const id = req.body.id;
     const password = req.body.password;

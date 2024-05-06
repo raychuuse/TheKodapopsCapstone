@@ -92,32 +92,32 @@ const SwipeableBinItem = ({
           }}
           style={[
             styles.actionButton,
-            binData.isFull
+            bin.full
               ? { backgroundColor: theme.spCompleteBG }
               : { backgroundColor: theme.spPendingBG },
             { width: 150 },
           ]}
         >
           <MaterialCommunityIcons
-            name={binData.isFull ? 'tray-full' : 'tray'}
+            name={bin.full ? 'tray-full' : 'tray'}
             size={24}
-            color={binData.isFull ? theme.spCompleteText : theme.spPendingText}
+            color={bin.full ? theme.spCompleteText : theme.spPendingText}
           />
           <Headline
             style={{
-              color: binData.isFull
+              color: bin.full
                 ? theme.spCompleteText
                 : theme.spPendingText,
               marginLeft: 'auto',
             }}
           >
-            Mark {binData.isFull ? 'as Full' : 'Empty'}
+            Mark {bin.full ? 'as Full' : 'Empty'}
           </Headline>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.actionButton,
-            binData.isBurnt
+            bin.burnt
               ? { backgroundColor: theme.bgGreen }
               : { backgroundColor: theme.bgBurnt },
             { width: 138 },
@@ -128,12 +128,12 @@ const SwipeableBinItem = ({
           }}
         >
           <MaterialCommunityIcons
-            name={binData.isBurnt ? 'fire' : 'leaf'}
+            name={bin.burnt ? 'fire' : 'leaf'}
             size={24}
             color={theme.spAtSidingText}
           />
           <Headline style={{ color: theme.spAtSidingText, marginLeft: 'auto' }}>
-            Mark {binData.isBurnt ? 'Green' : 'Burnt'}
+            Mark {bin.burnt ? 'Green' : 'Burnt'}
           </Headline>
         </TouchableOpacity>
       </View>

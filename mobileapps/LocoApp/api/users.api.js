@@ -1,7 +1,7 @@
 import { handleFetch, postConfig, serverUrl } from './utils.api';
 
-const apiUrl = `${serverUrl}/users`;
+const apiUrl = `${serverUrl}/user`;
 
 export function login(email, password) {
-    return handleFetch(fetch(`${apiUrl}/login`, postConfig({email: email, password: password})), true);
+    return handleFetch(fetch(`${apiUrl}/login`, postConfig({id: 1, password: password})), true);
 }

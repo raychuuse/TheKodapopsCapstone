@@ -27,6 +27,7 @@ const LogInPage = () => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const handleLogin = () => {
+      return router.navigate('/setup');
       if (email == null || password == null) {
           console.error('Please enter a valid email and password');
           return;
@@ -38,8 +39,8 @@ const LogInPage = () => {
           return;
       }
 
-      if (password.length < 5) {
-          console.error('Please enter a valid password, 5 or more characters in length');
+      if (password.length < 4) {
+          console.error('Please enter a valid password, 4 or more characters in length');
           return;
       }
 
