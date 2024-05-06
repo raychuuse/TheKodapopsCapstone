@@ -20,12 +20,19 @@ const SwipeableBinItem = ({
   isSelected,
 }) => {
   // Providers
-  const { setBinFull, setBinBurnt, deleteBin, flagBin,
-    setBinMissing, setBinToRepair, checkRepair, getExceptionBinData, handleConsignBin } = useBins();
+  const { handleConsignBin, handleUpdateBinState } = useBins();
 
   // ~ ~ ~ ~ ~ ~ ~ ~ Reference ~ ~ ~ ~ ~ ~ ~ ~ //
   // Swipeable Reference
   const swipeableRef = useRef(null);
+
+  const onBinRepair = () => {
+      handleUpdateBinState(bin, 'REPAIR', !bin.repair);
+  };
+
+  const onBinMissing = () => {
+      handleUpdateBinState(bin, 'MISSING', !bin.missing);
+  };
 
   // ~ ~ ~ ~ ~ ~ ~ ~ Components ~ ~ ~ ~ ~ ~ ~ ~ //
   // Define the right actions for swipe
@@ -44,7 +51,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           onPress={() => {
             Haptics.selectionAsync();
-            RepairBinAlert(`Bin #${binNumber}`, binNumber, setBinToRepair, getBinData);}
+            RepairBinAlert(`Bin #${bin.binID}`, bin, onBinRepair)}
           }
           style={[styles.actionButton, { backgroundColor: '#FFA000' }]}
         >
@@ -59,7 +66,7 @@ const SwipeableBinItem = ({
           style={[styles.actionButton, { backgroundColor: '#D32F2F' }]}
           onPress={() => {
             Haptics.selectionAsync();
-            RemoveBinAlert(`Bin #${binNumber}`, binNumber, deleteBin);}}
+            RemoveBinAlert(`Bin #${bin.binID}`, bin, onBinMissing)}}
         >
           <Feather
             name='help-circle'
@@ -92,7 +99,7 @@ const SwipeableBinItem = ({
               : styles.actionButtonBurnt,
             { width: 180 },
           ]}
-          onPress={() => setBinBurnt(bin.binID, !bin.burnt)}
+          onPress={() => handleUpdateBinState(bin, 'BURNT', !bin.burnt)}
         >
           <MaterialCommunityIcons
             name={!bin.burnt ? 'fire' : 'leaf'}
@@ -111,7 +118,7 @@ const SwipeableBinItem = ({
   // OnSwipeOpen Handler
   const onSwipeOpen = (direction) => {
     if (direction == 'left') {
-      setBinBurnt(bin.binID, !bin.burn);
+      handleUpdateBinState(bin, 'BURNT', !bin.burnt)
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       swipeableRef.current.close();
     }

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { consignBin } from '../api/bins.api';
+import { consignBin, findBin, updateBinFieldState } from '../api/bins.api';
 import {getBinsFromSiding}  from '../api/siding.api'
 
 /**
@@ -73,6 +73,8 @@ const BinContext = createContext({
   checkRepair: () => {},
   getBins: () => {},
   handleConsignBin: () => {},
+  handleUpdateBinState: () => {},
+  handleFindBin: () => {},
 });
 
 /**
@@ -119,6 +121,39 @@ export const BinProvider = ({ children }) => {
         .catch(err => {
           console.error(err);
         });
+  };
+
+  const handleUpdateBinState = (bin, field, state) => {
+      updateBinFieldState(bin.binID, field, state)
+          .then(response => {
+              if (field === 'BURNT') bin.burnt = state;
+              else if (field === 'MISSING') bin.missing = state;
+              else bin.repair = state;
+
+              const index = bins.findIndex(b => b.binID === bin.binID);
+              if (index >= 0) {
+                  if (field === 'MISSING') bins.splice(index, 1);
+                  else bins[index] = bin;
+
+                  setBins([...bins]);
+              } else {
+                  // rip
+                  console.error('Shouldn\'t be here');
+              }
+          })
+          .catch(err => {
+              console.error(err);
+          });
+  };
+
+  const handleFindBin = (code) => {
+      findBin(code, 1)
+          .then(bin => {
+              bins.push(bin);
+          })
+          .catch(err => {
+              console.error(err);
+          });
   };
 
   /**
@@ -194,7 +229,7 @@ export const BinProvider = ({ children }) => {
   const setBinFull = (binNum, isFull) => {
     updateBin(binNum, { isFull });
   };
-  
+
   /**
    * setBinMissing is a specific function to set the 'isMissing' status of a bin. It uses the `updateExceptionBin` function to change the status.
    *
@@ -249,9 +284,9 @@ export const BinProvider = ({ children }) => {
       return val.isRepairNeeded;
     }
   };
-  
+
   const deleteBin = (binNum) => {
-    var filtered = binData.filter(function(func) { return func.binNum != binNum; }); 
+    var filtered = binData.filter(function(func) { return func.binNum != binNum; });
     setBinData(filtered);
   }
 
@@ -268,7 +303,7 @@ export const BinProvider = ({ children }) => {
  /**
    * flagBin is the same as 'CreateBin' but for dynamically adding to a flagged bin list.
    *
-   * @param {Object} flaggedBin - The bin object to add to the bin exception data. 
+   * @param {Object} flaggedBin - The bin object to add to the bin exception data.
    * It should contain properties like `binNum`, `setBinMissing`
    */
  const flagBin = (bin) => {
@@ -300,6 +335,8 @@ const setBurn = (bool) => {
         checkRepair,
         getBins,
         handleConsignBin,
+        handleUpdateBinState,
+        handleFindBin
       }}
     >
       {children}

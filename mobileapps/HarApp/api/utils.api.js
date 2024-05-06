@@ -15,6 +15,19 @@ export function postConfig(data) {
     }
 }
 
+export function putConfig(data) {
+    const b = data != null ? JSON.stringify(data) : '';
+    return {
+        method: 'PUT',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken(),
+        },
+        body: b
+    }
+}
+
 export function getConfig() {
     return {
         method: 'GET',

@@ -22,7 +22,7 @@ const AddBinCamera = ({ modalCloser }) => {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const cameraRef = useRef(null);
   const [imageUri, setImageUri] = useState(null);
-  const {binData, createBin, getBinData} = useBins();
+  const {handleFindBin} = useBins();
 
   const [binNumber, setBinNumber] = useState();
   const inputRef = useRef(null);
@@ -59,35 +59,8 @@ const AddBinCamera = ({ modalCloser }) => {
     setFlash(!flash);
   }
 
-  function VerifyBinNumber(num) {
-
-    // Regex from stack overflow, \d for digits
-    if (/^\d+$/.test(num)) {
-
-      // check for undefined/ null
-      valIfExists = getBinData(num) == null;
-      if (valIfExists == null) {
-        issueAlert("An invalid number has been entered.")
-        return false;
-      }
-      else {
-        return true;
-      }
-    }
-  }
-
   function handleSubmit() {
-    if (VerifyBinNumber(binNumber)) {
-      try {
-        createBin({isFull: false, binNum: binNumber, isBurnt: false});
-        Alert.alert('Bin Creation Successful.');
-        return;
-      }
-      catch (err) {
-        console.log(err);
-      }
-    }
-    Alert.alert('Bin Creation Failed, please enter a valid bin number.');
+      handleFindBin(binNumber);
   }
 
   if (!permission) requestPermission();
