@@ -10,13 +10,14 @@ import CustomModal from './modal';
 
 // import images
 const image1 = require('../assets/tutorial_1.gif');
+const image2 = require('../assets/tutorial_2.gif');
 
 const TutorialData = [
   {
     header: 'Marking Bins as Full',
     description:
       'See how to mark a bin as full with a simple swipe at the siding.',
-    image: '',
+    image: image2,
   },
   {
     header: 'Quick Swipe Actions for Bin Reports',
@@ -62,12 +63,7 @@ const ModalTutorial = ({ isVisable, setIsVisable }) => {
           onPageSelected={(e) => setActiveSlide(e.nativeEvent.position)}
         >
           {TutorialData.map((item, index) => (
-            <View
-              style={{
-                paddingHorizontal: 16,
-              }}
-              key={index}
-            >
+            <View key={index}>
               <Title2>{item.header}</Title2>
               <Subhead style={{ paddingBottom: 16 }}>
                 {item.description}
