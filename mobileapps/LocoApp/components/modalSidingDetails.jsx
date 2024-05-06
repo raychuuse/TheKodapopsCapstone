@@ -28,7 +28,6 @@ const ModalSidingDetails = () => {
 
   // Data
   const stop = getStop(sidingToViewID);
-  console.info('modelSidingDetails', sidingToViewID, stop);
   const loco = getLoco();
 
   return (

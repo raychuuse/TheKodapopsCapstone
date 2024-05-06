@@ -6,7 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { Link } from 'expo-router';
+import Cookie from 'js-cookie';
 
 // Import Components
 import CustomModal from '../components/modal';
@@ -14,6 +14,10 @@ import CustomModal from '../components/modal';
 // Import Style Compontes
 import { Title1, Subhead, H1 } from '../styles/typography';
 import { useTheme } from '../styles/themeContext';
+import { login } from '../api/users.api';
+import { router } from 'expo-router';
+
+const emailRegex =/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 const LogInPage = () => {
   const { theme, toggleTheme } = useTheme();
@@ -21,6 +25,35 @@ const LogInPage = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [password, setPassword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+
+  const handleLogin = () => {
+      if (email == null || password == null) {
+          console.error('Please enter a valid email and password');
+          return;
+      }
+
+      console.info(emailRegex.test(email), email);
+      if (!emailRegex.test(email)) {
+          console.error('Please enter a valid email');
+          return;
+      }
+
+      if (password.length < 5) {
+          console.error('Please enter a valid password, 5 or more characters in length');
+          return;
+      }
+
+      login(email, password)
+          .then(response => {
+              Cookie.set('token', response.token);
+              Cookie.set('user', response.user);
+              router.navigate('/setup')
+          })
+          .catch(err => {
+              console.error(err);
+          });
+  };
+
   return (
     <View style={[styles.page, { backgroundColor: theme.appBG }]}>
       <CustomModal
@@ -68,7 +101,7 @@ const LogInPage = () => {
           inputMode='email'
           autoComplete='email'
           clearButtonMode='always'
-          onChange={setEmail}
+          onChangeText={setEmail}
           value={email}
         />
         <TextInput
@@ -80,26 +113,21 @@ const LogInPage = () => {
           secureTextEntry
           clearButtonMode='always'
           value={password}
-          onChange={setPassword}
+          onChangeText={setPassword}
         />
         <View style={styles.button_container}>
-          <Link
-            href='/setup/'
-            asChild
+          <TouchableOpacity onPress={handleLogin}
+            style={{
+              backgroundColor: theme.bgButton,
+              borderRadius: 10,
+              padding: 15,
+              alignItems: 'center',
+            }}
           >
-            <TouchableOpacity
-              style={{
-                backgroundColor: theme.bgButton,
-                borderRadius: 10,
-                padding: 15,
-                alignItems: 'center',
-              }}
-            >
-              <Text style={[styles.button_text, { color: theme.textButton }]}>
-                Sign in
-              </Text>
-            </TouchableOpacity>
-          </Link>
+            <Text style={[styles.button_text, { color: theme.textButton }]}>
+              Sign in
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.link}
             onPress={() => setModalVisible(true)}

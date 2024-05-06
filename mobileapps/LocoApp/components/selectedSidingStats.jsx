@@ -20,7 +20,6 @@ export default function SelectedSiddingStats() {
   if (selectedSidingID == null) return;
   // Data
   const stop = getStop(selectedSidingID);
-  console.info('Hello', stop, selectedSidingID);
 
   return (
     <Container

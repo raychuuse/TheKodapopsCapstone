@@ -14,14 +14,10 @@ import {Colours} from '../styles/colours';
 
 // Import Mock Data
 import {getAllLocos} from "../api/loco.api";
-import {getAllRunsOnDate} from "../api/runs.api";
-import { SettingMockData_Run, SettingsMockData_Loco } from '../data/settingsMockData';
 
 const SetupPage = () => {
-/*    const [locos, setLocos] = useState();
+    const [locos, setLocos] = useState();
     const [selectedLoco, setSelectedLoco] = useState();
-    const [runs, setRuns] = useState();
-    const [selectedRun, setSelectedRun] = useState();
 
     useEffect(() => {
         getAllLocos()
@@ -29,16 +25,10 @@ const SetupPage = () => {
                 setLocos(response.map(loco => {
                     return {id: loco.locoID, label: loco.locoName};
                 }));
-            })
-            .catch(err => {
-                console.error(err);
-            });
-
-        getAllRunsOnDate(new Date())
-            .then(response => {
-                setRuns(response.map(run => {
-                    return {id: run.runID, label: run.runName};
-                }));
+              for (const loco of response) {
+                if (loco.locoID === 1)
+                  setSelectedLoco({id: loco.locoID, label: loco.locoName});
+              }
             })
             .catch(err => {
                 console.error(err);
@@ -46,36 +36,31 @@ const SetupPage = () => {
     }, []);
 
     const onStart = () => {
-        // if (selectedLoco != null && selectedRun != null) {
+        if (selectedLoco != null) {
             router.navigate('/dashboard');
-        // }
+        }
     };
 
     return (
         <View style={styles.page}>
             <View style={styles.body}>
-                {/!* Page Headings *!/}
+                {/* Page Headings */}
                 <View style={styles.page_heading}>
                     <LargeTitle>
                         <GreetingMessage/>
                     </LargeTitle>
                     <Title1>John Smith</Title1>
                 </View>
-                {/!* Page Content *!/}
+                {/* Page Content */}
                 <View style={styles.content}>
-                    {/!* Locomotive Selector *!/}
+                    {/* Locomotive Selector */}
                     {locos != undefined && <SettingsItem
                         label='Locomotive'
                         options={locos}
                         setSelectedItem={setSelectedLoco}
                     />}
-                    {runs != undefined && <SettingsItem
-                        label='Run'
-                        options={runs}
-                        setSelectedItem={setSelectedRun}
-                    />}
                 </View>
-                {/!* Actions *!/}
+                {/* Actions */}
                 <View style={styles.actions}>
                     <Link
                         href='/'
@@ -97,59 +82,7 @@ const SetupPage = () => {
                 </View>
             </View>
         </View>
-    )*/;
-  const { theme } = useTheme();
-  return (
-    <View style={[styles.page, { backgroundColor: theme.appBG }]}>
-      <View style={[styles.body, { backgroundColor: theme.bgModal }]}>
-        {/* Page Headings */}
-        <View style={styles.page_heading}>
-          <LargeTitle>
-            <GreetingMessage />
-          </LargeTitle>
-          <Title1>John Smith</Title1>
-        </View>
-        {/* Page Content */}
-        <View style={styles.content}>
-          {/* Locomotive Selector */}
-          <SettingsItem
-            label='Locomotive'
-            options={SettingsMockData_Loco}
-            startOption={SettingsMockData_Loco[0].id}
-          />
-          {/* Run Selector */}
-          <SettingsItem
-            label='Run'
-            options={SettingMockData_Run}
-            startOption={SettingMockData_Run[0].id}
-          />
-        </View>
-        {/* Actions */}
-        <View style={styles.actions}>
-          <Link
-            href='/'
-            asChild
-          >
-            <Button
-              title='Log Out'
-              textColor={theme.textLevel2}
-              backgroundColor='transparent'
-              border
-            />
-          </Link>
-          <Link
-            href='/dashboard'
-            asChild
-          >
-            <Button
-              title='Start'
-              style={StyleSheet.create({ flex: 1 })}
-            />
-          </Link>
-        </View>
-      </View>
-    </View>
-  );
+    );
 };
 
 const styles = StyleSheet.create({

@@ -23,43 +23,24 @@ router.get("/", (req, res) => {
 router.get("/:sidingId/breakdown", (req, res) => {
   const id = req.params.sidingId;
   if (!isValidId(id, res)) return;
-  const stopID = req.query.stopID;
-  console.info(stopID);
-  if (stopID != null && !isValidId(stopID, res))
-      return;
 
-  const withStopQuery = `SELECT b.binID, b.status, b.sidingID, b.full, b.burnt, s.sidingName, t.transactionTime, t.type, stopState.pickedUpInStop, stopState.droppedOffInStop
-      FROM bin b
-               LEFT JOIN siding s ON b.sidingID = s.sidingID
-               LEFT JOIN (SELECT tl.*, ROW_NUMBER() OVER (PARTITION BY binID ORDER BY transactionTime DESC) AS rn
-                          FROM transactionlog tl) t ON t.binID = b.binID AND t.rn = 1
-               LEFT JOIN (SELECT binID,
-                                 IF(SUM(type = 'PICKED_UP') > 0, true, false) as 'pickedUpInStop', 
-                                 IF(SUM(type = 'DROPPED_OFF') > 0, true, false) as 'droppedOffInStop'
-                          FROM transactionlog
-                          WHERE stopID = ?
-                            AND transactionTime > DATE_SUB(NOW(), INTERVAL 1 DAY)
-                          GROUP BY binID) as stopState ON stopState.binID = b.binID
-      WHERE b.sidingID = ?`;
-
-  const withoutStopQuery = `SELECT b.binID, b.status, b.sidingID, b.full, b.burnt, s.sidingName, t.transactionTime, t.type
+  const withoutStopQuery = `SELECT b.*, s.sidingName, t.transactionTime, t.type
       FROM bin b
                LEFT JOIN siding s ON b.sidingID = s.sidingID
                LEFT JOIN (SELECT tl.*, ROW_NUMBER() OVER (PARTITION BY binID ORDER BY transactionTime DESC) AS rn
                           FROM transactionlog tl) t ON t.binID = b.binID AND t.rn = 1
       WHERE b.sidingID = ?
+      ORDER BY b.full DESC, b.droppedOffInRun
   `;
 
-  req.db.raw(stopID != null ? withStopQuery : withoutStopQuery, stopID != null ? [stopID, id] : [id])
+  req.db.raw(withoutStopQuery, [id])
       .then(processQueryResult)
       .then(data => {
         for (const datum of data) {
             datum.full = !!datum.full;
             datum.burnt = !!datum.burnt;
-            if (stopID != null) {
-              datum.droppedOffInStop = !!datum.droppedOffInStop;
-              datum.pickedUpInStop = !!datum.pickedUpInStop;
-            }
+            datum.droppedOffInRun = !!datum.droppedOffInRun;
+            datum.pickedUpInRun = !!datum.pickedUpInRun;
         }
         res.status(200).json(data);
       })

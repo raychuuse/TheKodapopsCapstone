@@ -34,8 +34,6 @@ export default function Page() {
   const [notifications, setNotifications] = useState(NotificationsMockData);
   const stops = getStops();
 
-  console.info('Index', stops);
-
   return (
     <View
       style={{
@@ -97,7 +95,6 @@ export default function Page() {
               keyExtractor={(item) => item.stopID}
               data={stops}
               renderItem={({ item, index }) => {
-                  console.info('item', item);
                   return (
                 <SidingCard
                   stopID={item.stopID}

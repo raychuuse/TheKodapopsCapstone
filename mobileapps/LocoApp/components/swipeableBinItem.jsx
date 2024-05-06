@@ -29,7 +29,7 @@ const SwipeableBinItem = ({
   const { handlePickUpBin, handleDropOffBin } = useRun();
 
   const message = type === 'SIDING' ? 'Dropped Off' : 'Picked Up';
-  const isSelected = bin.pickedUpInStop || bin.pickedUpInStop;
+  const isSelected = bin.pickedUpInRun || bin.droppedOffInRun;
 
   // Define the right actions for swipe
   const renderRightActions = () => {
@@ -153,7 +153,6 @@ const SwipeableBinItem = ({
           style={styles.binPressable}
           onPress={() => {
             // SetIsFull(sidingId, binData.binNumber, binsKey);
-              console.info('Yo', type);
               if (type === 'SIDING')
                   handlePickUpBin(bin.binID, stopID);
               else
@@ -197,7 +196,7 @@ const SwipeableBinItem = ({
               : null,
           ]}
         >
-        {(bin.droppedOffInStop || bin.pickedUpInStop) && message + ' | '} {bin.full ? 'Full' : 'Empty'} {bin.burnt ? ' |' +
+        {(bin.droppedOffInRun || bin.pickedUpInRun) && message + ' | '} {bin.full ? 'Full' : 'Empty'} {bin.burnt ? ' |' +
             ' Burnt' : ''}
         </Headline>
       </View>

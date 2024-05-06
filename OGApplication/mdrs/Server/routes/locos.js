@@ -42,28 +42,14 @@ router.get("/:locoId/siding_breakdown", (req, res) => {
 router.get('/:locoId/load', (req, res) => {
   const id = req.params.locoId;
   if (!isValidId(id, res)) return;
-  const stopID = req.query.stopID;
-  if (stopID != null && !isValidId(stopID, res))
-    return;
 
-  const withStopId = `SELECT b.binID, b.code, b.status, b.full, b.burnt, l.locoID, l.locoName, stopState.pickedUpInStop, stopState.droppedOffInStop
+  const withoutStopId = `SELECT b.*, l.locoID, l.locoName
       FROM locomotive l
       LEFT JOIN bin b ON b.locoID = l.locoID
-      LEFT JOIN (SELECT binID,
-                        IF(SUM(type = 'PICKED_UP') > 0, true, false) as 'pickedUpInStop',
-                        IF(SUM(type = 'DROPPED_OFF') > 0, true, false) as 'droppedOffInStop'
-                 FROM transactionlog
-                 WHERE stopID = ?
-                   AND transactionTime > DATE_SUB(NOW(), INTERVAL 1 DAY)
-                 GROUP BY binID) as stopState ON stopState.binID = b.binID
-      WHERE l.locoID = ?`;
+      WHERE l.locoID = ?
+      ORDER BY b.full, b.pickedUpInRun`;
 
-  const withoutStopId = `SELECT b.binID, b.code, b.status, b.full, b.burnt, l.locoID, l.locoName
-      FROM locomotive l
-      LEFT JOIN bin b ON b.locoID = l.locoID
-      WHERE l.locoID = ?`;
-
-  req.db.raw(stopID != null ? withStopId : withoutStopId, stopID != null ? [stopID, id] : [id])
+  req.db.raw(withoutStopId, [id])
       .then(processQueryResult)
       .then(data => {
         const loco = {
@@ -81,8 +67,8 @@ router.get('/:locoId/load', (req, res) => {
                 status: bin.status,
                 full: !!bin.full,
                 burnt: !!bin.burnt,
-                pickedUpInStop: !!bin.pickedUpInStop,
-                droppedOffInStop: !!bin.droppedOffInStop
+                pickedUpInRun: !!bin.pickedUpInRun,
+                droppedOffInRun: !!bin.droppedOffInRun
             });
         }
         res.status(200).json(loco);

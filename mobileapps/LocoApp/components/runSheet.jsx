@@ -16,11 +16,13 @@ import { useRun } from '../context/runContext';
 const RunSheet = ({ onClose, isVisible }) => {
   // Providers
   const { theme } = useTheme();
-  const { runData } = useRun();
+  const { getStops } = useRun();
+
+  const stops = getStops();
 
   // List Render Item
   const renderItem = ({ item }) => {
-    return <RunSheetSidingItem sidingId={item.id} />;
+    return <RunSheetSidingItem stop={item} />;
   };
 
   return (
@@ -52,7 +54,7 @@ const RunSheet = ({ onClose, isVisible }) => {
       {/* Run List */}
       <FlatList
         style={Styles.content}
-        data={runData.sidings}
+        data={stops}
         renderItem={renderItem}
         ItemSeparatorComponent={<Divider style={{ marginVertical: 10 }} />}
       />

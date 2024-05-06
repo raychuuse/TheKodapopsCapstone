@@ -23,7 +23,6 @@ const BinList = ({ stopID, type }) => {
   // Data
   const loco = getLoco();
   const stop = getStop(stopID);
-  console.info('Stop', stop, stopID, loco);
   const bins = type === 'SIDING' ? stop.bins : loco.bins;
   const runData = [];
 
