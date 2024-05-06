@@ -12,6 +12,7 @@ import { Colours } from './colours';
 import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
 import { useBins } from '../context/binContext';
 
+
 const SwipeableBinItem = ({
   index,
   binNumber,
@@ -19,7 +20,8 @@ const SwipeableBinItem = ({
   isSelected,
 }) => {
   // Providers
-  const { getBinData, setBinFull, setBinBurnt } = useBins();
+  const { getBinData, setBinFull, setBinBurnt, deleteBin, flagBin, 
+    setBinMissing, setBinToRepair, checkRepair, getExceptionBinData } = useBins();
 
   // ~ ~ ~ ~ ~ ~ ~ ~ Reference ~ ~ ~ ~ ~ ~ ~ ~ //
   // Swipeable Reference
@@ -28,6 +30,7 @@ const SwipeableBinItem = ({
   // ~ ~ ~ ~ ~ ~ ~ ~ Components ~ ~ ~ ~ ~ ~ ~ ~ //
   // Define the right actions for swipe
   const renderRightActions = () => {
+
     return (
       <View
         style={{
@@ -40,9 +43,9 @@ const SwipeableBinItem = ({
       >
         <TouchableOpacity
           onPress={() => {
-            RepairBinAlert(binNumber);
             Haptics.selectionAsync();
-          }}
+            RepairBinAlert(`Bin #${binNumber}`, binNumber, setBinToRepair, getBinData);}
+          }
           style={[styles.actionButton, { backgroundColor: '#FFA000' }]}
         >
           <Feather
@@ -55,9 +58,8 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: '#D32F2F' }]}
           onPress={() => {
-            RemoveBinAlert(`Bin #${binNumber}`);
             Haptics.selectionAsync();
-          }}
+            RemoveBinAlert(`Bin #${binNumber}`, binNumber, deleteBin);}}
         >
           <Feather
             name='help-circle'
@@ -175,6 +177,13 @@ const SwipeableBinItem = ({
             Bin #{binNumber}
           </Headline>
         </TouchableOpacity>
+        {getBinData(binNumber).isRepairNeeded ? (
+          <Feather
+          name='tool'
+          size={24}
+          color='#fff'
+          />
+        ) : null}
         {/* Edit Btn / Full Indicator */}
         {getBinData(binNumber).isFull ? (
           <Headline

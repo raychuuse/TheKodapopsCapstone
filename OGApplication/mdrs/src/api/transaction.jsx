@@ -1,14 +1,34 @@
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {serverUrl} from "./utils";
+import {serverUrl, Status} from "./utils";
 
-const Status = {
-    1: 'Empty At Mill',
-    2: 'Empty On Loco',
-    3: 'Empty At Siding',
-    4: 'Full At Siding',
-    5: 'Full On Loco',
-    6: 'Full At Mill'
+
+const translateStatus = (fill, sidingID, type) => {
+    if (type == 'MISSING') {
+        return 7;
+    }
+    if (type == "PICKED_UP") {
+        if (fill == true) {
+            return 5;
+        }
+        else {
+            return 2;
+        }
+    }
+    if (sidingID == 0) {
+        if (fill == true) {
+            return 6;
+        }
+        else {
+            return 1;
+        }
+    }
+    if (fill == true) {
+        return 4;
+    }
+    else {
+        return 3;
+    }
 }
 
 export function getAllTransactions(){
@@ -16,20 +36,20 @@ export function getAllTransactions(){
         .then((body) => body.json())
         .then((data) =>{
             // Data formatted
-            return data.map((bin) => ({
-                binID: bin.binID,
-                transactionTime: new Date(bin.transactionTime).toLocaleString("en-AU"),
-                date: new Date(bin.transactionTime).toLocaleDateString("en-AU"),
-                time: new Date(bin.transactionTime).toLocaleTimeString("en-AU", {hour12: false}),
-                transactionNumber: bin.transactionNumber,
-                statusID: bin.statusID,
-                status: (Status[parseInt(bin.statusID)]),
-                sidingID: bin.sidingID,
-                locoID: bin.locoID,
-                harvesterID: bin.harvesterID,
-                sidingName: bin.sidingName,
-                harvesterName: bin.harvesterName,
-                locoName: bin.locoName,
+            return data.map((transaction) => ({
+                transactionNumber: transaction.transactionID,
+                transactionTime: new Date(transaction.transactionTime).toLocaleString("en-AU"),
+                date: new Date(transaction.transactionTime).toLocaleDateString("en-AU"),
+                time: new Date(transaction.transactionTime).toLocaleTimeString("en-AU", {hour12: false}),
+                binID: transaction.binID,
+                type: transaction.type,
+                status: (Status[parseInt(translateStatus(transaction.status, transaction.sidingID, transaction.type))]),
+                sidingID: transaction.sidingID,
+                locoID: transaction.locoID,
+                harvesterID: transaction.harvesterID,
+                sidingName: transaction.sidingName,
+                harvesterName: transaction.harvesterName,
+                locoName: transaction.locoName,
             }))
         })
 }

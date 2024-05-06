@@ -1,4 +1,4 @@
-import {postConfig, putConfig, serverUrl} from "./utils";
+import {fullConverter, postConfig, putConfig, serverUrl} from "./utils";
 
 const apiUrl = `${serverUrl}/locos`;
 
@@ -22,11 +22,14 @@ export function getLoco(id) {
 
 export function getCurrentLoad(id) {
     return fetch(`${apiUrl}/${id}/load`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+        .then((body) => body.json())
+        .then((data) =>{
+            // Data formatting
+            return data.map((obj) => ({
+                binID: obj.binID,
+                status: fullConverter(obj.status),
+            }))
+        })
 }
 
 export function getSidingBreakdown(id) {

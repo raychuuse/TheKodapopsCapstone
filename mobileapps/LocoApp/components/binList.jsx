@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Import Styles
 import { Title2 } from '../styles/typography';
@@ -13,6 +14,7 @@ import SwipeableBinItem from './swipeableBinItem';
 import { useRun } from '../context/runContext';
 import { useTheme } from '../styles/themeContext';
 import { useModal } from '../context/modalContext';
+import AddBinCamera from './addBinCamera';
 
 const BinList = ({ stopID, type }) => {
   // Provider
@@ -28,12 +30,11 @@ const BinList = ({ stopID, type }) => {
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
   const [selectedIndices, setSelectedIndices] = useState([]);
-  const [longPressedIndex, setLongPressedIndex] = useState(null);
+  const [isSelected, setIsSelected] = useState(null);
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
-  // TODO: Fix this to use the context right and the re-render issue after updates
   // Function to handle long press range selection on bins.
   const LongPressRangeSelect = (binNumber, index) => {
     // Clone the current selection to avoid direct state mutation.
@@ -46,7 +47,7 @@ const BinList = ({ stopID, type }) => {
       // Update the state to reflect the new selection.
       setSelectedIndices(newSelection);
       // Set the is selected indicator
-      setLongPressedIndex(index);
+      setIsSelected(index);
       // Provide haptic feedback to indicate successful selection.
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
@@ -57,7 +58,7 @@ const BinList = ({ stopID, type }) => {
         // Clear the selection if the same bin is selected again.
         setSelectedIndices([]);
         // Unset the is selected indicator
-        setLongPressedIndex(null);
+        setIsSelected(null);
         // Provide haptic feedback to indicate removal.
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
@@ -99,7 +100,7 @@ const BinList = ({ stopID, type }) => {
         // Clear the selection after the action is completed.
         setSelectedIndices([]);
         // Unset the is selected indicator
-        setLongPressedIndex(null);
+        setIsSelected(null);
         // Provide haptic feedback to indicate successful processing.
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
@@ -142,6 +143,11 @@ const BinList = ({ stopID, type }) => {
     <GestureHandlerRootView
       style={{ flex: 1, width: '100%', position: 'relative' }}
     >
+      {/* Add Bin Modal */}
+      <AddBinCamera
+        sidingID={sidingId}
+        isDrop={binsKey}
+      />
       {/* List Header */}
       <View
         style={[
@@ -172,6 +178,36 @@ const BinList = ({ stopID, type }) => {
         </Title2>
         <Title2>{bins.length}</Title2>
         <Title2>{bins.length > 1 ? 'Bins' : 'Bin'} at Siding</Title2>
+        <TouchableOpacity
+          onPress={() => {
+            openAddBinModal();
+            Haptics.selectionAsync();
+          }}
+          style={[
+            {
+              padding: 8,
+              borderRadius: 8,
+              marginLeft: 'auto',
+            },
+            stop.isCompleted
+              ? { backgroundColor: theme.spCompleteBG }
+              : stop.stopID == selectedSidingID
+              ? { backgroundColor: theme.spSelectedBG }
+              : { backgroundColor: theme.bgModal },
+          ]}
+        >
+          <MaterialCommunityIcons
+            name={'plus-circle-outline'}
+            size={24}
+            color={
+              stop.isCompleted
+                ? theme.spCompleteText
+                : stop.stopID == selectedSidingID
+                ? theme.spSelectedText
+                : theme.spPendingText
+            }
+          />
+        </TouchableOpacity>
       </View>
       {/* Bin List */}
       <FlatList

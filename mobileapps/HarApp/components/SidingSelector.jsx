@@ -1,12 +1,12 @@
 // Import Components
 import { View } from "react-native";
-import Divider from "../components/divider";
+import Divider from "./divider";
 
 // Import Style Components
-import { Headline } from "../components/typography";
+import { Headline } from "./typography";
 import { EvilIcons } from "@expo/vector-icons";
 
-const SelectedSiding = ({ sidingName = "Selected Siding" }) => {
+const SidingSelector = ({ sidingName = "Selected Siding" }) => {
   return (
     <>
       <Divider />
@@ -32,4 +32,4 @@ const SelectedSiding = ({ sidingName = "Selected Siding" }) => {
   );
 };
 
-export default SelectedSiding;
+export default SidingSelector;

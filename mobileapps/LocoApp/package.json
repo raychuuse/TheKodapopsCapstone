@@ -19,7 +19,7 @@
     "expo-haptics": "~12.8.1",
     "expo-linear-gradient": "~12.7.2",
     "expo-linking": "~6.2.2",
-    "expo-router": "~3.4.7",
+    "expo-router": "~3.4.10",
     "expo-status-bar": "~1.11.1",
     "js-cookie": "^3.0.5",
     "react": "18.2.0",

@@ -133,4 +133,44 @@ router.delete('/:id', (req, res) => {
       });
 });
 
+router.get("/:sidingID/bins", (req, res) => {
+  if (!req[0].token) {
+      res.status(200)
+          .json({success: false, message: "Token was not provided."});
+  }
+  const decode = checkJWT(req[0].token);
+  if (checkIfExpired(decode.exp)) {
+      res.status(400)
+          .json({success: false, message: "Error! Login Invalid, token expired."});
+  }
+  // Haven't introduced restriction based on user in db
+  if (!req.params.sidingID) {
+    req.db.raw(`SELECT *
+            FROM bins`)
+    .then(processQueryResult)
+    .then((farms) => {
+      res.status(200).json(farms);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json(err);
+    });
+  }
+  else {
+      req.db.raw(`SELECT *
+          FROM bins
+      WHERE sidingID = ?`, [id])
+      .then(processQueryResult)
+      .then((bins) => {
+        res.status(200).json(bins);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json(err);
+      });
+  }
+});
+
+
+
 module.exports = router;

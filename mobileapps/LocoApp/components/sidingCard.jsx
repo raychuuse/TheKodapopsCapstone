@@ -58,10 +58,14 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
         onPress={() => openSidingModal(stopID)}
         style={{ flex: 1, width: '100%', alignItems: 'center' }}
       >
-        <View style={{ flex: 3, justifyContent: 'center' }}>
+        <View style={{ flex: 4, justifyContent: 'center' }}>
           <Title3
             style={[
-              { color: theme.spPendingText },
+              {
+                color: theme.spPendingText,
+                paddingHorizontal: 8,
+                textAlign: 'center',
+              },
               stop.isCompleted
                 ? { color: theme.spCompleteText }
                 : stop.stopID == selectedSidingID

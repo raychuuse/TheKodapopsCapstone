@@ -37,7 +37,7 @@ export default function Harvester() {
                 <div className="row">
                     <div className="col-sm-3">
                         <div className="container-fluid">
-                            <ItemList onItemSelected={changeState} itemName={'Harvesters'}
+                            <ItemList onItemSelected={changeState} itemName={'Harvester'}
                                       getAllItemApi={getAllHarvesters} createItemApi={createHarvester}
                                       updateItemApi={updateHarvester} deleteItemApi={deleteHarvester}/>
                         </div>
@@ -73,34 +73,31 @@ const HarvesterDetails = ({id}) => {
 
     return (
         <>
-            {loading && <LoadingSpinner/>}
             {error && <ErrorAlert message={error.message}/>}
-            {!loading && !error && (
-                <section className="data-table">
-                    <div className="container-fluid">
-                        <div className="row">
-                            <div className="table-wrapper">
-                                <div className="table-header-wrapper">
-                                    <h1 className="table-header">{harvesterData.name}</h1>
-                                    <div className="table-bin-count-wrapper">
-                                        <h1 className="bin-count-header">Bins:</h1>
-                                        {/*<h1 className="bin-count-number">{`${harvesterData.data.full.length + harvesterData.data.empty.length}`}</h1>*/}
-                                    </div>
+            <section className="data-table">
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="table-wrapper">
+                            <div className="table-header-wrapper">
+                                <h1 className="table-header">{harvesterData.name}</h1>
+                                <div className="table-bin-count-wrapper">
+                                    <h1 className="bin-count-header"> Siding Breakdown:</h1>
+                                    {/*<h1 className="bin-count-number">{`${harvesterData.data.full.length + harvesterData.data.empty.length}`}</h1>*/}
                                 </div>
                             </div>
                         </div>
-                        <hr/>
-                        <div className="row">
-                            <div className="col">
-                                <div className="row">
-                                    <HarvesterSidingBreakdown id={id}/>
-                                </div>
-                            </div>
-                        </div>
-                        <hr/>
                     </div>
-                </section>
-            )}
+                    <hr/>
+                    <div className="row">
+                        <div className="col">
+                            <div className="row">
+                                <HarvesterSidingBreakdown id={id}/>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                </div>
+            </section>
         </>
     )
 }
@@ -129,7 +126,7 @@ const HarvesterSidingBreakdown = ({id}) => {
             .catch(err => {
                 setError(err);
             });
-    });
+    }, [id]);
 
 
     const columns = [

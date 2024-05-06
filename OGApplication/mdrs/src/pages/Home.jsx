@@ -44,7 +44,7 @@ export default function Home() {
                     <br></br>
                     {/* Overview Metrics */}
                     <div className="row">
-                        <DashboardMetrics />
+                        {/**<DashboardMetrics />**/}
                     </div>
                     {/* Overview Tables */}
                     <div className="row">

@@ -34,3 +34,24 @@ export function handleFetch(promise, hasJson=true) {
             }
         });
 }
+
+export const Status = {
+    1: 'Empty At Mill',
+    2: 'Empty On Loco',
+    3: 'Empty At Siding',
+    4: 'Full At Siding',
+    5: 'Full On Loco',
+    6: 'Full At Mill',
+    7: 'Missing',
+    8: 'Error Unknown'
+}
+
+export const fullConverter = (val) => {
+    if (val == 0) {
+        return 'Empty'
+    }
+    else if (val == 1) {
+        return 'Full';
+    }
+    return null;
+}

@@ -9,31 +9,31 @@ router.get("/", (req, res) => {
   const data = {}
   const locoData = req.db
     .from("locomotive")
-    .join("bin", "bins.locoID", "=", "locomotive.locoID")
+    .join("bin", "bin.locoID", "=", "locomotive.locoID")
     .select(
       "locomotive.locoID",
       "locomotive.locoName",
-      "bins.statusID",
-      "bins.binsID"
+      "bin.status",
+      "bin.binID"
     );
   const sidingData = req.db
     .from("siding")
-    .join("bin", "bins.sidingID", "=", "siding.sidingID")
+    .join("bin", "bin.sidingID", "=", "siding.sidingID")
     .select(
       "siding.sidingID",
       "siding.sidingName",
-      "bins.statusID",
-      "bins.binsID"
+      "bin.status",
+      "bin.binID"
     );
 
   const harvestData = req.db
     .from("harvester")
-    .join("bin", "bins.harvesterID", "=", "harvester.harvesterID")
+    .join("bin", "bin.harvesterID", "=", "harvester.harvesterID")
     .select(
       "harvester.harvesterID",
       "harvester.harvesterName",
-      "bins.binsID",
-      "bins.statusID"
+      "bin.binID",
+      "bin.status"
     );
 
   locoData

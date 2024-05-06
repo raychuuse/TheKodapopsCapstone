@@ -45,3 +45,25 @@ export function useSetIsBurnt() {
     [getBin, updateBin]
   );
 }
+
+/**
+ * Custom hook to toggle the 'isDone' status of a bin.
+ * @param {number} sidingId
+ * @param {number} binNumber
+ * @param {boolean} isDrop
+ */
+export function useSetIsDone() {
+  const { updateBin, getBin } = useRun();
+
+  return useCallback(
+    (sidingId, binNumber, isDrop) => {
+      const bin = getBin(sidingId, binNumber, isDrop);
+      if (bin) {
+        // Toggle the 'isBurnt' flag
+        const updatedBin = { ...bin, isDone: !bin.isDone };
+        updateBin(sidingId, binNumber, updatedBin, isDrop);
+      }
+    },
+    [getBin, updateBin]
+  );
+}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
@@ -9,22 +9,67 @@ import Modal from './modal';
 // Import Style Components
 import * as Type from './typography';
 import { Colours } from './colours';
+import {useSelections } from '../context/selectionContext';
 
 const SettingsItem = ({
   type = '',
   startOption = 0,
-  label = 'label',
+  label = "label",
   options = [{ label: 'Label', value: 0 }],
-  style,
+  style
 }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
+  const {updateSiding, updateFarm, updateBlock, updateSub, updatePad, updateBurnt,
+  getSiding, getFarm, getBlock, getSub, getPad, getBurnt} = useSelections();
 
+
+  const changeData = (values) => {
+    newVal = getCurItem(values);
+    switch (label) {
+      case "Siding":
+        updateSiding(newVal);
+      case "Farm":
+        updateFarm(newVal);
+      case "Block":
+        updateBlock(newVal);
+      case "Sub":
+        updateSub(newVal);
+      case "Pad":
+        updatePad(newVal);
+      case "Burnt":
+        updateBurnt(newVal);
+      }
+    }
+
+    const getCur = (label) => {
+      switch (label) {
+        case "Siding":
+          return getSiding();
+        case "Farm":
+          return getFarm();
+        case "Block":
+          return getBlock();
+        case "Sub":
+          return getSub();
+        case "Pad":
+          return getPad();
+        case "Burnt":
+          return getBurnt();
+        }
+      }
+
+  const getCurItem = (values) => {
+    return (values.find((item) => item.value == selectedOption)?.label);
+  }
   return (
     <>
       <Modal
         isVisible={pickerVisable}
-        onClose={() => setPickerVisable(!pickerVisable)}
+        onClose={() => {
+          setPickerVisable(!pickerVisable);
+          // Make it so this modal isnt needed
+          changeData(options);}}
         buttonIcon='check-circle-outline'
       >
         <View style={{ gap: 16, width: '100%' }}>
@@ -49,9 +94,10 @@ const SettingsItem = ({
             />
             {options.map((option) => (
               <Picker.Item
-                value={option.value}
-                label={option.label}
-                style={{ width: '100%' }}
+              key = {option.value}
+              value={option.value}
+              label={option.label}
+              style={{ width: '100%' }}
               />
             ))}
           </Picker>
@@ -63,7 +109,7 @@ const SettingsItem = ({
           style={[Type.styles.body, styles.body]}
           numberOfLines={1}
         >
-          {options.find((item) => item.value == selectedOption)?.label}
+          {label == "Siding" ? getSiding(): getCurItem(options)}
         </Text>
 
         <Button
@@ -75,7 +121,9 @@ const SettingsItem = ({
           borderWidth={1}
           iconSize={28}
           style={styles.button}
-          onPress={() => setPickerVisable(!pickerVisable)}
+          onPress={() => {
+            setPickerVisable(!pickerVisable);
+          }}
         />
       </View>
     </>

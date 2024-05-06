@@ -94,6 +94,16 @@ const DashboardCard = ({ title, data, link, columns }) => {
     );
 };
 
+export const toFull = (integer) => {
+    if (integer == 1) {
+        return "Full";
+    }
+    else if (integer == 0) {
+        return "Empty";
+    }
+    return null;
+}
+
 
 export const DashboardLogTables = () => {
     const [{ bins, transactions, error }, setState] = useState({
@@ -108,7 +118,11 @@ export const DashboardLogTables = () => {
         try {
             const transactionData = await getAllTransactions();
             const binData = await getAllBins();
-            setState({ bins: binData, transactions: transactionData, error: null });
+            const temp = binData.map(bins => ({
+                binID: bins.binID,
+                status: toFull(bins.status)
+            }))
+            setState({ bins: temp, transactions: transactionData, error: null });
         } catch (err) {
             setState({ bins: null, transactions: null, error: err });
         } finally {
@@ -129,11 +143,11 @@ export const DashboardLogTables = () => {
     ]
 
     const binColumns = [
-        { headerName: "Bin ID", field: "binsID", width: 80},        
-        { headerName: "Status", field: "status", sortable: true },          
+        { headerName: "Bin ID", field: "binID"},        
+        { headerName: "Status", field: "status", sortable: true }/*,          
         { headerName: "Loco", field: "locoName",  minWidth: 100, maxWidth: 300 },
         { headerName: "Harvester", field: "harvesterName",  minWidth: 100, maxWidth: 300 },
-        { headerName: "Siding", field: "sidingName",  minWidth: 100, maxWidth: 300 },
+        { headerName: "Siding", field: "sidingName",  minWidth: 100, maxWidth: 300 },*/
     ]
 
     return (

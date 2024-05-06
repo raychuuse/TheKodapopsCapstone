@@ -23,11 +23,14 @@ export function getHarvester(id) {
 
 export function getSidingBreakdown(id) {
     return fetch(`${apiUrl}/${id}/siding_breakdown`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+        .then((body) => body.json())
+        .then((data) =>{
+            // Data formatting
+            return data.map((obj) => ({
+                sidingName: obj.sidingName == null ? "No Siding Listed" : obj.sidingName,
+                binsFilled: obj.binsFilled,
+            }))
+        })
 }
 
 export function createHarvester(name) {

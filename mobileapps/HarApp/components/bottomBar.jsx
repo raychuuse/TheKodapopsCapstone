@@ -23,14 +23,6 @@ const BottomBar = ({
     >
       <View style={{ flexDirection: 'row' }}>
         <Button
-          iconName='settings'
-          backgroundColor='transparent'
-          iconSize={48}
-          iconColor='#fff'
-          onPress={() => setSettingsVisable(true)}
-        />
-
-        <Button
           iconName='help-outline'
           backgroundColor='transparent'
           iconSize={48}

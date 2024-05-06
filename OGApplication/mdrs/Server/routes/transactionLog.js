@@ -7,6 +7,7 @@ router.get("/", function (req, res, next) {
   req.db.raw(`
       SELECT *
       FROM transactionlog t
+               LEFT JOIN bin b ON t.binID = b.binID 
                LEFT JOIN siding s ON t.sidingID = s.sidingID
                LEFT JOIN harvester h ON t.harvesterID = h.harvesterID
                LEFT JOIN locomotive l ON t.locoID = l.locoID

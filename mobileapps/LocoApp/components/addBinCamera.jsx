@@ -6,25 +6,32 @@ import {
   View,
 } from 'react-native';
 import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera';
-import { useContext, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 
 // Import Components
 import Button from './button';
-import { LargeTitle } from './typography';
-import { useBins } from '../context/binContext';
-import { issueAlert } from '../lib/alerts';
+import { LargeTitle } from '../styles/typography';
 
-const AddBinCamera = ({ modalCloser }) => {
+import CustomModal from './modal';
+
+// Import Provider
+import { useModal } from '../context/modalContext';
+import { useRun } from '../context/runContext';
+
+const AddBinCamera = ({ sidingID, isDrop }) => {
+  // Providers
+  const { modalAddBinVisible, closeAddBinModal } = useModal();
+  const { addBin } = useRun();
+
   const [type, setType] = useState(CameraType.back);
   const [flashMode, setFlashMode] = useState(FlashMode.off);
   const [flash, setFlash] = useState(false);
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const cameraRef = useRef(null);
   const [imageUri, setImageUri] = useState(null);
-  const {binData, createBin, getBinData} = useBins();
 
-  const [binNumber, setBinNumber] = useState();
+  const [binNumber, setBinNumber] = useState('');
   const inputRef = useRef(null);
   const MAX_LENGTH = 6;
 
@@ -46,6 +53,13 @@ const AddBinCamera = ({ modalCloser }) => {
     }
   };
 
+  const addBinHandeler = () => {
+    addBin(sidingID, binNumber, isDrop);
+    setBinNumber('');
+    closeAddBinModal();
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
   function toggleCameraType() {
     setType((current) =>
       current === CameraType.back ? CameraType.front : CameraType.back
@@ -59,41 +73,18 @@ const AddBinCamera = ({ modalCloser }) => {
     setFlash(!flash);
   }
 
-  function VerifyBinNumber(num) {
-
-    // Regex from stack overflow, \d for digits
-    if (/^\d+$/.test(num)) {
-
-      // check for undefined/ null
-      valIfExists = getBinData(num) == null;
-      if (valIfExists == null) {
-        issueAlert("An invalid number has been entered.")
-        return false;
-      }
-      else {
-        return true;
-      }
-    }
-  }
-
-  function handleSubmit() {
-    if (VerifyBinNumber(binNumber)) {
-      try {
-        createBin({isFull: false, binNum: binNumber, isBurnt: false});
-        Alert.alert('Bin Creation Successful.');
-        return;
-      }
-      catch (err) {
-        console.log(err);
-      }
-    }
-    Alert.alert('Bin Creation Failed, please enter a valid bin number.');
-  }
-
   if (!permission) requestPermission();
 
   return (
-    <>
+    <CustomModal
+      isVisible={modalAddBinVisible}
+      onClose={() => {
+        setBinNumber('');
+        closeAddBinModal();
+      }}
+      buttonIcon='close-circle-outline'
+      style={{ height: '60%', marginTop: 56, width: 600 }}
+    >
       <View
         style={{
           width: '100%',
@@ -194,14 +185,30 @@ const AddBinCamera = ({ modalCloser }) => {
         </View>
       </Camera>
       <Button
-        onPress={handleSubmit}
+        onPress={() => {
+          if (binNumber.length < MAX_LENGTH) {
+            Alert.alert(
+              'Missing Bin Number!',
+              `Please ensure there is a Bin Number with a length of ${MAX_LENGTH} digits.`
+            );
+          } else {
+            Alert.alert(
+              'Are you sure?',
+              `Are you sure you waould like to add Bin ${binNumber} to this siding?`,
+              [
+                { text: "No, Don't!" },
+                { text: 'Yes, Add it.', onPress: addBinHandeler },
+              ]
+            );
+          }
+        }}
         iconName='check-circle-outline'
         iconColor='white'
         iconSize={56}
         backgroundColor='transparent'
         style={{ position: 'absolute', bottom: -88, right: -16 }}
       />
-    </>
+    </CustomModal>
   );
 };
 

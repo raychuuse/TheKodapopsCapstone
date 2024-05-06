@@ -13,8 +13,10 @@ const Header = () => {
   const toggleNavbar = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  if (auth.token == null)
+  if (auth.token == null) {
+    // add leaving functionality
     return;
+  }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -67,6 +69,11 @@ const Header = () => {
             <li className="nav-item">
               <a className="nav-link" href="/users">
                 Users
+              </a>
+            </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/maintenance">
+                Maintenance
               </a>
             </li>
           </ul>

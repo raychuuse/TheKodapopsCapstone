@@ -9,10 +9,6 @@ import LoadingSpinner from "./LoadingSpinner";
 
 import { getDashboardMetrics } from "../api/dashboard"
 
-export function filterByStatus(bins, query) {
-    return bins.filter(bin => bin.statusID === query)
-}
-
 const Metric = ({ count, text, }) => {
 
     return (

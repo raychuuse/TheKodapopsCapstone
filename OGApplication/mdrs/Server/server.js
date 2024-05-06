@@ -6,8 +6,11 @@ const app = express();
 const router = express.Router();
 const WebSocket = require('ws');
 
+const port = 8080;
+
 const server = http.createServer(app);
-const wss = new WebSocket.Server({server});
+const ws = new WebSocket.Server({server});
+const clients = {}
 
 // Websocket integration
 // i.e.
@@ -63,9 +66,10 @@ app.get("/knex", function (req, res, next) {
 });
 
 
-// catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
 });
 
 // error handler
@@ -78,21 +82,45 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   // res.status(err.status || 500);
-  res.json({ Error: true, Message: err.message });
-
 });
 
-wss.on('connection', (ws, req) => {
-  const url = req.url;
-  console.info(url);
+ws.on('connection', (ws, req) => {
+  const userId = uuidv4();
 
-  if (url === '') {
-    ws.on('message', message => {
-      console.info(message);
-      ws.send('Received: ' + message);
-    });
+  // May want to use req to specificy client difference more
+  // i.e. specific users, or roles for different notifications
+  console.log(`New Connection established.`);
+
+  clients[userId] = ws;
+  console.log(`${userId} connected.`);
+
+  // Was shifted elsewhere
+  // Don't need to multiply by 1000, already done in jwt token creation
+  /*
+  if (req[0].exp < Date.now()) {
+      //removed
   }
-
+  */
 });
 
-server.listen(8080, () => console.log("API runs on http:localhost:8080"));
+function handleDC(userId) {
+  console.log(`${userId} disconnected.`);
+  delete clients[userId];
+}
+
+ws.on('close', () => handleDC(userId));
+
+// Functionality for global notifs, may want to seperate user
+// by app, then send specific messags to each role...
+function broadcastMessage(data) {
+  
+  //const data = JSON.stringify(json);
+  for(let userId in clients) {
+    let client = clients[userId];
+    if(client.readyState === WebSocket.OPEN) {
+      client.send(data);
+    }
+  };
+}
+
+server.listen(port, () => console.log(`API runs on http:localhost:${port}`));

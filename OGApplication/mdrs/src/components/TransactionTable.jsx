@@ -123,6 +123,11 @@ const Table = ({ data }) => {
             filter: 'agNumberColumnFilter',
         },
         {
+            headerName: "Type",
+            field: "type",
+            filter: 'agTextColumnFilter',
+        },
+        {
             headerName: "Status",
             field: "status",
             filter: 'agTextColumnFilter',

@@ -1,4 +1,4 @@
-import React from 'react';
+import {React, forwardRef} from 'react';
 import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../styles/themeContext';
@@ -16,7 +16,7 @@ const Button = ({
   textStyle = {},
   border = false,
   borderWidth = 2,
-}) => {
+}, ref) => {
   // Determine if the icon should be rendered and if title is provided
   const shouldRenderIcon = iconName !== '';
   const shouldRenderTitle = title !== '';
@@ -45,6 +45,7 @@ const Button = ({
 
   return (
     <TouchableOpacity
+      ref = {ref}
       onPress={onPress}
       style={[
         styles.button,
@@ -108,4 +109,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Button;
+export default forwardRef(Button);
