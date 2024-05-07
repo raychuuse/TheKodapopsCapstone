@@ -11,6 +11,7 @@ import CustomModal from './modal';
 // import images
 const image1 = require('../assets/tutorial_1.gif');
 const image2 = require('../assets/tutorial_2.gif');
+const image3 = require('../assets/tutorial_3.gif');
 
 const TutorialData = [
   {
@@ -29,7 +30,7 @@ const TutorialData = [
     header: 'Add Bins with Camera',
     description:
       'Discover how to use your camera to add a bin to the siding in just a few taps.',
-    image: '',
+    image: image3,
   },
 ];
 
