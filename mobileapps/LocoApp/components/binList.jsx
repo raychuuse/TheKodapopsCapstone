@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { View, FlatList, TouchableOpacity } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Feather } from '@expo/vector-icons';
 
 // Import Styles
-import { Title2 } from '../styles/typography';
+import { Title1, Title2 } from '../styles/typography';
 
 // Import Components
 import SwipeableBinItem from './swipeableBinItem';
@@ -32,6 +32,21 @@ const BinList = ({ sidingId, binListName }) => {
   const [isSelected, setIsSelected] = useState(null);
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  // ~ ~ ~ ~ ~ ~ ~ ~ List Styles ~ ~ ~ ~ ~ ~ ~ ~ //
+  // Used to set the text colour
+  const textColour = isCompleted
+    ? { color: theme.spCompleteText }
+    : { color: theme.spPendingText };
+
+  // Used to set the icon colour
+  const iconColour = isCompleted ? theme.spCompleteText : theme.spPendingText;
+
+  // Used to set the background color
+  const backgroundColor = isCompleted
+    ? { backgroundColor: theme.spComplete }
+    : { backgroundColor: theme.spPending };
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
   // Function to handle long press range selection on bins.
@@ -140,7 +155,11 @@ const BinList = ({ sidingId, binListName }) => {
 
   return (
     <GestureHandlerRootView
-      style={{ flex: 1, width: '100%', position: 'relative' }}
+      style={{
+        flex: 1,
+        width: '100%',
+        position: 'relative',
+      }}
     >
       {/* Add Bin Modal */}
       <AddBinCamera
@@ -208,6 +227,42 @@ const BinList = ({ sidingId, binListName }) => {
           />
         </TouchableOpacity>
       </View>
+      {/* Bin List Complete Button */}
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 24,
+          left: 0,
+          zIndex: 2,
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'center',
+        }}
+      >
+        <TouchableOpacity
+          style={[
+            {
+              flexDirection: 'row',
+              paddingHorizontal: 16,
+              paddingVertical: 8,
+              borderRadius: 10,
+              gap: 10,
+              alignItems: 'center',
+            },
+            backgroundColor,
+          ]}
+          onPress={() => setIsCompleted(!isCompleted)}
+        >
+          <Feather
+            size={24}
+            name={isCompleted ? 'check-circle' : 'circle'}
+            color={iconColour}
+          />
+          <Title2 style={textColour}>
+            {isCompleted ? 'Completed' : 'Incomplete'}
+          </Title2>
+        </TouchableOpacity>
+      </View>
       {/* Bin List */}
       <FlatList
         data={BinData}
@@ -222,7 +277,7 @@ const BinList = ({ sidingId, binListName }) => {
         renderItem={listRenderItem}
         ItemSeparatorComponent={BinListSeparator}
         ListHeaderComponent={<View style={{ marginTop: 40 }} />}
-        ListFooterComponent={<View style={{ marginTop: 18 }} />}
+        ListFooterComponent={<View style={{ marginTop: 100 }} />}
         nestedScrollEnabled
         showsVerticalScrollIndicator={false}
       />
