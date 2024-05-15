@@ -145,7 +145,7 @@ const UserView = () => {
         t.role = role == null || role.trim() === '' || role.trim() === 'Choose Role...';
         t.password = type === 'CREATE' && password.trim() === '';
         t.selectedHarvester = role === 'Harvester' && (selectedHarvester == null || selectedHarvester === '');
-        t.email = email.trim() === '' && !validateEmail(email);
+        t.email = email.trim() === '' || !validateEmail(email);
         // Return true if all formErrors keys are false or formErrors has no keys.
         let ret = true;
         for (const formErrorsKey in t)

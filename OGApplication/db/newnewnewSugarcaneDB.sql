@@ -216,11 +216,11 @@ CREATE TABLE `transactionlog` (
   KEY `transactionlog_users_userID_fk` (`userID`),
   KEY `transactionlog_run_stops_stopID_fk` (`stopID`),
   CONSTRAINT `transactionlog_bin_binID_fk` FOREIGN KEY (`binID`) REFERENCES `bin` (`binID`) ON DELETE CASCADE,
-  CONSTRAINT `transactionlog_harvester_harvesterID_fk` FOREIGN KEY (`harvesterID`) REFERENCES `harvester` (`harvesterID`),
-  CONSTRAINT `transactionlog_locomotive_locoID_fk` FOREIGN KEY (`locoID`) REFERENCES `locomotive` (`locoID`),
-  CONSTRAINT `transactionlog_run_stops_stopID_fk` FOREIGN KEY (`stopID`) REFERENCES `run_stops` (`stopID`),
-  CONSTRAINT `transactionlog_siding_sidingID_fk` FOREIGN KEY (`sidingID`) REFERENCES `siding` (`sidingID`),
-  CONSTRAINT `transactionlog_users_userID_fk` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`)
+  CONSTRAINT `transactionlog_harvester_harvesterID_fk` FOREIGN KEY (`harvesterID`) REFERENCES `harvester` (`harvesterID`) ON DELETE CASCADE,
+  CONSTRAINT `transactionlog_locomotive_locoID_fk` FOREIGN KEY (`locoID`) REFERENCES `locomotive` (`locoID`) ON DELETE CASCADE,
+  CONSTRAINT `transactionlog_run_stops_stopID_fk` FOREIGN KEY (`stopID`) REFERENCES `run_stops` (`stopID`) ON DELETE CASCADE,
+  CONSTRAINT `transactionlog_siding_sidingID_fk` FOREIGN KEY (`sidingID`) REFERENCES `siding` (`sidingID`) ON DELETE CASCADE,
+  CONSTRAINT `transactionlog_users_userID_fk` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=900 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
