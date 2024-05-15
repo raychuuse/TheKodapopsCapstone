@@ -114,6 +114,14 @@ router.post('/', (req, res) => {
 router.put('/:id/name', (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
+    // Multiple locos existing?
+    /*
+    if(req.db.raw(`select locoName from locomotive where locoName = ${req.body.name}`).length) {
+      console.log("uip");
+      res.status(450).json({message: "Already exists."});
+      return;
+    }*/
+    
     req.db('locomotive').update({locoName: req.body.name}).where({locoID: id})
         .then(result => {
             res.status(204).send();

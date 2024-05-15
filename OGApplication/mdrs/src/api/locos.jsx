@@ -34,11 +34,15 @@ export function getCurrentLoad(id) {
 
 export function getSidingBreakdown(id) {
     return fetch(`${apiUrl}/${id}/siding_breakdown`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+        .then((body) => body.json())
+        .then((data) =>{
+            // Data formatting
+            return data.map((obj) => ({
+                sidingName: obj.sidingName !== null ? obj.sidingName : "NOT LISTED",
+                type: obj.type !== null ? obj.type : "NOT LISTED",
+                count: obj.count
+            }))
+        })
 }
 
 export function createLoco(name) {
