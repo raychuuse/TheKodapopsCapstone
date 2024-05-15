@@ -84,16 +84,25 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:binID', (req, res) => {
-  req.db('bin').update({binData: req.body.data}).where({binID: req.params.id})
-      .then(response => {
-        res.json({Error: false, Message: 'Success'});
-      })
-      .catch(error => {
-
-        // Note this will not trigger other catch
-        console.error(error);
-        res.json({Error: true, Message: error.message});
-      })
+    const id = req.params.id;
+    req.db.raw(`select count(binID) AS count from bin WHERE binID = '${id}'`)
+    .then(processQueryResult)
+    .then(data => {
+      if (data[0].count > 0) {
+        res.status(510).json('Duplicate appeared.');
+      }
+      else {
+        req.db('bin').update({binData: req.body.data}).where({binID: id})
+        .then(response => {
+          res.json({Error: false, Message: 'Success'});
+        })
+        .catch(error => {
+          console.error(error);
+          res.json({Error: true, Message: error.message});
+        })
+      }
+    })
+    
 });
 
 router.delete('/:binID', (req, res) => {
@@ -103,7 +112,7 @@ router.delete('/:binID', (req, res) => {
   req.db.raw(`DELETE FROM bin 
               WHERE binID = '${id}'`)
         .then(result => {
-            res.status(204).send(result);
+            res.status(204).send();
         })
         .catch(error => {
             console.error(error);

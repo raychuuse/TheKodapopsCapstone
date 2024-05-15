@@ -123,11 +123,16 @@ const ItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi, updat
             });
         } else if (state === 'EDIT') {
             updateItemApi(formSelectedId, formInput).then(result => {
-                fetchItems();
-                setSuccess({message: itemName + ' Successfully Updated'});
-                setInterval(() => setSuccess(null), 2500);
-                navigate(`?id=${formSelectedId}`);
-                setStateCreate();
+                if (result.ok) {
+                    fetchItems();
+                    setSuccess({message: itemName + ' Successfully Updated'});
+                    setInterval(() => setSuccess(null), 2500);
+                    navigate(`?id=${formSelectedId}`);
+                    setStateCreate();
+                }
+                else {
+                    setError(result);
+                }
             }).catch(error => {
                 setError(error);
             });
@@ -153,11 +158,11 @@ const ItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi, updat
         <div className="search-bar-wrapper">
             <Search keyword={keyword} onChange={updateKeyword} />
             {loading && <LoadingSpinner />}
-            {error && <ErrorAlert message={error.message} />}
+            {error && <ErrorAlert message={error.message !== "" ? error.message : "Error in input."} />}
             {success && <SuccessAlert message={success.message} />}
         </div>
         <div className="list-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
-            {!loading && !error && (
+            {!loading /**  && !error */ && (
                 <List
                     data={selectedItem}
                     onClick={updateSearch}

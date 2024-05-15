@@ -54,15 +54,26 @@ router.post('/', (req, res) => {
 
 router.put('/:id/name', (req, res) => {
     const id = req.params.id;
+    const name = req.body.name;
     if (!isValidId(id)) return;
-    req.db('harvester').update({harvesterName: req.body.name}).where({harvesterID: id})
+    
+    req.db.raw(`select count(harvesterName) AS count from harvester WHERE harvesterName = '${name}'`)
+    .then(processQueryResult)
+    .then(data => {
+      if (data[0].count > 0) {
+        res.status(510).json('Duplicate appeared.');
+      }
+      else {
+        req.db('harvester').update({harvesterName: req.body.name}).where({harvesterID: id})
         .then(response => {
-            res.status(204).send(response);
+            res.status(200).send();
         })
         .catch(error => {
             console.error(error);
             res.status(500).json(error);
         })
+      }
+    })
 });
 
 router.delete('/:id', (req, res) => {
@@ -72,7 +83,7 @@ router.delete('/:id', (req, res) => {
     req.db.raw(`DELETE FROM harvester 
                 WHERE harvesterID = '${id}'`)
     .then(result => {
-      res.status(204).send(result);
+      res.status(204).send();
     })
     .catch(error => {
       console.error(error);

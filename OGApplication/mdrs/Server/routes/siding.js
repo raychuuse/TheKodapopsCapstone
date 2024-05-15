@@ -101,8 +101,16 @@ router.post('/', (req, res) => {
 
 router.put('/:id/name', (req, res) => {
   const id = req.params.id;
+  const name = req.body.name;
   if (!isValidId(id)) return;
-  req.db('siding').update({sidingName: req.body.name}).where({sidingID: id})
+  req.db.raw(`select count(sidingName) AS count from siding WHERE sidingName = '${name}'`)
+  .then(processQueryResult)
+  .then(data => {
+    if (data[0].count > 0) {
+      res.status(510).json('Duplicate appeared.');
+    }
+    else {
+      req.db('siding').update({sidingName: req.body.name}).where({sidingID: id})
       .then(result => {
         res.status(204).send();
       })
@@ -110,6 +118,9 @@ router.put('/:id/name', (req, res) => {
         console.error(error);
         res.status(500).json(error);
       })
+    }
+  })
+  
 });
 
 router.delete('/:id', (req, res) => {
@@ -119,7 +130,7 @@ router.delete('/:id', (req, res) => {
   req.db.raw(`DELETE FROM siding 
               WHERE sidingID = '${id}'`)
         .then(result => {
-        res.status(204).send(result);
+        res.status(204).send();
         })
         .catch(error => {
             console.error(error);

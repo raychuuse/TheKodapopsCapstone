@@ -154,11 +154,11 @@ const ItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi, delet
         <div className="search-bar-wrapper">
             <Search keyword={keyword} onChange={updateKeyword} />
             {loading && <LoadingSpinner />}
-            {error && <ErrorAlert message={error.message} />}
+            {error && <ErrorAlert message={error.message !== "" ? error.message : "Error in input."} />}
             {success && <SuccessAlert message={success.message} />}
         </div>
         <div className="list-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
-            {!loading && !error && (
+            {!loading /**&& !error**/ && (
                 <List
                     data={selectedItem}
                     onClick={updateSearch}

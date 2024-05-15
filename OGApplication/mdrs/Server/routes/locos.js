@@ -115,31 +115,33 @@ router.put('/:id/name', (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
     // Multiple locos existing?
-    /*
-    if(req.db.raw(`select locoName from locomotive where locoName = ${req.body.name}`).length) {
-      console.log("uip");
-      res.status(450).json({message: "Already exists."});
-      return;
-    }*/
-    
-    req.db('locomotive').update({locoName: req.body.name}).where({locoID: id})
+    req.db.raw(`select count(locoName) AS count from locomotive WHERE locoName = '${req.body.name}'`)
+    .then(processQueryResult)
+    .then(data => {
+      if (data[0].count > 0) {
+        res.status(510).json('Duplicate appeared.');
+      }
+      else {
+        req.db('locomotive').update({locoName: req.body.name}).where({locoID: id})
         .then(result => {
             res.status(204).send();
         })
         .catch(error => {
-            console.error(error);
             res.status(500).json(error);
+            console.error(error);
         })
+      }
+    })
 });
 
 router.delete('/:id', (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
     
-    req.db.raw(`DELETE FROM locomotivve 
+    req.db.raw(`DELETE FROM locomotive 
               WHERE locoID = '${id}'`)
         .then(result => {
-            res.status(204).send(result);
+            res.status(204).send();
         })
         .catch(error => {
             console.error(error);
