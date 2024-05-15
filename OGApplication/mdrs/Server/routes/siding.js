@@ -116,14 +116,15 @@ router.delete('/:id', (req, res) => {
   const id = req.params.id;
   if (!isValidId(id)) return;
 
-  req.db('siding').where({sidingID: id}).del()
-      .then(result => {
-        res.status(204).send();
-      })
-      .catch(error => {
-        console.error(error);
-        res.status(500).json(error);
-      });
+  req.db.raw(`DELETE FROM siding 
+              WHERE sidingID = '${id}'`)
+        .then(result => {
+        res.status(204).send(result);
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
+        });
 });
 
 router.get("/:sidingID/bins", (req, res) => {

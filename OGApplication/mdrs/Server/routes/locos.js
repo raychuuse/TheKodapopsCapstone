@@ -127,10 +127,11 @@ router.put('/:id/name', (req, res) => {
 router.delete('/:id', (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
-
-    req.db('locomotive').where({locoID: id}).del()
+    
+    req.db.raw(`DELETE FROM locomotivve 
+              WHERE locoID = '${id}'`)
         .then(result => {
-            res.status(204).send();
+            res.status(204).send(result);
         })
         .catch(error => {
             console.error(error);

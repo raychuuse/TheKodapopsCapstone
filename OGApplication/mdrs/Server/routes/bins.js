@@ -98,17 +98,17 @@ router.put('/:binID', (req, res) => {
 
 router.delete('/:binID', (req, res) => {
   const id = req.params.binID;
-  console.log(id);
   if (!isValidId(id)) return;
 
   req.db.raw(`DELETE FROM bin 
               WHERE binID = '${id}'`)
-      .then(response => {
-        res.json({Error: false, Message: 'Success'});
-      })
-      .catch(error => {
-        res.json({Error: true, Message: error.message})
-      });
+        .then(result => {
+            res.status(204).send(result);
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
+        });
 });
 
 router.post('/missing/:id'), (req, res) => {

@@ -69,14 +69,15 @@ router.delete('/:id', (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
 
-    req.db('harvester').where({harvesterID: id}).del()
-        .then(response => {
-            res.status(204).send(response);
-        })
-        .catch(error => {
-            console.error(error);
-            res.status(500).json(error);
-        });
+    req.db.raw(`DELETE FROM harvester 
+                WHERE harvesterID = '${id}'`)
+    .then(result => {
+      res.status(204).send(result);
+    })
+    .catch(error => {
+      console.error(error);
+      res.status(500).json(error);
+    });
 });
 
 
