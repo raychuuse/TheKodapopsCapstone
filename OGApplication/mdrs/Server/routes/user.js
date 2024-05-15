@@ -212,10 +212,6 @@ router.post('/', createValidationRules, (req, res) => {
 
     const {password, firstName, lastName, email, role} = req.body;
     const selectedHarvester = role === 'Harvester' ? req.body.selectedHarvester : null;
-    if (role === 'Locomotive') {
-        // Current dummy data uses Loco Operator, calibrate with zac on db finalisation...
-        role = 'Loco Operator';
-    }
     if (role === 'Harvester' && selectedHarvester == undefined) {
         console.error("Need selected harvester");
         return res.status(400).json({message: 'Please select the harvesting company this user works for'});

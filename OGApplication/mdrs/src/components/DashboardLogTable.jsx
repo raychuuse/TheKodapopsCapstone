@@ -120,7 +120,9 @@ export const DashboardLogTables = () => {
             const binData = await getAllBins();
             const temp = binData.map(bins => ({
                 binID: bins.binID,
-                status: toFull(bins.status)
+                status: bins.status !== null ? bins.status : "NOT LISTED",
+                sidingName: bins.sidingName,
+                locoName: bins.locoName
             }))
             setState({ bins: temp, transactions: transactionData, error: null });
         } catch (err) {
@@ -137,17 +139,17 @@ export const DashboardLogTables = () => {
         { headerName: "Time", field: "transactionTime", width: 200, sortable: true },
         { headerName: "Bin ID", field: "binID", width: 100, filter: 'agNumberColumnFilter', sortable: true },
         { headerName: "Status", field: "status", sortable: true },
-        // { headerName: "Loco", field: "locoName", sortable: true },
-        // { headerName: "Harvester", field: "harvesterName", sortable: true },
-        // { headerName: "Siding", field: "sidingName", sortable: true },
+        { headerName: "Loco", field: "locoName", sortable: true },
+        { headerName: "Harvester", field: "harvesterName", sortable: true },
+        { headerName: "Siding", field: "sidingName", sortable: true },
     ]
 
     const binColumns = [
         { headerName: "Bin ID", field: "binID"},        
-        { headerName: "Status", field: "status", sortable: true }/*,          
+        { headerName: "Status", field: "status", sortable: true },          
         { headerName: "Loco", field: "locoName",  minWidth: 100, maxWidth: 300 },
-        { headerName: "Harvester", field: "harvesterName",  minWidth: 100, maxWidth: 300 },
-        { headerName: "Siding", field: "sidingName",  minWidth: 100, maxWidth: 300 },*/
+        { headerName: "Siding", field: "sidingName",  minWidth: 100, maxWidth: 300 },/* 
+        { headerName: "Harvester", field: "harvesterName",  minWidth: 100, maxWidth: 300 },*/
     ]
 
     return (

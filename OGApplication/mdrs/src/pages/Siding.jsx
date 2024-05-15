@@ -82,11 +82,8 @@ const SidingDetails = ({id}) => {
                 <div className="row">
                     <div className="table-wrapper">
                         <div className="table-header-wrapper">
-                            <h1 className="table-header">{sidingData.name}</h1>
-                            <div className="table-bin-count-wrapper">
-                                <h1 className="bin-count-header">Bins:</h1>
-                                {/*<h1 className="bin-count-number">{`${sidingData.data.full.length + sidingData.data.empty.length}`}</h1>*/}
-                            </div>
+                            <h1 className="bin-count-header">Bins:</h1>
+                            {/*<h1 className="bin-count-number">{`${sidingData.data.full.length + sidingData.data.empty.length}`}</h1>*/}
                         </div>
                     </div>
                 </div>
@@ -139,7 +136,7 @@ const SidingBreakdown = ({id}) => {
         getSidingBreakdown(id)
             .then(data => {
                 setData(data);
-                setFullBins(data.reduce((sum, bin) => sum + (bin.status === 'Full' ? 1 : 0), 0));
+                setFullBins(data.reduce((sum, bin) => sum + (bin.status === 'FULL' ? 1 : 0), 0));
                 setError(null);
             })
             .catch(err => {

@@ -15,6 +15,7 @@ const AuthProvider = ({children}) => {
         setToken(token);
         Cookies.set('token', token);
         Cookies.set('user', user);
+        Cookies.set('firstName', user.firstName)
         navigate("/");
     };
 
@@ -24,6 +25,7 @@ const AuthProvider = ({children}) => {
         navigate("/login");
         Cookies.remove('token');
         Cookies.remove('user');
+        Cookies.remove('firstName', user.firstName)
     };
 
     return (

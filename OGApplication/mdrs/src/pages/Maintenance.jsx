@@ -69,6 +69,7 @@ const MaintenanceBreakdown = () => {
 
     const columns = [
         {headerName: "Bin", field: "id"},
+        {headerName: "Siding Location (Or Last Location)", field: "sidingName"},
         {headerName: "Issue", field: "issue"}
     ];
 

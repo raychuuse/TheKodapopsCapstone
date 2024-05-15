@@ -22,7 +22,12 @@ export function filterByStatus(bins, query) {
 */
 
 export function filterByStatus(bins, isFull,) {
-    return bins.filter(bin => bin.status === isFull);
+    if (isFull) {
+        return bins.filter(bin => bin.status == "FULL");
+    }
+    else {
+        return bins.filter(bin => bin.status == "EMPTY");
+    }
 }
 
 export async function getDashboardMetrics() {
@@ -31,7 +36,7 @@ export async function getDashboardMetrics() {
 
     //check for db error
     if (body.Error) {
-        console.log(body.Message);
+        //console.log(body.Message);
         throw Error(`${body.Message}`);
     }
 

@@ -36,7 +36,7 @@ export function getSidingBreakdown(sidingId) {
             // Data formatting
             return data.map((obj) => ({
                 binID: obj.binID,
-                status: fullConverter(obj.status),
+                status: obj.status !== null ? obj.status : "NOT LISTED",
                 time: obj.transactionTime
             }))
         })

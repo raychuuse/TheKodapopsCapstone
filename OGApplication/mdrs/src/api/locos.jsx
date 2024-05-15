@@ -21,13 +21,13 @@ export function getLoco(id) {
 }
 
 export function getCurrentLoad(id) {
-    return fetch(`${apiUrl}/${id}/load`)
+    return fetch(`${apiUrl}/${id}/current-load`)
         .then((body) => body.json())
         .then((data) =>{
             // Data formatting
             return data.map((obj) => ({
                 binID: obj.binID,
-                status: fullConverter(obj.status),
+                status: obj.status !== null ? obj.status : "NOT LISTED",
             }))
         })
 }

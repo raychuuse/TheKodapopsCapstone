@@ -60,7 +60,7 @@ router.get("/", (req, res) => {
               return data;
             })
             .then((data) => {
-              // console.log(data);
+              console.log(data);
               res.json({ Error: false, Message: "Success", data: data });
             })
             //Error Handling

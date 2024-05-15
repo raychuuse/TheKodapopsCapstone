@@ -41,14 +41,54 @@ router.get("/:locoId/siding_breakdown", (req, res) => {
 
 router.get('/:locoId/load', (req, res) => {
   const id = req.params.locoId;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
+  const withoutStopId = `SELECT b.*, l.locoID, l.locoName
+      FROM locomotive l
+      LEFT JOIN bin b ON b.locoID = l.locoID
+      WHERE l.locoID = ?
+      ORDER BY b.full, b.pickedUpInRun`;
 
-  req.db.raw(`
-      SELECT b.binID, b.status, l.locoID, l.locoName
+  req.db.raw(withoutStopId, [id])
+      .then(processQueryResult)
+      .then(data => {
+        const loco = {
+            locoID: data[0].locoID,
+            locoName: data[0].locoName,
+            bins: []
+        };
+        for (const bin of data) {
+            // No bin on this loco
+            if (bin.binID == null)
+                continue;
+            loco.bins.push({
+                binID: bin.binID,
+                code: bin.code,
+                status: bin.status,
+                full: !!bin.full,
+                burnt: !!bin.burnt,
+                pickedUpInRun: !!bin.pickedUpInRun,
+                droppedOffInRun: !!bin.droppedOffInRun
+            });
+        }
+        res.status(200).json(loco);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json(err);
+      })
+});
+
+// Same instance of prev route, but want different model of data
+router.get('/:locoId/current-load', (req, res) => {
+  const id = req.params.locoId;
+  if (!isValidId(id, res)) return;
+  const withoutStopId = `SELECT b.*, b.locoID, l.locoName
       FROM bin b
-               LEFT JOIN locomotive l ON b.locoID = l.locoID
+      LEFT JOIN locomotive l ON l.locoID = b.locoID
       WHERE b.locoID = ?
-  `, [id])
+      ORDER BY b.full, b.pickedUpInRun`;
+
+  req.db.raw(withoutStopId, [id])
       .then(processQueryResult)
       .then(data => {
         res.status(200).json(data);
@@ -58,6 +98,7 @@ router.get('/:locoId/load', (req, res) => {
         res.status(500).json(err);
       })
 });
+
 
 router.post('/', (req, res) => {
     req.db.insert({locoName: req.body.name}).into('locomotive')

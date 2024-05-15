@@ -93,7 +93,7 @@ const UserView = () => {
         console.info(data);
         update(data)
             .then(response => {
-                setSuccess('User Sucecssfully Updated');
+                setSuccess('User Successfully Updated');
                 resetSuccessAlert(setSuccess);
             })
             .catch(err => {
@@ -107,7 +107,7 @@ const UserView = () => {
         const data = {firstName: firstName, lastName: lastName, role: role, password: password, selectedHarvester: selectedHarvester, email: email};
         create(data)
             .then(response => {
-                setSuccess('User Sucecssfully Created');
+                setSuccess('User Successfully Created');
                 resetSuccessAlert(setSuccess);
                 // For some reason, this doesn't navigate to the new url, just seems to change the URL, so need to
                 // do the following state changes.
@@ -130,6 +130,13 @@ const UserView = () => {
         }
     };
 
+    // from stack overflow
+    const validateEmail = (email) => {
+        return email.match(
+          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        );
+    }
+
     const validateFormData = () => {
         // Need to use a temp object because setFormErrors doesn't set formErrors immediately.
         const t = {}
@@ -138,7 +145,7 @@ const UserView = () => {
         t.role = role == null || role.trim() === '' || role.trim() === 'Choose Role...';
         t.password = type === 'CREATE' && password.trim() === '';
         t.selectedHarvester = role === 'Harvester' && (selectedHarvester == null || selectedHarvester === '');
-        t.email = email.trim() === '';
+        t.email = email.trim() === '' && !validateEmail(email);
         // Return true if all formErrors keys are false or formErrors has no keys.
         let ret = true;
         for (const formErrorsKey in t)
@@ -207,7 +214,7 @@ const UserView = () => {
                                 <option value={""} disabled>Choose Role...</option>
                                 <option value="Mill">Mill</option>
                                 <option value="Harvester">Harvester</option>
-                                <option value="Locomotive">Locomotive</option>
+                                <option value="Locomotive">Locomotive Driver</option>
                             </Input>
                             {formErrors.role && <span className="text-danger">Please select a role from the list</span>}
                         </FormGroup>

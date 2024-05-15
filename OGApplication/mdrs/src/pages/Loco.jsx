@@ -207,7 +207,7 @@ const LocoSidingBreakdown = ({id}) => {
             <div className="hero__content">
                 <div className="table-wrapper">
                     <div className="table-header-wrapper">
-                        <h4 className="table-header">Current Load</h4>
+                        <h4 className="table-header">Siding Breakdown</h4>
                     </div>
                     <div className="row">
                         {data ? <Table columns={columns} data={data}/> : null}

@@ -87,7 +87,7 @@ export function getSidingBreakdown(id) {
             // Data formatting
             return data.map((transaction) => ({
                 type: transaction.type,
-                sidingName: transaction.sidingName,
+                sidingName: transaction.sidingName == null ? "No Siding Listed" : transaction.sidingName,
             }))
         })
 }
@@ -132,7 +132,18 @@ export function getMaintenanceBreakdown() {
             // Data formatting
             return data.map((obj) => ({
                 id: obj.binID,
-                issue: obj.flag,
+                sidingName: obj.sidingName,
+                issue: getFlag(obj.missing, obj.repair),
             }))
         })
+}
+
+const getFlag = (missing, repair) => {
+    if (missing) {
+        return "Missing";
+    }
+    if (repair)
+    {
+        return "Needs Repairs";
+    }
 }

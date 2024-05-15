@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useAuth} from "../AuthProvider";
+import Cookies from 'js-cookie';
 
 
 const Header = () => {
@@ -90,7 +91,7 @@ const Header = () => {
               aria-expanded={isDropdownOpen}
               onClick={toggleDropdown}
             >
-              User: {auth.user.firstName}
+              User: {Cookies.get('firstName')}
             </button>
             <ul className={`dropdown-menu  ${isDropdownOpen ? 'show' : ''}`} aria-labelledby="navbarDropdown">
               <li>

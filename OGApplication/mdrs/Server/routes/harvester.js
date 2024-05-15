@@ -33,7 +33,6 @@ router.get("/:harvesterId/siding_breakdown", (req, res) => {
   `, [id])
       .then(processQueryResult)
       .then(data => {
-        console.log(data);
         res.status(200).json(data);
       })
       .catch(err => {
