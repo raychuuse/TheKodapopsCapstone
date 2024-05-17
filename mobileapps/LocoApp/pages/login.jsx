@@ -173,10 +173,12 @@ const LogInPage = () => {
         try {
           const data = await res.json();
           const parsedData = JSON.parse(data);
+          // Awaiting async vs cookies! needed for in loco func with zac merge
+          /*
           await AsyncStorage.setItem('isSignedIn', 'true');
           await AsyncStorage.setItem('userID', toString(parsedData.user.userID));
           await AsyncStorage.setItem('email', email);
-          await AsyncStorage.setItem('token', parsedData.token);
+          await AsyncStorage.setItem('token', parsedData.token);*/
           signIn();
         }
         catch (err) {
