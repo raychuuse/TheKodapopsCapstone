@@ -73,14 +73,28 @@ const burntOptions = [
 const SetupPage = () => {
   const loginRef = '/';
   const dashboardRef = '/dashboard';
-  const { signOut, lastJsonMessage, mockMode, setMockMode } = useAuth();
+  const {serverURL, signOut, lastJsonMessage, mockMode, setMockMode, getToken} = useAuth();
   const [farmOptions, setFarmOptions] = useState(initialFarmOptions);
   const [sidingOptions, setSidingOptions] = useState(initialSidingOptions);
   const [blockOptions, setBlockOptions] = useState(initialBlockOptions);
   const [subBlockOptions, setSubOptions] = useState(initialSubBlockOptions);
-  const [padOptions, setPadOptions] = useState(initialPadOptions);
+  //const [padOptions, setPadOptions] = useState(initialPadOptions);
+  const [lastCheck, setLastCheck] = useState(new Date().getTime())
+  
+  const [farmPickDisabler, setFarmPickDisabler] = useState(false);
+  const [blockPickDisabler, setBlockPickDisabler] = useState(false);
+
   const { setBurn } = useBins();
-  const { getSiding, getFarm } = useSelections();
+  const { getSiding, getFarm, getBurnt, getFarmID, getBlockID } = useSelections();
+  
+  const sidingSelected = () => {
+    siding = getSiding();
+    if (siding == '' || siding == null) {
+      return false;
+    }
+    return true;
+  }
+
 
   const handleLogout = () => {
     if (mockMode) {
@@ -97,15 +111,18 @@ const SetupPage = () => {
 
   const handleStart = () => {
     siding = getSiding();
-    if (siding == '' || siding == null) {
+    if (!sidingSelected) {
       issueAlert('It is required that a siding option is selected.');
       return;
     }
-    /*
+    
+    // Updates default for bins as burnt or unburnt
+    // Make sure matches consign functionality
+    // current consign update whole data inc this
     const burnOption = getBurnt();
-    if (burnOption != "neutral") {
+    if (burnOption != "Neutral" && burnOption !== null) {
         setBurn(burnOption == "Yes");
-    }*/
+    }
     if (mockMode) {
       router.navigate(dashboardRef);
       return;
@@ -126,15 +143,259 @@ const SetupPage = () => {
         if (!lastJsonMessage.notification) {
           // Handle other events
         } else {
-          if (lastJsonMessage.query == 'Siding') {
-            // data is a stringified json, use as needed
-            setSidingOptions(lastJsonMessage.data);
-          }
-          // repeat for each, note sub-logic in dependencies
+          // handle notifications
         }
       }
     }
   }, [lastJsonMessage]);
+
+  const getSidings = async () => {
+    if (mockMode) {
+      return;
+    }
+    try {
+      getToken() 
+      .then(token => {
+        if (!token) {
+          handleLogout();
+        }
+        const options = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + token,
+          }
+        };
+        // ID passed as dummy, has no impact as sidings aren't harvester restricted at current.
+        fetch(`${serverURL}/user/1/sidings`, options)
+        .then(res => {
+          if (res.ok) {
+            res.json()
+            .then(data => {
+              setSidingOptions(data.map((obj) => ({
+                  label: obj.sidingName,
+                  value: obj.sidingID,
+              })))
+            })
+          }
+          else {
+            issueAlert("Couldn't load siding data.");
+            //setLoading(false);
+          }
+        })
+        .catch((err) => {
+          issueAlert("Server issues occured.");
+          console.log(err.message);
+        });
+      })
+      .catch((err) => {
+        issueAlert("Server issues occured.");
+        console.log(err.message);
+      });
+    }
+    catch (err) {
+        issueAlert(err.message);
+        console.log(err.message);
+    }
+  }
+
+  const getFarms = async () => {
+    if (mockMode) {
+      return;
+    }
+    try {
+      getToken() 
+      .then(token => {
+        if (!token) {
+          handleLogout();
+        }
+        const options = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + token,
+          }
+        };
+        
+        // Again, ID isn't relevant in current use case
+        fetch(`${serverURL}/user/1/farms`, options)
+        .then(res => {
+          if (res.ok) {
+            res.json()
+            .then(data => {
+              setFarmOptions(data.map((obj) => ({
+                  label: obj.farmName,
+                  value: obj.farmID,
+              })))
+            })
+          }
+          else {
+            issueAlert("Couldn't load farm data.");
+            //setLoading(false);
+          }
+        })
+        .catch((err) => {
+          issueAlert("Server issues occured.");
+          console.log(err.message);
+        });
+      })
+      .catch((err) => {
+        issueAlert("Server issues occured.");
+        console.log(err.message);
+      });
+    }
+    catch (err) {
+        issueAlert(err.message);
+        console.log(err.message);
+    }
+  }
+  
+
+  const getBlocks = async (farmID) => {
+    if (mockMode) {
+      return;
+    }
+    try {
+      getToken() 
+      .then(token => {
+        if (!token) {
+          handleLogout();
+        }
+        const options = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + token,
+          }
+        };
+        
+        fetch(`${serverURL}/user/farms/${farmID}/blocks`, options)
+        .then(res => {
+          if (res.ok) {
+            res.json()
+            .then(data => {
+              setBlockOptions(data.map((obj) => ({
+                  label: obj.blockID,
+                  value: obj.blockID,
+              })))
+            })
+          }
+          else {
+            issueAlert("Couldn't load block data.");
+            //setLoading(false);
+          }
+        })
+        .catch((err) => {
+          issueAlert("Server issues occured.");
+          console.log(err.message);
+        });
+      })
+      .catch((err) => {
+        issueAlert("Server issues occured.");
+        console.log(err.message);
+      });
+    }
+    catch (err) {
+        issueAlert(err.message);
+        console.log(err.message);
+    }
+  }
+
+  const getSubBlocks = async (farmID, blockID) => {
+    if (mockMode) {
+      return;
+    }
+    try {
+      getToken() 
+      .then(token => {
+        if (!token) {
+          handleLogout();
+        }
+        const options = {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + token,
+          }
+        };
+        
+        fetch(`${serverURL}/user/blocks/${farmID}/${blockID}/subs`, options)
+        .then(res => {
+          if (res.ok) {
+            res.json()
+            .then(data => {
+              setSubOptions(data.map((obj) => ({
+                  label: obj.subBlockID,
+                  value: obj.subBlockID,
+              })))
+            })
+          }
+          else {
+            issueAlert("Couldn't load sub-block data.");
+            //setLoading(false);
+          }
+        })
+        .catch((err) => {
+          issueAlert("Server issues occured.");
+          console.log(err.message);
+        });
+      })
+      .catch((err) => {
+        issueAlert("Server issues occured.");
+        console.log(err.message);
+      });
+    }
+    catch (err) {
+        issueAlert(err.message);
+        console.log(err.message);
+    }
+  }
+
+  useEffect(() => {
+    if (mockMode) {
+      return;
+    }
+    getSidings();
+    getFarms();
+    const farmID = getFarmID();
+    const blockID = getBlockID();
+
+    // Simple check whether selections have been made and modifying activated elements
+
+    // Need to change dummy data
+    if (farmID == "" || farmID=== null) {
+      setFarmPickDisabler(true);
+      setBlockPickDisabler(true);
+    }
+    else if (blockID == "" || blockID === null) { 
+      setFarmPickDisabler(false);
+      setBlockPickDisabler(true);
+    }
+    else {
+      setFarmPickDisabler(false);
+      setBlockPickDisabler(false);
+    } 
+
+    const tempDate = new Date().getTime();
+
+    // Only update data per 15 seconds
+    if ((tempDate - lastCheck) / 1000 > 15) {
+      setLastCheck(tempDate);
+      
+
+      if (!farmPickDisabler) {
+        getBlocks(farmID);
+        if (!blockPickDisabler) {
+          getSubBlocks(farmID, blockID);
+        }
+      }
+    }
+    
+  },[farmOptions, blockOptions])
 
   return (
     <View style={styles.body}>
@@ -162,11 +423,13 @@ const SetupPage = () => {
           type='select'
           label='Block'
           options={blockOptions}
+          isDisabled= {farmPickDisabler}
         />
         <SettingsItem
           type='select'
           label='Sub'
           options={subBlockOptions}
+          isDisabled= {blockPickDisabler}
         />
         {/* <SettingsItem type="select" label="Pad" options={padOptions} /> */}
         <SettingsItem

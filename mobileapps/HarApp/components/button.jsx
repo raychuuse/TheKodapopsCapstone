@@ -18,6 +18,7 @@ const Button = ({
   border = false,
   borderWidth = 2,
   innerRef,
+  isDisabled = false
 }, ref) => {
   // Determine if the icon should be rendered and if title is provided
   const shouldRenderIcon = iconName !== "";
@@ -31,6 +32,7 @@ const Button = ({
 
   return (
     <TouchableOpacity 
+      disabled = {isDisabled}
       ref = {ref}
       onPress={() => {
         onPress();

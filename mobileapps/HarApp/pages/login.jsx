@@ -29,12 +29,20 @@ const LogInPage = () => {
   const [loading, setLoading] = useState(false);
   const setupPageRef = "dashboard/setup";
 
+  const emailChecker = (mail) => {
+      return mail.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+  }
+
   const {serverURL, signIn, mockMode} = useAuth();
 
   const handleResetCode = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
     if (!codeEmail) {
       generalAlert("Please provide email.");
+      return;
+    }
+    if (!emailChecker(codeEmail)) {
+      generalAlert("Please provide a valid email.");
       return;
     }
     if (mockMode) {
@@ -52,18 +60,18 @@ const LogInPage = () => {
           email: codeEmail
         }),
       };
-      const res = await fetch(`${serverURL}/har/reset-code`, options)
+      const res = await fetch(`${serverURL}/user/har/reset-code`, options)
       if (res.ok) {
         generalAlert("Code has been sent successfully.");
       }
       else {
-        issueAlert(res.message);
+        issueAlert(res.status);
         //setLoading(false);
       }
     }
     catch (err) {
-        errorAlert(err)
-        console.log(err.message)
+        issueAlert(err.message);
+        console.log(err.message);
     }
   }
 
@@ -77,7 +85,15 @@ const LogInPage = () => {
       generalAlert("Passwords do not match.");
       return;
     }
+    if (!emailChecker(resetEmail)) {
+      generalAlert("Please provide a valid email.");
+      return;
+    }
     // Add further logic if desired for mock
+    /*
+    if (!resetPass.match(`^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8,}$`)){
+      generalAlert("Please provide a stronger password (minimum 8 characters, 1 special character, 2 numerals, 3 lower case, 2 upper case).");
+    }*/
     if (mockMode) {
       generalAlert("Password has been reset successfully");
       return;
@@ -90,23 +106,33 @@ const LogInPage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email,
-          password: password,
+          email: resetEmail,
+          password: resetPass,
           code: resetCode
         }),
       };
-      const res = await fetch(`${serverURL}/har/reset-password`, options)
-      if (res.ok) {
-        generalAlert("Password has been reset successfully.");
-      }
-      else {
-        issueAlert(res.message);
-        //setLoading(false);
-      }
+      fetch(`${serverURL}/user/har/reset-password`, options)
+      .then(res => {
+        if (res.ok) {
+          generalAlert("Password has been reset successfully.");
+        }
+        else {
+          res.json()
+          .then(issue => {
+            issueAlert(issue.message);
+          })
+          //setLoading(false);
+        }
+      })
+      .catch((err) => {
+        issueAlert("Server issues occured.");
+        console.log(err.message);
+      });
     }
     catch (err) {
-        errorAlert(err)
-        console.log(err.message)
+        // or err.message
+        issueAlert("Server issues occured.");
+        console.log(err.message);
     }
   }
   
@@ -121,13 +147,10 @@ const LogInPage = () => {
       generalAlert("Passwords do not match.");
       return;
     }
-    /*
-    console.log(email);
-    console.log(password);
-    */
     if (mockMode) {
       router.navigate(setupPageRef)
     }
+
     try {
       const options = {
         method: "POST",
@@ -161,12 +184,15 @@ const LogInPage = () => {
         router.navigate(setupPageRef);
       }
       else {
-        issueAlert(res.status);
+        res.json()
+          .then(issue => {
+            issueAlert(issue.message);
+          })
         //setLoading(false);
       }
     }
     catch (err) {
-        //errorAlert(err.message);
+        issueAlert("Failed to login.");
         console.log(err.message);
     }
   }

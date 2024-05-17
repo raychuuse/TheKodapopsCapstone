@@ -9,11 +9,12 @@ router.use(bodyParser.json());
 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const hashKey = 8;
 
 const secretKey = "secret key"
 const mailer = "sugarcaneconsignment@gmail.com"
 const mailPassword = "hhuh jtmg qhkg alqn"
-const harvesterRole = "Harvester Operator"
+const harvesterRole = "Harvester"
 
 const nodemailer = require("nodemailer");
 let transporter = nodemailer.createTransport({
@@ -34,6 +35,8 @@ function GenerateUniqueID() {
 const {validateUserBody} = require("../middleware/validateUser")
 const {processQueryResult, validationErrorToError, checkIfExpired} = require("../utils");
 const {isNumeric} = require("validator");
+const e = require("express");
+const { verifyAuthorization } = require("../middleware/authorization");
 
 const loginValidationRulesID = [
     body('id').isInt({min: 1}).withMessage("Please provide valid user id"),
@@ -120,7 +123,6 @@ router.post("/har/login", (req, res) => {
 
     const email = req.body.email;
     const password = req.body.password;
-
     req.db.raw(`SELECT u.*, h.harvesterName
                 FROM users u
                 LEFT JOIN harvester h ON h.harvesterID = u.harvesterID
@@ -217,7 +219,7 @@ router.post('/', createValidationRules, (req, res) => {
         return res.status(400).json({message: 'Please select the harvesting company this user works for'});
     }
 
-    bcrypt.hash(password, 8, (err, hashPassword) => {
+    bcrypt.hash(password, hashKey, (err, hashPassword) => {
         if (err) {
             console.error(err);
             return res.status(500).json({message: 'An unknown error occurred, please try again.'});
@@ -278,8 +280,7 @@ router.post("/har/reset-password", (req, res) => {
     const email = req.body.email
     const code  = req.body.code
     const password = req.body.password
-    const queryUsers = req.db.from("userTokens").select("*").where("email", "=", email).where("userRole", "=", harvesterRole);
-
+    const queryUsers = req.db.from("usertokens").select("*").where("email", "=", email).where("userRole", "=", harvesterRole);
     //checking db for matching users with emails
     queryUsers
         .then((users) => {
@@ -289,38 +290,51 @@ router.post("/har/reset-password", (req, res) => {
                 console.log("No email token has been sent");
                 return;
             }
-            
-            if (users.code == code) {
-                try {
-                    req.db.raw(`UPDATE users
-                                SET password = ${password}
-                                WHERE email = ${email} AND userRole = ${harvesterRole}`)
-                    .then(result => {
-                        if (result != 1) {
-                            console.error("Error exists within database tokens")
-                        }
-                        if (result == 0) {
-                            res.status(500).json({Error: true, Message: "Unknown error occured."});
-                        }
-                        res.status(200).json({message: "Password updated successfully"});
+            const trueToken = users[0]['resetToken'];
 
-                        // Delete token from saved database
-                        try {
-                            req.db.raw(`DELETE FROM userTokens WHERE email = ${email} AND userRole = ${harvesterRole}`);
-                        }
-                        catch (err) {
+            if (trueToken == code) {
+                try {
+                    bcrypt.hash(password, hashKey, (err, hashPassword) => {
+                        if (err) {
                             console.error(err);
+                            return res.status(500).json({message: 'An unknown error occurred, please try again.'});
                         }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        res.status(500).json({message: "Failed to update password."});
+                        req.db.raw(`UPDATE users
+                                SET password = '${hashPassword}'
+                                WHERE email = '${email}' AND userRole = '${harvesterRole}'`)
+                        .then(result => {
+
+                            if (result == 0) {
+                                res.status(500).json({Error: true, Message: "Unknown error occured."});
+                            }
+
+                            if (result != 1) {
+                                console.error("Error exists within database tokens")
+                            }
+
+                            res.status(200).json({message: "Password updated successfully"});
+
+                            // Delete token from saved database
+                            try {
+                                req.db.raw(`DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${harvesterRole}'`);
+                            }
+                            catch (err) {
+                                console.error(err);
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            res.status(500).json({message: "Failed to update password."});
+                        });
                     });
                 }
                 catch (err) {
                     console.error(err);
                     res.status(500).json({message: "Failed to update password."});
                 }
+            }
+            else {
+                res.status(510).json({message: "Invalid Token"});
             }
         })
         .catch((err) => {
@@ -333,7 +347,6 @@ router.post("/har/reset-code", async (req, res) => {
 
     const email = req.body.email
     const queryUsers = req.db.from("users").select("*").where("email", "=", email).where("userRole", "=", harvesterRole);
-
     //checking db for matching users with emails
     queryUsers
         .then((users) => {
@@ -343,20 +356,24 @@ router.post("/har/reset-code", async (req, res) => {
                 return;
             }
             code = GenerateUniqueID();
-            req.db.raw(`INSERT INTO userTokens 
-                        VALUES (${email}, ${harvesterRole}, ${code})`)
+
+            // In future, check if a token exists... timeout requests... do this by adding
+            // an expiry to db tokens or specific Traffic Office setup.
+            req.db.raw(`INSERT INTO usertokens 
+                        VALUES ('${email}', '${harvesterRole}', '${code}')
+                        ON DUPLICATE KEY UPDATE resetToken = '${code}'`)
             .then(result => {
                 if (result == 0) {
                     res.status(500).json({Error: true, Message: "Unknown error occured."});
                 }
+                sendCode(email, code);
+                res.status(200).json({Message: "A link to reset password to the user's email has been sent."})
             })
             .catch(err => {
                 console.error(err);
                 res.status(500).json({message: "Failed to register token on server."});
                 return;
             });
-            sendCode(email, code);
-            res.status(200).json({Message: "A link to reset password to the user's email has been sent."})
         })
         .catch((err) => {
             console.log(err);
@@ -420,17 +437,18 @@ router.put('/', updateValidationRules, (req, res) => {
 });
 
 
-router.get("/:id/sidings", (req, res) => {
-    if (!req[0].token) {
+router.get("/:id/sidings", verifyAuthorization, (req, res) => {
+    // Old auth code
+    /*if (!req[0].token) {
         res.status(200)
             .json({success: false, message: "Token was not provided."});
-    }
+    }*/
+    /*
     const decode = checkJWT(req[0].token);
     if (checkIfExpired(decode.exp)) {
         res.status(400)
             .json({success: false, message: "Error! Login Invalid, token expired."});
-    }
-    // Haven't introduced restriction based on user in db
+    }*/
     req.db.raw(`SELECT *
                 FROM siding`)
         .then(processQueryResult)
@@ -442,18 +460,19 @@ router.get("/:id/sidings", (req, res) => {
           res.status(500).json(err);
         });
 });
-
-router.get("/:id/farms", (req, res) => {
-    if (!req[0].token) {
-        res.status(200)
-            .json({success: false, message: "Token was not provided."});
-    }
-    const decode = checkJWT(req[0].token);
-    if (checkIfExpired(decode.exp)) {
-        res.status(400)
-            .json({success: false, message: "Error! Login Invalid, token expired."});
-    }
-
+router.get("/:id/farms", verifyAuthorization, (req, res) => {
+    req.db.raw(`SELECT *
+                FROM farms`)
+    .then(processQueryResult)
+    .then((farms) => {
+        res.status(200).json(farms);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).json(err);
+    });
+    // Example instructions do not differentiate based on siding/ userID
+    /*
     if (!req.params.id) {
         req.db.raw(`SELECT *
                 FROM farms`)
@@ -478,36 +497,18 @@ router.get("/:id/farms", (req, res) => {
           console.error(err);
           res.status(500).json(err);
         });
-    }
+    }*/
 });
 
-router.get("/farms/:id/blocks", (req, res) => {
-    if (!req[0].token) {
-        res.status(200)
-            .json({success: false, message: "Token was not provided."});
-    }
-    const decode = checkJWT(req[0].token);
-    if (checkIfExpired(decode.exp)) {
-        res.status(400)
-            .json({success: false, message: "Error! Login Invalid, token expired."});
-    }
-
-    if (!req.params.id) {
-        req.db.raw(`SELECT *
-                FROM blocks`)
-        .then(processQueryResult)
-        .then((blocks) => {
-          res.status(200).json(blocks);
-        })
-        .catch((err) => {
-          console.error(err);
-          res.status(500).json(err);
-        });
+router.get("/farms/:id/blocks", verifyAuthorization, (req, res) => {
+    const farmID = req.params.id;
+    if (!farmID) {
+        res.status(430).json({Message: "farmID required."})
     }
     else {
         req.db.raw(`SELECT *
         FROM blocks
-        WHERE farmID = ?`, [id])
+        WHERE farmID = ?`, [farmID])
         .then(processQueryResult)
         .then((blocks) => {
           res.status(200).json(blocks);
@@ -519,33 +520,17 @@ router.get("/farms/:id/blocks", (req, res) => {
     }
 });
 
-router.get("/blocks/:id/subs", (req, res) => {
-    if (!req[0].token) {
-        res.status(200)
-            .json({success: false, message: "Token was not provided."});
-    }
-    const decode = checkJWT(req[0].token);
-    if (checkIfExpired(decode.exp)) {
-        res.status(400)
-            .json({success: false, message: "Error! Login Invalid, token expired."});
-    }
-
-    if (!req.params.id) {
-        req.db.raw(`SELECT *
-                FROM subs`)
-        .then(processQueryResult)
-        .then((subs) => {
-          res.status(200).json(subs);
-        })
-        .catch((err) => {
-          console.error(err);
-          res.status(500).json(err);
-        });
+router.get("/blocks/:farmID/:blockID/subs", (req, res) => {
+    const farmID = req.params.farmID;
+    const blockID = req.params.blockID;
+    
+    if (!farmID || !blockID) {
+        res.status(430).json({Message: "farmID and blockID required."})
     }
     else {
         req.db.raw(`SELECT *
         FROM subs
-        WHERE blockID = ?`, [id])
+        WHERE blockID = '${blockID}' AND farmID = '${farmID}'`)
         .then(processQueryResult)
         .then((subs) => {
           res.status(200).json(subs);
@@ -557,33 +542,15 @@ router.get("/blocks/:id/subs", (req, res) => {
     }
 });
 
-router.get("/subs/:id/pads", (req, res) => {
-    if (!req[0].token) {
-        res.status(200)
-            .json({success: false, message: "Token was not provided."});
-    }
-    const decode = checkJWT(req[0].token);
-    if (checkIfExpired(decode.exp)) {
-        res.status(400)
-            .json({success: false, message: "Error! Login Invalid, token expired."});
-    }
-    
-    if (!req.params.id) {
-        req.db.raw(`SELECT *
-                FROM pads
-                WHERE subBlockID = ?`, [id])
-        .then(processQueryResult)
-        .then((subs) => {
-          res.status(200).json(subs);
-        })
-        .catch((err) => {
-          console.error(err);
-          res.status(500).json(err);
-        });
+router.get("/farms/:id/pads", (req, res) => {
+    const farmID = req.params.id;
+    if (!farmID) {
+        res.status(430).json({Message: "farmID required."})
     }
     else {
         req.db.raw(`SELECT *
-                FROM pads`)
+                FROM pads
+                WHERE farmID = '${farmID}'`)
         .then(processQueryResult)
         .then((subs) => {
           res.status(200).json(subs);

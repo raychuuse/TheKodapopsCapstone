@@ -19,7 +19,11 @@ export const SelectionContext = createContext({
     updateSub: () => {},
     updatePad: () => {},
     updateBurnt: () => {},
-    resetSelectData: () => {}
+    resetSelectData: () => {},
+    getFarmID: () => {},
+    setFarmID: () => {},
+    getBlockID: () => {},
+    setBlockID: () => {},
 });
 
 // Need a way to transport data from child components to parents can use asyncStorage (esp for peristence), 
@@ -27,7 +31,8 @@ export const SelectionContext = createContext({
 export const SelectionProvider = ({ children }) => {
     // Refactored to one set of data
     const [selectionData, _setSelectionData] = useState(initialValues);
-
+    const [farmID, _setFarmID] = useState("");
+    const [blockID, _setBlockID] = useState("");
     const setSelectionData = (newData) => {
         _setSelectionData(newData);
     }
@@ -35,6 +40,23 @@ export const SelectionProvider = ({ children }) => {
     const updateSelection = (update) => {
         setSelectionData({ ...selectionData, ...update });
     }
+
+    const getFarmID = () => {
+        return farmID;
+    }
+
+    const setFarmID = (ID) => {
+        _setFarmID(ID);
+    }
+
+    const getBlockID = () => {
+        return blockID;
+    }
+
+    const setBlockID = (ID) => {
+        _setBlockID(ID);
+    }
+
     const getSiding = () => {
         return selectionData.Siding;
     }
@@ -117,6 +139,10 @@ export const SelectionProvider = ({ children }) => {
         updateSub,
         updatePad,
         updateBurnt,
+        getFarmID,
+        setFarmID,
+        getBlockID,
+        setBlockID,
         resetSelectData}}>
       {children}
     </SelectionContext.Provider>

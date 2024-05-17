@@ -16,12 +16,13 @@ const SettingsItem = ({
   startOption = 0,
   label = "label",
   options = [{ label: 'Label', value: 0 }],
-  style
+  style,
+  isDisabled = false
 }) => {
   const [selectedOption, setSelectedOption] = useState(startOption);
   const [pickerVisable, setPickerVisable] = useState(false);
   const {updateSiding, updateFarm, updateBlock, updateSub, updatePad, updateBurnt,
-  getSiding, getFarm, getBlock, getSub, getPad, getBurnt} = useSelections();
+  getSiding, getFarm, getBlock, getSub, getPad, getBurnt, setFarmID, setBlockID} = useSelections();
 
 
   const changeData = (values) => {
@@ -31,8 +32,10 @@ const SettingsItem = ({
         updateSiding(newVal);
       case "Farm":
         updateFarm(newVal);
+        setFarmID(selectedOption);
       case "Block":
         updateBlock(newVal);
+        setBlockID(selectedOption);
       case "Sub":
         updateSub(newVal);
       case "Pad":
@@ -41,8 +44,8 @@ const SettingsItem = ({
         updateBurnt(newVal);
       }
     }
-
-    const getCur = (label) => {
+    /** Switch case based on selection
+    const getCurrent = (label) => {
       switch (label) {
         case "Siding":
           return getSiding();
@@ -58,7 +61,7 @@ const SettingsItem = ({
           return getBurnt();
         }
       }
-
+      **/
   const getCurItem = (values) => {
     return (values.find((item) => item.value == selectedOption)?.label);
   }
@@ -124,6 +127,7 @@ const SettingsItem = ({
           onPress={() => {
             setPickerVisable(!pickerVisable);
           }}
+          isDisabled = {isDisabled}
         />
       </View>
     </>

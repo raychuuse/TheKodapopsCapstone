@@ -10,7 +10,7 @@ export const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   // Set this for testing
-  const [mockMode, setMockMode] = useState(true);
+  const [mockMode, setMockMode] = useState(false);
 
   const [isSignedIn, setIsSignedIn] = useState('false');
   const [isOnline, setIsOnline] = useState(false);
@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [val, setVal] = useState(null);
   const [jToken, setToken] =  useState('');
   
-  const serverURL = "http://localhost:8080";
+  const serverURL = "http://10.0.0.195:8080";
   const wsURL = "ws://10.0.195:8080"
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
     wsURL,
@@ -108,7 +108,8 @@ export const AuthProvider = ({ children }) => {
     sendJsonMessage,
     lastJsonMessage,
     readyState,
-    setMockMode
+    setMockMode,
+    getToken
   };
 
   return (
