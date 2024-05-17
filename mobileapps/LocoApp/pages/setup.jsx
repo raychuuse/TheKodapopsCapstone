@@ -55,7 +55,6 @@ const SetupPage = () => {
               textColor={theme.textLevel2}
               backgroundColor='transparent'
               border
-              ref = {ref}
             />
           </Link>
           <Link
@@ -65,7 +64,6 @@ const SetupPage = () => {
             <Button
               title='Start'
               style={StyleSheet.create({ flex: 1 })}
-              ref = {ref}
             />
           </Link>
         </View>

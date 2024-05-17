@@ -11,10 +11,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const hashKey = 8;
 
-const secretKey = "secret key"
-const mailer = "sugarcaneconsignment@gmail.com"
-const mailPassword = "hhuh jtmg qhkg alqn"
-const harvesterRole = "Harvester"
+const secretKey = "secret key";
+const mailer = "sugarcaneconsignment@gmail.com";
+const mailPassword = "hhuh jtmg qhkg alqn";
+const harvesterRole = "Harvester";
+const locoRole = "Locomotive";
 
 const nodemailer = require("nodemailer");
 let transporter = nodemailer.createTransport({
@@ -51,7 +52,7 @@ const loginValidationRulesEmail = [
 ];
 
 function checkJWT(jwt) {
-    return jwt.verify(token, "secretkeyappearshere");
+    return jwt.verify(token, secretKey);
   }
 
 const sendCode = async (userEmail, resetCode) => {
@@ -59,7 +60,7 @@ const sendCode = async (userEmail, resetCode) => {
         let info = await transporter.sendMail({
             from: mailer,
             to: userEmail,
-            subject: "Hello! Reset Code for your Harvester Consigment App Attached",
+            subject: "Reset Code - Harvester Consignment App",
             text: `Your reset code is: ${resetCode}`,
             html: `<p>Your reset code is: ${resetCode}</p>`
         })
@@ -159,6 +160,53 @@ router.post("/har/login", (req, res) => {
             return res.status(520).json({message: err.message});
         });
 });
+
+router.post("/loco/login", (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({errors: errors.array()});
+    }
+
+    const email = req.body.email;
+    const password = req.body.password;
+    req.db.raw(`SELECT u.*, l.locoName
+                FROM users u
+                LEFT JOIN loco l ON l.locoID = u.locoID
+                WHERE email = "${email}" AND userRole = "${locoRole}"`)
+        .then(processQueryResult)
+        .then((response) => {
+            if (response.length === 0) {
+                return res.status(404).json({message: "User doesn't exist"});
+            }
+            bcrypt.compare(password, response[0].password, (err, result) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+                }
+                if (!result) {
+                    return res.status(401).json({message: "No matching user ID and password"});
+                }
+                
+                const user = response[0];
+
+                // Remove inappropriate info from user object so that it is not sent to client.
+                delete user.password;
+                delete user.userRole
+                delete user.Permission
+                
+                // Getting a day's worth of seconds once multiplied from milliseconds
+                const expires_in = 60 * 60 * 24
+                const exp = Date.now() + expires_in * 1000
+                const token = jwt.sign({email, exp}, secretKey,);
+                return res.status(200).json(JSON.stringify({token: token, user: user}));
+            });
+        })
+        .catch((err) => {
+            console.error(err);
+            return res.status(520).json({message: err.message});
+        });
+});
+
 
 router.get('/:id', (req, res) => {
     if (!req.params.id || !isNumeric(req.params.id))
@@ -361,6 +409,112 @@ router.post("/har/reset-code", async (req, res) => {
             // an expiry to db tokens or specific Traffic Office setup.
             req.db.raw(`INSERT INTO usertokens 
                         VALUES ('${email}', '${harvesterRole}', '${code}')
+                        ON DUPLICATE KEY UPDATE resetToken = '${code}'`)
+            .then(result => {
+                if (result == 0) {
+                    res.status(500).json({Error: true, Message: "Unknown error occured."});
+                }
+                sendCode(email, code);
+                res.status(200).json({Message: "A link to reset password to the user's email has been sent."})
+            })
+            .catch(err => {
+                console.error(err);
+                res.status(500).json({message: "Failed to register token on server."});
+                return;
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).json({Error: true, Message: err.message});
+        });
+});
+
+router.post("/loco/reset-password", (req, res) => {
+
+    const email = req.body.email
+    const code  = req.body.code
+    const password = req.body.password
+    const queryUsers = req.db.from("usertokens").select("*").where("email", "=", email).where("userRole", "=", locoRole);
+    //checking db for matching users with emails
+    queryUsers
+        .then((users) => {
+            //checking if any matching user emails are found
+            if (users.length == 0) {
+                res.status(400).json({Error: true, Message: "No email token has been sent"});
+                console.log("No email token has been sent");
+                return;
+            }
+            const trueToken = users[0]['resetToken'];
+
+            if (trueToken == code) {
+                try {
+                    bcrypt.hash(password, hashKey, (err, hashPassword) => {
+                        if (err) {
+                            console.error(err);
+                            return res.status(500).json({message: 'An unknown error occurred, please try again.'});
+                        }
+                        req.db.raw(`UPDATE users
+                                SET password = '${hashPassword}'
+                                WHERE email = '${email}' AND userRole = '${locoRole}'`)
+                        .then(result => {
+
+                            if (result == 0) {
+                                res.status(500).json({Error: true, Message: "Unknown error occured."});
+                            }
+
+                            if (result != 1) {
+                                console.error("Error exists within database tokens")
+                            }
+
+                            res.status(200).json({message: "Password updated successfully"});
+
+                            // Delete token from saved database
+                            try {
+                                req.db.raw(`DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${locoRole}'`);
+                            }
+                            catch (err) {
+                                console.error(err);
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            res.status(500).json({message: "Failed to update password."});
+                        });
+                    });
+                }
+                catch (err) {
+                    console.error(err);
+                    res.status(500).json({message: "Failed to update password."});
+                }
+            }
+            else {
+                res.status(510).json({message: "Invalid Token"});
+            }
+        })
+        .catch((err) => {
+            console.log(err);
+            res.json({Error: true, Message: err.message});
+        });
+});
+
+router.post("/loco/reset-code", async (req, res) => {
+
+    const email = req.body.email
+    const queryUsers = req.db.from("users").select("*").where("email", "=", email).where("userRole", "=", locoRole);
+    //checking db for matching users with emails
+    queryUsers
+        .then((users) => {
+            if (users.length == 0) {
+                res.status(400).json({Error: true, Message: "User does not exist."});
+                console.log("No email exists.");
+                return;
+            }
+            code = GenerateUniqueID();
+
+            // In future, check if a token exists... timeout requests... do this by adding
+            // an expiry to db tokens or specific Traffic Office setup.
+            req.db.raw(`INSERT INTO usertokens 
+                        VALUES ('${email}', '${locoRole}', '${code}')
                         ON DUPLICATE KEY UPDATE resetToken = '${code}'`)
             .then(result => {
                 if (result == 0) {

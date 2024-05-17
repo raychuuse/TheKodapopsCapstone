@@ -224,7 +224,7 @@ const LogInPage = () => {
         <View style={{ width: "100%", gap: 16 }}>
           <View style={{ marginBottom: 32, gap: 8 }}>
             <Title1>Reset Your Password</Title1>
-            <Subhead>Enter the email address and set code with your new password for reset.</Subhead>
+            <Subhead>Enter relevant details to reset password.</Subhead>
           </View>
           <TextInput
             style={[styles.input, { backgroundColor: "rgb(230,230,230)" }]}
