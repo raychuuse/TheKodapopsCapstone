@@ -12,6 +12,18 @@ import { Colours } from './colours';
 import SwipeableBinItem from './swipeableBinItem';
 import { useBins } from '../context/binContext';
 
+/**
+ * BinList Component
+ *
+ * This component renders a list of bins with swipeable items and provides functionalities
+ * like selection, locking, and adding new bins.
+ *
+ * @param {Object} props - Component props
+ * @param {Array} props.BinData - Array of bin data to display
+ * @param {function} props.openAddBinModal - Function to open the modal for adding a new bin
+ *
+ * @returns {JSX.Element} The rendered BinList component
+ */
 const BinList = ({ BinData, openAddBinModal }) => {
   // Provider
   const { binData, setBinData, getBinData } = useBins();
@@ -22,74 +34,67 @@ const BinList = ({ BinData, openAddBinModal }) => {
   const [isLocked, setIsLocked] = useState(false);
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
-  // Lock lits handeler for when then lock button is longPressed
+
+  /**
+   * Toggle the lock state of the bin list.
+   */
   const toggleLock = () => {
     setIsLocked(!isLocked);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Provide haptic feedback
   };
 
-  // Function to handle long press range selection on bins.
+  /**
+   * Handle long press range selection on bins.
+   *
+   * @param {string} binNumber - The bin number being selected
+   * @param {number} index - The index of the bin in the list
+   */
   const LongPressRangeSelect = (binNumber, index) => {
-    // Clone the current selection to avoid direct state mutation.
-    let newSelection = [...selectedIndices];
+    let newSelection = [...selectedIndices]; // Clone the current selection
 
-    // Case when no bins are currently selected.
     if (newSelection.length === 0) {
-      // Add the first selected bin's details to the array.
       newSelection.push({ binNumber, index });
-      // Update the state to reflect the new selection.
-      setSelectedIndices(newSelection);
-      // Set the is selected indicator
+      setSelectedIndices(newSelection); // Update the state with the new selection
       setIsSelected(index);
-      // Provide haptic feedback to indicate successful selection.
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
-    // Case when there is already one bin selected.
-    else if (newSelection.length === 1) {
-      // Check if the same bin is selected again.
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Provide haptic feedback
+    } else if (newSelection.length === 1) {
       if (newSelection[0].index === index) {
-        // Clear the selection if the same bin is selected again.
-        setSelectedIndices([]);
-        // Unset the is selected indicator
+        setSelectedIndices([]); // Clear the selection if the same bin is selected again
         setIsSelected(null);
-        // Provide haptic feedback to indicate removal.
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Provide haptic feedback
       } else {
-        // Add the newly selected bin to the selection array.
         newSelection.push({ binNumber, index });
+        const _binData = binData; // Temporary copy of bin data
 
-        // Temporary copy of bin data for mutation.
-        const _binData = binData;
-
-        // Extract indices from the selected objects for range calculation.
         const indices = newSelection.map((selection) => selection.index);
-        // Calculate the minimum and maximum indices to define the range.
         const minIndex = Math.min(...indices);
         const maxIndex = Math.max(...indices);
 
-        // Determine the desired 'full' state based on the first selected bin.
-        const toSet = !binData[newSelection[0].index].isFull;
+        const toSet = !binData[newSelection[0].index].isFull; // Desired 'full' state
 
-        // Loop through the range of indices and set each bin's 'full' state.
         for (let i = minIndex; i <= maxIndex; i++) {
-          _binData[i].isFull = toSet;
+          _binData[i].isFull = toSet; // Set each bin's 'full' state
         }
 
-        // Update the bin data state with the new 'full' states.
-        setBinData(_binData);
-        // Clear the selection after the action is completed.
-        setSelectedIndices([]);
-        // Unset the is selected indicator
+        setBinData(_binData); // Update the bin data state
+        setSelectedIndices([]); // Clear the selection
         setIsSelected(null);
-        // Provide haptic feedback to indicate successful processing.
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Provide haptic feedback
       }
     }
   };
 
   // ~ ~ ~ ~ ~ ~ ~ List Components ~ ~ ~ ~ ~ ~ ~ //
 
-  // Bin List component to renmder
+  /**
+   * Render each bin item in the list.
+   *
+   * @param {Object} param0 - Object containing the item and index
+   * @param {Object} param0.item - The bin item data
+   * @param {number} param0.index - The index of the bin item in the list
+   *
+   * @returns {JSX.Element} The rendered SwipeableBinItem component
+   */
   const listRenderItem = ({ item, index }) => {
     return (
       <SwipeableBinItem
@@ -109,6 +114,11 @@ const BinList = ({ BinData, openAddBinModal }) => {
     );
   };
 
+  /**
+   * Render the separator between bin items in the list.
+   *
+   * @returns {JSX.Element} The separator view
+   */
   const listSeperator = () => {
     return (
       <View
@@ -125,6 +135,11 @@ const BinList = ({ BinData, openAddBinModal }) => {
     );
   };
 
+  /**
+   * Render the header for the bin list.
+   *
+   * @returns {JSX.Element} The list header view
+   */
   const ListHeader = () => {
     return (
       <View
@@ -138,9 +153,8 @@ const BinList = ({ BinData, openAddBinModal }) => {
           flexDirection: 'row',
           gap: 12,
           backgroundColor: 'rgb(235, 235, 235)',
-          zIndex: 100,
-          borderRadius: 12,
           zIndex: 3,
+          borderRadius: 12,
         }}
       >
         <View
@@ -192,6 +206,11 @@ const BinList = ({ BinData, openAddBinModal }) => {
     );
   };
 
+  /**
+   * Render the lock view overlay when the list is locked.
+   *
+   * @returns {JSX.Element} The lock view overlay
+   */
   const LockView = () => {
     return (
       <BlurView
@@ -216,6 +235,11 @@ const BinList = ({ BinData, openAddBinModal }) => {
     );
   };
 
+  /**
+   * Render the footer for the bin list.
+   *
+   * @returns {JSX.Element} The list footer view
+   */
   const listFooter = () => {
     return <View style={{ marginVertical: 40 }} />;
   };

@@ -1,8 +1,8 @@
-import React, { createContext, useState, useEffect, useContext} from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import useWebSocket from 'react-use-websocket';
-import NetInfo from '@react-native-community/netinfo'
+import NetInfo from '@react-native-community/netinfo';
 
 export const AuthContext = createContext({
   setMockMode: () => {},
@@ -17,35 +17,30 @@ export const AuthProvider = ({ children }) => {
 
   const [isReady, setIsReady] = useState(false);
   const [val, setVal] = useState(null);
-  const [jToken, setToken] =  useState('');
-  
-  const serverURL = "http://10.0.0.195:8080";
-  const wsURL = "ws://10.0.195:8080"
-  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(
-    wsURL,
-    {
-      share: true,  
-      token: getToken,
-      shouldReconnect: (closeEvent) => {
-        if (mockMode) {
-          return false;
-        }
-        if (isSignedIn) {
-          return true;
-        }
-        else {
-          return false;
-        }
-      },
-      reconnectAttempts: 10,
-      reconnectInterval: 3000
-    },
-  )
+  const [jToken, setToken] = useState('');
 
+  const serverURL = 'http://127.0.0.1:8080';
+  const wsURL = 'ws://127.0.0.1:8080';
+  const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(wsURL, {
+    share: true,
+    token: getToken,
+    shouldReconnect: (closeEvent) => {
+      if (mockMode) {
+        return false;
+      }
+      if (isSignedIn) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    reconnectAttempts: 10,
+    reconnectInterval: 3000,
+  });
 
   const getToken = async () => {
     return await AsyncStorage.getItem('token');
-  }
+  };
 
   const signIn = () => {
     setIsSignedIn(true);
@@ -63,21 +58,18 @@ export const AuthProvider = ({ children }) => {
   // still testing utility vs just using netinfo
   useEffect(() => {
     NetInfo.fetch().then((state) => {
-        
-        setIsOnline(state.isInternetReachable);
+      setIsOnline(state.isInternetReachable);
     });
 
     //Internet connection listener
     NetInfo.addEventListener((state) => {
-
       //console.warn('called');
       //console.warn(state.isInternetReachable);
       setIsOnline(state.isInternetReachable);
     });
   }, []);
 
-
-  // Effect that detects a message (for notifications) can be done here or locally in 
+  // Effect that detects a message (for notifications) can be done here or locally in
   //components
   /*useEffect(() => {
     console.log(`Got a new message: ${lastJsonMessage}`)
@@ -96,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     }, [ready, send]);
 }*/
 
-// if just needing to recieve data, use if (lastJsonMessage)
+  // if just needing to recieve data, use if (lastJsonMessage)
   const globalValues = {
     isSignedIn,
     signIn,
@@ -109,13 +101,11 @@ export const AuthProvider = ({ children }) => {
     lastJsonMessage,
     readyState,
     setMockMode,
-    getToken
+    getToken,
   };
 
   return (
-    <AuthContext.Provider value={globalValues}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={globalValues}>{children}</AuthContext.Provider>
   );
 };
 

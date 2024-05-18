@@ -13,7 +13,6 @@ import { EvilIcons } from '@expo/vector-icons';
  * a location icon and the name of the siding passed as a prop.
  *
  * @param {string} sidingName - The name of the selected siding. Defaults to "Selected Siding".
- *
  * @returns {JSX.Element} The rendered SidingSelector component.
  */
 const SidingSelector = ({ sidingName = 'Selected Siding' }) => {
