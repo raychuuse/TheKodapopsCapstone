@@ -1,2 +1,2 @@
-# TheKodapopsCapstone
-Sugarcane Consigment Application Development
+# The Kodapops Capstone
+Sugarcane Consignment Application Development
