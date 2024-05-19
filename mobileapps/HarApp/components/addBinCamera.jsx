@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera';
+import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera/legacy';
 import { useContext, useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 
