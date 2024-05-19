@@ -91,14 +91,14 @@ const AltButton = (
             !shouldRenderIcon && styles.buttonContentNoIcon,
           ]}
         >
-          {iconPosition === 'left' && renderIcon()}{' '}
+          {iconPosition === 'left' && renderIcon()}
           {/* Render icon on the left */}
           {shouldRenderTitle && (
             <Text style={[styles.button_text, { color: textColor }, textStyle]}>
               {pressed ? title : pressedTitle} {/* Change text when pressed */}
             </Text>
           )}
-          {iconPosition === 'right' && renderIcon()}{' '}
+          {iconPosition === 'right' && renderIcon()}
           {/* Render icon on the right */}
         </View>
       )}

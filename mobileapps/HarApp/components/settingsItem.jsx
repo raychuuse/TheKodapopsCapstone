@@ -92,7 +92,7 @@ const SettingsItem = ({
    * @returns {string} The label of the selected option
    */
   const getCurItem = (values) => {
-    return values.find((item) => item.value === selectedOption)?.label;
+    return values.find((item) => item.value == selectedOption)?.label;
   };
 
   return (
@@ -146,12 +146,12 @@ const SettingsItem = ({
           style={[Type.styles.body, styles.body]}
           numberOfLines={1}
         >
-          {label === 'Siding' ? getSiding() : getCurItem(options)}
+          {label == 'Siding' ? getSiding() : getCurItem(options)}
         </Text>
 
         {/* Button to open the picker modal */}
         <Button
-          iconName={type === 'location' ? 'edit-location-alt' : 'edit'}
+          iconName={type == 'location' ? 'edit-location-alt' : 'edit'}
           iconColor={Colours.textLevel3}
           textColor={Colours.textLevel3}
           backgroundColor={Colours.bgLevel3}

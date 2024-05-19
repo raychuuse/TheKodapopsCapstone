@@ -50,7 +50,8 @@ const CustomModal = ({
         />
         {/* Modal content */}
         <View style={[styles.modalContent, style]}>
-          {children} {/* Render modal children */}
+          {/* Render modal children */}
+          {children}
           {/* Close button */}
           <TouchableOpacity
             style={styles.closeButton}

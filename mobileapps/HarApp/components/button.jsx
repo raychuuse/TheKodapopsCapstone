@@ -27,25 +27,21 @@ import * as Haptics from 'expo-haptics';
  *
  * @returns {JSX.Element} The rendered Button component
  */
-const Button = (
-  {
-    title = '',
-    onPress = () => alert('Button Pressed'),
-    backgroundColor = '#4F12FA42',
-    textColor = Colours.textLevel3,
-    iconPosition = 'left',
-    iconName = '',
-    iconSize = 24,
-    iconColor = Colours.textLevel3,
-    style = {},
-    textStyle = {},
-    border = false,
-    borderWidth = 2,
-    innerRef,
-    isDisabled = false,
-  },
-  ref
-) => {
+const Button = ({
+  title = '',
+  onPress = () => alert('Button Pressed'),
+  backgroundColor = '#4F12FA42',
+  textColor = Colours.textLevel3,
+  iconPosition = 'left',
+  iconName = '',
+  iconSize = 24,
+  iconColor = Colours.textLevel3,
+  style = {},
+  textStyle = {},
+  border = false,
+  borderWidth = 2,
+  isDisabled = false,
+}) => {
   // Determine if the icon should be rendered and if title is provided
   const shouldRenderIcon = iconName !== '';
   const shouldRenderTitle = title !== '';
@@ -70,7 +66,6 @@ const Button = (
   return (
     <TouchableOpacity
       disabled={isDisabled} // Disable the button if isDisabled is true
-      ref={ref} // Reference to the button element
       onPress={() => {
         onPress(); // Call the onPress function
         Haptics.selectionAsync(); // Trigger haptic feedback
@@ -91,15 +86,15 @@ const Button = (
           !shouldRenderIcon && styles.buttonContentNoIcon,
         ]}
       >
-        {iconPosition === 'left' && renderIcon()}{' '}
+        {iconPosition === 'left' && renderIcon()}
         {/* Render icon on the left */}
         {shouldRenderTitle && (
           <Text style={[styles.button_text, { color: textColor }, textStyle]}>
             {title}
           </Text>
-        )}{' '}
+        )}
         {/* Render button text */}
-        {iconPosition === 'right' && renderIcon()}{' '}
+        {iconPosition === 'right' && renderIcon()}
         {/* Render icon on the right */}
       </View>
     </TouchableOpacity>
@@ -142,5 +137,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// When passing refs in use forwardRef
-export default React.forwardRef(Button);
+export default Button;

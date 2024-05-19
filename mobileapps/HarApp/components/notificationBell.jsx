@@ -64,8 +64,8 @@ const NotificationBell = ({
             { color: countTextColor, fontSize: counterSize / 2 },
           ]}
         >
-          {Math.min(99, notificationCount)}{' '}
           {/* Limiting displayed count to 99 */}
+          {Math.min(99, notificationCount)}
         </Text>
       </View>
     );
@@ -83,7 +83,8 @@ const NotificationBell = ({
           size={iconSize}
           color={iconColor}
         />
-        {renderNotificationCount()} {/* Render notification count badge */}
+        {/* Render notification count badge */}
+        {renderNotificationCount()}
       </View>
     </TouchableOpacity>
   );

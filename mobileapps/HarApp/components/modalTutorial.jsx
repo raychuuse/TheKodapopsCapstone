@@ -102,7 +102,7 @@ const ModalTutorial = ({ isVisable, setIsVisable }) => {
               key={index}
               style={[
                 styles.dot,
-                activeSlide === index ? styles.activeDot : styles.inactiveDot, // Highlight active dot
+                activeSlide == index ? styles.activeDot : styles.inactiveDot, // Highlight active dot
               ]}
               onPress={() => goToSlide(index)} // Navigate to selected slide
               accessible={true}
