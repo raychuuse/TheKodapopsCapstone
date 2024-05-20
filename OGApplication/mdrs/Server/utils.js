@@ -17,8 +17,16 @@ function validationErrorToError(validationError) {
   return {message: str.substring(0, str.length - 1)};
 }
 
+function checkIfExpired(date) {
+  if (date >= Date.now()) {
+    return false;
+  }
+  return true;
+}
+
 module.exports = {
   processQueryResult,
   isValidId,
-  validationErrorToError
+  validationErrorToError,
+  checkIfExpired
 }

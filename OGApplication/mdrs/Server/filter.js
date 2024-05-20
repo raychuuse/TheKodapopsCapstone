@@ -1,5 +1,10 @@
 function filterById(bins, query) {
-  return bins.filter((bin) => bin.statusID === query);
+  if (query) {
+    return bins.filter((bin) => bin.status === "FULL");
+    
+  }
+  // Bins that have "null" instead of full or empty, list as empty in count?
+  return bins.filter((bin) => bin.status === "EMPTY");
 }
 
 function getMetrics(bins) {
@@ -95,9 +100,9 @@ function dashSort(grouped, flag) {
       const newObj = {
         id:key,
         name: bins[0].locoName,
-        mill: filterById(bins, 6).length,
-        full: filterById(bins, 5).length,
-        empty: filterById(bins, 2).length,
+        loco: bins.length,
+        full: filterById(bins, true).length,
+        empty: filterById(bins, false).length,
       };
       data.push(newObj);
     }
@@ -106,9 +111,9 @@ function dashSort(grouped, flag) {
       const newObj = {
         id:key,
         name: bins[0].sidingName,
-        mill: filterById(bins, 6).length,
-        full: filterById(bins, 4).length,
-        empty: filterById(bins, 3).length,
+        siding: bins.length,
+        full: filterById(bins, true).length,
+        empty: filterById(bins, false).length,
       };
       data.push(newObj);
     }
@@ -118,9 +123,9 @@ function dashSort(grouped, flag) {
       const newObj = {
         id:key,
         name: bins[0].harvesterName,
-        mill: filterById(bins, 6).length,
-        full: filterById(bins, 4).length + filterById(bins, 5).length,
-        empty: filterById(bins, 3).length,
+        harvester: bins.length,
+        full: filterById(bins, true).length,
+        empty: filterById(bins, false).length,
       };
       data.push(newObj);
     }

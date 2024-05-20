@@ -83,7 +83,7 @@ const LocoDetails = ({id}) => {
                                 <div className="table-header-wrapper">
                                     {/*<h1 className="table-header">{locoData.name}</h1>*/}
                                     <div className="table-bin-count-wrapper">
-                                        <h1 className="bin-count-header">Bins:</h1>
+                                        <h1 className="bin-count-header">Locomotive: {id ? id: "Select a Loco"}</h1>
                                         {/*<h1 className="bin-count-number">{`${locoData.data.full.length + locoData.data.empty.length}`}</h1>*/}
                                     </div>
                                 </div>
@@ -136,7 +136,7 @@ const LocoCurrentLoad = ({id}) => {
 
 
     const columns = [
-        {headerName: "Bin", field: "code"},
+        {headerName: "Bin", field: "binID"},
         {headerName: "Status", field: "status"}
     ];
 
@@ -207,7 +207,7 @@ const LocoSidingBreakdown = ({id}) => {
             <div className="hero__content">
                 <div className="table-wrapper">
                     <div className="table-header-wrapper">
-                        <h4 className="table-header">Current Load</h4>
+                        <h4 className="table-header">Siding Breakdown</h4>
                     </div>
                     <div className="row">
                         {data ? <Table columns={columns} data={data}/> : null}

@@ -1,4 +1,4 @@
-import {postConfig, putConfig, serverUrl} from "./utils";
+import {fullConverter, postConfig, putConfig, serverUrl} from "./utils";
 
 const apiUrl = `${serverUrl}/locos`;
 
@@ -21,21 +21,28 @@ export function getLoco(id) {
 }
 
 export function getCurrentLoad(id) {
-    return fetch(`${apiUrl}/${id}/load`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+    return fetch(`${apiUrl}/${id}/current-load`)
+        .then((body) => body.json())
+        .then((data) =>{
+            // Data formatting
+            return data.map((obj) => ({
+                binID: obj.binID,
+                status: obj.status !== null ? obj.status : "NOT LISTED",
+            }))
+        })
 }
 
 export function getSidingBreakdown(id) {
     return fetch(`${apiUrl}/${id}/siding_breakdown`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+        .then((body) => body.json())
+        .then((data) =>{
+            // Data formatting
+            return data.map((obj) => ({
+                sidingName: obj.sidingName !== null ? obj.sidingName : "NOT LISTED",
+                type: obj.type !== null ? obj.type : "NOT LISTED",
+                count: obj.count
+            }))
+        })
 }
 
 export function createLoco(name) {

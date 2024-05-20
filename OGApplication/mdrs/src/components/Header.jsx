@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {useAuth} from "../AuthProvider";
+import Cookies from 'js-cookie';
 
 
 const Header = () => {
@@ -13,8 +14,10 @@ const Header = () => {
   const toggleNavbar = () => setIsOpen(!isOpen);
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  if (auth.token == null)
+  if (auth.token == null) {
+    // add leaving functionality
     return;
+  }
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -69,6 +72,11 @@ const Header = () => {
                 Users
               </a>
             </li>
+            <li className="nav-item">
+              <a className="nav-link" href="/maintenance">
+                Maintenance
+              </a>
+            </li>
           </ul>
         </div>
 
@@ -83,7 +91,7 @@ const Header = () => {
               aria-expanded={isDropdownOpen}
               onClick={toggleDropdown}
             >
-              User: {auth.user.firstName}
+              User: {Cookies.get('firstName')}
             </button>
             <ul className={`dropdown-menu  ${isDropdownOpen ? 'show' : ''}`} aria-labelledby="navbarDropdown">
               <li>

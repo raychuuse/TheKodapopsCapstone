@@ -94,6 +94,16 @@ const DashboardCard = ({ title, data, link, columns }) => {
     );
 };
 
+export const toFull = (integer) => {
+    if (integer == 1) {
+        return "Full";
+    }
+    else if (integer == 0) {
+        return "Empty";
+    }
+    return null;
+}
+
 
 export const DashboardLogTables = () => {
     const [{ bins, transactions, error }, setState] = useState({
@@ -108,7 +118,13 @@ export const DashboardLogTables = () => {
         try {
             const transactionData = await getAllTransactions();
             const binData = await getAllBins();
-            setState({ bins: binData, transactions: transactionData, error: null });
+            const temp = binData.map(bins => ({
+                binID: bins.binID,
+                status: bins.status !== null ? bins.status : "NOT LISTED",
+                sidingName: bins.sidingName,
+                locoName: bins.locoName
+            }))
+            setState({ bins: temp, transactions: transactionData, error: null });
         } catch (err) {
             setState({ bins: null, transactions: null, error: err });
         } finally {
@@ -123,17 +139,17 @@ export const DashboardLogTables = () => {
         { headerName: "Time", field: "transactionTime", width: 200, sortable: true },
         { headerName: "Bin ID", field: "binID", width: 100, filter: 'agNumberColumnFilter', sortable: true },
         { headerName: "Status", field: "status", sortable: true },
-        // { headerName: "Loco", field: "locoName", sortable: true },
-        // { headerName: "Harvester", field: "harvesterName", sortable: true },
-        // { headerName: "Siding", field: "sidingName", sortable: true },
+        { headerName: "Loco", field: "locoName", sortable: true },
+        { headerName: "Harvester", field: "harvesterName", sortable: true },
+        { headerName: "Siding", field: "sidingName", sortable: true },
     ]
 
     const binColumns = [
-        { headerName: "Bin ID", field: "binsID", width: 80},        
+        { headerName: "Bin ID", field: "binID"},        
         { headerName: "Status", field: "status", sortable: true },          
         { headerName: "Loco", field: "locoName",  minWidth: 100, maxWidth: 300 },
-        { headerName: "Harvester", field: "harvesterName",  minWidth: 100, maxWidth: 300 },
-        { headerName: "Siding", field: "sidingName",  minWidth: 100, maxWidth: 300 },
+        { headerName: "Siding", field: "sidingName",  minWidth: 100, maxWidth: 300 },/* 
+        { headerName: "Harvester", field: "harvesterName",  minWidth: 100, maxWidth: 300 },*/
     ]
 
     return (

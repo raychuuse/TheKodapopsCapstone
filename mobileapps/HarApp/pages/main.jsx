@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
 
 // Import Components
 import GreetingMessage from '../components/greetingMessage';
 import Button from '../components/button';
 import CustomModal from '../components/modal';
-import SelectedSiding from '../components/selectedSiding';
+import SidingSelector from '../components/SidingSelector';
 import AddBinCamera from '../components/addBinCamera';
 import NetworkIndicator from '../components/networkIndicator';
+import { Alert } from 'react-native';
 
 //Import Functions
 import { FinishedAlert } from '../lib/alerts';
@@ -18,11 +20,29 @@ import { Colours } from '../components/colours';
 import BinList from '../components/binList';
 import { useBins } from '../context/binContext';
 
+
+// Import Contexts
+import { useAuth } from '../context/authContext';
+import { useSelections } from '../context/selectionContext';
+
 const MainPage = () => {
   const { binData } = useBins();
 
+  const {getSiding, setSelectionData} = useSelections();
+  const setupPageRef = "dashboard/setup";
+
+  const {signOut, sendJsonMessage, readyState, lastJsonMessage, mockMode} = useAuth();
   const [addBinVisable, setAddBinVisable] = useState(false);
 
+  const handleDone = () => {
+    if (!mockMode) {
+      // Checks etc before
+      FinishedAlert({Siding: getSiding(), Farm: "", Block:"", Sub: "", Pad: "", Burnt: "Neutral"},setSelectionData);
+    }
+    else {
+      FinishedAlert({Siding: getSiding(), Farm: "", Block:"", Sub: "", Pad: "", Burnt: "Neutral"},setSelectionData);
+    }
+  }
   return (
     <View style={styles.body}>
       {/* Add Bin Modal */}
@@ -56,7 +76,7 @@ const MainPage = () => {
       {/* Page Content */}
       <View style={styles.content}>
         {/* Selected Siding */}
-        <SelectedSiding sidingName='Old Creek Rd' />
+        <SidingSelector sidingName= {getSiding()}/>
         {/* Bin List */}
         <BinList
           BinData={binData}
@@ -66,7 +86,7 @@ const MainPage = () => {
       <Button
         title='Done'
         style={StyleSheet.create({ width: '100%' })}
-        onPress={FinishedAlert}
+        onPress={handleDone}
       />
     </View>
   );

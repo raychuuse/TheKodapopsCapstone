@@ -78,6 +78,7 @@ const SettingsItem = ({
             />
             {options.map((option) => (
               <Picker.Item
+                key={option.id}
                 value={option.id}
                 label={option.label}
                 style={{ width: '100%' }}

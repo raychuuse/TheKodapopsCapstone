@@ -11,14 +11,21 @@ import Button from './button';
 import RunSheet from './runSheet';
 import ModalSettings from './modalSettings';
 import ModalNotifications from './modalNotifications';
+import ModalTutorial from './modalTutorial';
 
 const BottomBar = ({ notifications, setNotifications }) => {
+  const [tutorialVisable, setTutorialVisible] = useState(false);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [notificationsVisible, setNotificationsVisible] = useState(false);
   const [routeVisible, setRouteVisible] = useState(false);
   const { theme } = useTheme();
   return (
     <>
+      {/* Tutorial Modal */}
+      <ModalTutorial
+        isVisible={tutorialVisable}
+        onClose={() => setTutorialVisible(false)}
+      />
       {/* Settings Modal */}
       <ModalSettings
         isVisible={settingsVisible}
@@ -70,6 +77,14 @@ const BottomBar = ({ notifications, setNotifications }) => {
             iconSize={48}
             iconColor={theme.textLevel3}
             onPress={() => setSettingsVisible(true)}
+          />
+          {/* Open Tutorial Modal Button */}
+          <Button
+            backgroundColor='transparent'
+            iconName='help'
+            iconSize={48}
+            iconColor={theme.textLevel3}
+            onPress={() => setTutorialVisible(true)}
           />
         </View>
       </LinearGradient>

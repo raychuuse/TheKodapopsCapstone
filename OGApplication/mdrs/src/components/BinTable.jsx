@@ -194,7 +194,7 @@ export const BinAllocationTable = () => {
 
     // Enabled manual editing for specific rows, can be changed in future
     const columns = [
-        { headerName: "Bin ID", field: "binsID", width: 90, maxWidth: 200, filter: 'agNumberColumnFilter', },
+        { headerName: "Bin ID", field: "binID", width: 90, maxWidth: 200, filter: 'agNumberColumnFilter', },
         { headerName: "Status", field: "status", editable: true, filter: 'agTextColumnFilter', },
         { headerName: "Loco", field: "locoName", editable: true, minWidth: 100, filter: 'agTextColumnFilter', },
         { headerName: "Harvester", field: "harvesterName", editable: true, minWidth: 100, filter: 'agTextColumnFilter', },

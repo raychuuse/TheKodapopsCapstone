@@ -127,8 +127,16 @@ router.post('/', (req, res) => {
 
 router.put('/:id/name', (req, res) => {
   const id = req.params.id;
+  const name = req.body.name;
   if (!isValidId(id)) return;
-  req.db('siding').update({sidingName: req.body.name}).where({sidingID: id})
+  req.db.raw(`select count(sidingName) AS count from siding WHERE sidingName = '${name}'`)
+  .then(processQueryResult)
+  .then(data => {
+    if (data[0].count > 0) {
+      res.status(510).json('Duplicate appeared.');
+    }
+    else {
+      req.db('siding').update({sidingName: req.body.name}).where({sidingID: id})
       .then(result => {
         res.status(204).send();
       })
@@ -136,20 +144,64 @@ router.put('/:id/name', (req, res) => {
         console.error(error);
         res.status(500).json(error);
       })
+    }
+  })
+
 });
 
 router.delete('/:id', (req, res) => {
   const id = req.params.id;
   if (!isValidId(id)) return;
 
-  req.db('siding').where({sidingID: id}).del()
-      .then(result => {
-        res.status(204).send();
-      })
-      .catch(error => {
-        console.error(error);
-        res.status(500).json(error);
-      });
+  req.db.raw(`DELETE FROM siding 
+              WHERE sidingID = '${id}'`)
+        .then(result => {
+            res.status(204).send();
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
+        });
 });
+
+router.get("/:sidingID/bins", (req, res) => {
+  if (!req[0].token) {
+      res.status(200)
+          .json({success: false, message: "Token was not provided."});
+  }
+  const decode = checkJWT(req[0].token);
+  if (checkIfExpired(decode.exp)) {
+      res.status(400)
+          .json({success: false, message: "Error! Login Invalid, token expired."});
+  }
+  // Haven't introduced restriction based on user in db
+  if (!req.params.sidingID) {
+    req.db.raw(`SELECT *
+            FROM bins`)
+    .then(processQueryResult)
+    .then((farms) => {
+      res.status(200).json(farms);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json(err);
+    });
+  }
+  else {
+      req.db.raw(`SELECT *
+          FROM bins
+      WHERE sidingID = ?`, [id])
+      .then(processQueryResult)
+      .then((bins) => {
+        res.status(200).json(bins);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json(err);
+      });
+  }
+});
+
+
 
 module.exports = router;

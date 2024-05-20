@@ -13,6 +13,7 @@ import Harvester from './pages/Harvester';
 import Siding from './pages/Siding';
 import BinAllocation from './pages/BinAllocation';
 import TransactionLog from './pages/TransactionLog';
+import Maintenance from './pages/Maintenance';
 
 // Component Imports
 import Header from './components/Header';
@@ -56,6 +57,7 @@ export default function App() {
                 <Route path='/bins' element={<BinAllocation />} />
                 <Route path='/log' element={<TransactionLog />} />
                 <Route path='/users' element={<UserPage />} />
+                <Route path='/maintenance' element={<Maintenance />} />
                 <Route path='/users/:id' element={<UserView />} />
                 <Route path='/users/create' element={<UserView />} />
               </Route>

@@ -130,8 +130,7 @@ const Table = ({ data, link }) => {
         { headerName: "ID", field: "id", hide: true },
         { headerName: "Name", field: "name",},
         { headerName: "Full", field: "full", maxWidth: 100 },
-        { headerName: "Empty", field: "empty",  maxWidth: 100 },
-        { headerName: "Mill", field: "mill", maxWidth: 100 }
+        { headerName: "Empty", field: "empty",  maxWidth: 100 }
     ]
 
     const gridRef = useRef();

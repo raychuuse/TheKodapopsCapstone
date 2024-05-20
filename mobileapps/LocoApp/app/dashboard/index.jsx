@@ -1,5 +1,5 @@
-import { View, Animated } from 'react-native';
-import React, { useState } from 'react';
+import { View, Animated, Dimensions } from 'react-native';
+import React, { useRef, useState } from 'react';
 
 // Components
 import StatusIndicator from '../../components/statusIndicator';
@@ -18,6 +18,7 @@ import { NotificationsMockData } from '../../data/NotificationsMockData';
 // Import Providers
 import { useTheme } from '../../styles/themeContext';
 import { useRun } from '../../context/runContext';
+import SidingListScrollBar from '../../components/sidingListScrollBar';
 
 import {getRunById} from "../../api/runs.api";
 import {getCurrentLoadById} from "../../api/loco.api";
@@ -29,6 +30,9 @@ export default function Page() {
 
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const [sidingCarouselWidth, setSidingCarouselWidth] = useState(0);
+
+  const sidingListRef = useRef(null);
+  const windowWidth = Dimensions.get('window').width;
 
   // Run Data for the Whole App
   const [notifications, setNotifications] = useState(NotificationsMockData);
@@ -80,6 +84,7 @@ export default function Page() {
             }}
           >
             <Animated.FlatList
+              ref={sidingListRef}
               contentContainerStyle={{
                 alignItems: 'center',
                 paddingVertical: 10,
@@ -108,13 +113,11 @@ export default function Page() {
               );}}
             />
           </View>
-          <View
-            style={{
-              minHeight: 56,
-              backgroundColor: theme.containerGradient[0],
-              borderRadius: 16,
-            }}
-          ></View>
+          <SidingListScrollBar
+            data={runData.sidings}
+            flatListRef={sidingListRef}
+            containerWidth={sidingCarouselWidth}
+          />
         </View>
       </View>
       {/* Nav Bar */}

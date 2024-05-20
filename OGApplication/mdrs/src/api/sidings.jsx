@@ -1,4 +1,4 @@
-import {serverUrl, postConfig, putConfig} from "./utils";
+import {serverUrl, postConfig, putConfig, fullConverter} from "./utils";
 
 const apiUrl = `${serverUrl}/sidings`;
 
@@ -29,13 +29,17 @@ export function getHarvesterBreakdown(id) {
         });
 }
 
-export function getSidingBreakdown(id) {
-    return fetch(`${apiUrl}/${id}/breakdown`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+export function getSidingBreakdown(sidingId) {
+    return fetch(`${apiUrl}/${sidingId}/breakdown`)
+        .then((body) => body.json())
+        .then((data) =>{
+            // Data formatting
+            return data.map((obj) => ({
+                binID: obj.binID,
+                status: obj.status !== null ? obj.status : "NOT LISTED",
+                time: obj.transactionTime
+            }))
+        })
 }
 
 export function getLocoBreakdown(id) {
@@ -51,7 +55,7 @@ export function createSiding(sidingName) {
     return fetch(`${apiUrl}`, postConfig({name: sidingName}))
         .then(response => {
             if (response.ok)
-                return response.json();
+                return response;
             throw new Error();
         });
 }

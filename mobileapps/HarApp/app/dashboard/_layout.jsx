@@ -11,7 +11,7 @@ import BottomBar from '../../components/bottomBar';
 
 // Import Providers
 import { BinProvider } from '../../context/binContext';
-
+import { SelectionProvider } from '../../context/selectionContext';
 // Mock Data
 const notificationsData = [
   {
@@ -77,9 +77,11 @@ const Layout = () => {
         setIsVisable={setTutorialVisable}
       />
       {/* Page */}
-      <BinProvider>
-        <Slot />
-      </BinProvider>
+      <SelectionProvider>
+        <BinProvider>
+          <Slot />
+        </BinProvider>
+      </SelectionProvider>
       {/* Navigation */}
       <BottomBar
         notifications={notifications}

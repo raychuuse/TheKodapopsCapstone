@@ -61,12 +61,23 @@ const burntOptions = [
   { label: 'No', value: 2 },
 ];
 
+/**
+ * ModalSettings Component
+ *
+ * This component renders a modal with settings options for the consignment.
+ *
+ * @param {Object} props - Component props
+ * @param {boolean} props.isVisable - Boolean to control the visibility of the modal
+ * @param {function} props.setIsVisable - Function to set the visibility of the modal
+ *
+ * @returns {JSX.Element} The rendered ModalSettings component
+ */
 const ModalSettings = ({ isVisable, setIsVisable }) => {
   return (
     <CustomModal
-      isVisible={isVisable}
-      onClose={() => setIsVisable(false)}
-      buttonIcon='check-circle-outline'
+      isVisible={isVisable} // Control modal visibility
+      onClose={() => setIsVisable(false)} // Close modal handler
+      buttonIcon='check-circle-outline' // Icon for the modal close button
     >
       <View style={{ width: '100%', gap: 8, maxHeight: 600 }}>
         <Title1 style={{ textAlign: 'center', marginBottom: 24 }}>
@@ -74,10 +85,10 @@ const ModalSettings = ({ isVisable, setIsVisable }) => {
         </Title1>
         <ScrollView
           style={{
-            maxHeight: 600,
-            backgroundColor: Colours.bgLevel6,
-            padding: 8,
-            borderRadius: 10,
+            maxHeight: 600, // Maximum height for the ScrollView
+            backgroundColor: Colours.bgLevel6, // Background color
+            padding: 8, // Padding inside the ScrollView
+            borderRadius: 10, // Rounded corners
           }}
         >
           <Title2 style={{ marginBottom: 16 }}>Consignment Settings</Title2>
@@ -86,9 +97,9 @@ const ModalSettings = ({ isVisable, setIsVisable }) => {
             off your loads.
           </Subhead>
           <SettingsItem
-            type='location'
-            label='Siding'
-            options={sidingOptions}
+            type='location' // Type of settings item
+            label='Siding' // Label for the settings item
+            options={sidingOptions} // Options for the picker
           />
           <Divider style={{ marginVertical: 8 }} />
           <SettingsItem
@@ -124,12 +135,12 @@ const ModalSettings = ({ isVisable, setIsVisable }) => {
           <Footnote
             style={{
               marginTop: 32,
-              color: '#fff',
-              textAlign: 'center',
-              backgroundColor: `${Colours.dangerBg}80`,
-              padding: 8,
-              borderRadius: 16,
-              overflow: 'hidden',
+              color: '#fff', // Text color
+              textAlign: 'center', // Center align text
+              backgroundColor: `${Colours.dangerBg}80`, // Background color with transparency
+              padding: 8, // Padding inside the footnote
+              borderRadius: 16, // Rounded corners
+              overflow: 'hidden', // Hide overflow content
             }}
           >
             <Strong>Warning: </Strong>Ensure accurate settings for smooth
