@@ -10,7 +10,7 @@ import {
 import { useTheme } from '../styles/themeContext';
 import { useModal } from '../context/modalContext';
 
-const CustomScrollbar = ({ data = [], flatListRef }) => {
+const CustomScrollbar = ({ stops = [], flatListRef }) => {
   const dotSize = 24;
   const spaceBetweenDots = 32;
   const windowWidth = Dimensions.get('window').width;
@@ -21,7 +21,7 @@ const CustomScrollbar = ({ data = [], flatListRef }) => {
 
   // Calculate total width of dots and spaces
   const totalDotsWidth =
-    data.length * (dotSize + spaceBetweenDots) - spaceBetweenDots;
+    stops.length * (dotSize + spaceBetweenDots) - spaceBetweenDots;
 
   // Determine if the dots should be centered
   const shouldCenterDots = totalDotsWidth < windowWidth;
@@ -52,8 +52,9 @@ const CustomScrollbar = ({ data = [], flatListRef }) => {
           shouldCenterDots ? { justifyContent: 'center', flex: 1 } : {},
         ]}
       >
-        {data.map((item, index) => {
-          const dotStyles = item.isCompleted
+        {stops.map((item, index) => {
+          const dotStyles =
+              item.collectComplete && item.dropOffComplete
             ? {
                 backgroundColor: theme.spComplete,
                 borderColor: theme.spCompleteBorder,

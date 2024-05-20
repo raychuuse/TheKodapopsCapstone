@@ -2,7 +2,7 @@ import React, {createContext, useContext, useEffect, useReducer, useState} from 
 
 // Import Mock Data from a relative path
 import {RunMockData} from '../data/RunMockData';
-import {getRunsByLocoAndDate, performStopAction} from '../api/runs.api';
+import {completeStop, getRunsByLocoAndDate, performStopAction} from '../api/runs.api';
 import {getCurrentLoadById} from '../api/loco.api';
 import {getSidingBreakdown} from '../api/siding.api';
 import {consignBin, findBin, updateBinFieldState} from '../api/bins.api.ts';
@@ -117,6 +117,20 @@ export const RunProvider = ({children}) => {
             });
     };
 
+    const onCompletePressed = (stopID, type) => {
+        completeStop(stopID, type === 'SIDING' ? 'COLLECT' : 'DROP_OFF')
+            .then(response => {
+                const stop = run.stops.find(s => s.stopID === stopID);
+                if (stop == null) return;
+                if (type === 'SIDING') stop.collectComplete = true;
+                else stop.dropOffComplete = true;
+                updateRun();
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    };
+
     const getFromSource = (stop, type) => {
         return type === 'COLLECT' ? stop : loco;
     };
@@ -173,7 +187,7 @@ export const RunProvider = ({children}) => {
         if (!connected) {
             for (let i = startIndex; i <= endIndex; i++) {
                 console.info(i, source.bins[i]);
-                offlineStopActions.push({binID: source.bins[i].binID, locoID: 1, stopID: stop.stopID, type: type});
+                offlineStopActions.push({binID: source.bins[i].binID, locoID: locoID, stopID: stop.stopID, type: type});
                 const bin = source.bins[i];
                 if (bin == null) {
                     console.error('Shouldn\'t be here');
@@ -190,7 +204,7 @@ export const RunProvider = ({children}) => {
         const promises = [];
         for (let i = startIndex; i <= endIndex; i++) {
             console.info(i, source.bins[i]);
-            promises.push(performStopAction(source.bins[i].binID, 1, stop.stopID, type));
+            promises.push(performStopAction(source.bins[i].binID, locoID, stop.stopID, type));
         }
 
         Promise.allSettled(promises)
@@ -236,7 +250,7 @@ export const RunProvider = ({children}) => {
 
     const handlePerformStopAction = (binID, stop, type) => {
         if (connected) {
-            performStopAction(binID, 1, stop.stopID, type)
+            performStopAction(binID, locoID, stop.stopID, type)
                 .then(response => {
                     handleSuccessfulStopAction(binID, stop, type, false);
                     updateRun();
@@ -246,7 +260,7 @@ export const RunProvider = ({children}) => {
                     console.error(err);
                 });
         } else {
-            offlineStopActions.push({binID: binID, locoID: 1, stopID: stop.stopID, type: type});
+            offlineStopActions.push({binID: binID, locoID: locoID, stopID: stop.stopID, type: type});
             console.info('stop-action', offlineStopActions);
             handleSuccessfulStopAction(binID, stop, type, false);
             updateRun();
@@ -328,14 +342,12 @@ export const RunProvider = ({children}) => {
                 });
         } else {
             offlineConsignActions.push({binID: bin.binID, full: !bin.full});
-            console.info(offlineConsignActions);
-                onReconnected();
             handleSuccessfulConsignBin(bin, stop);
         }
     };
 
     const handleFindBin = (code, stop) => {
-        findBin(code, stop != null ? stop.sidingID : null, stop == null ? 1 : null)
+        findBin(code, stop != null ? stop.sidingID : null, stop == null ? locoID : null)
             .then(bin => {
                 if (stop != null) {
                     stop.bins.push(bin);
@@ -375,6 +387,7 @@ export const RunProvider = ({children}) => {
                 onRunStarted,
                 getLocoID,
                 setLocoID,
+                onCompletePressed,
                 handlePerformStopAction,
                 handlePerformStopActionRange,
                 handleUpdateBinState,
@@ -449,6 +462,7 @@ export const useRun = () => {
         onRunStarted,
         getLocoID,
         setLocoID,
+        onCompletePressed,
         handlePerformStopAction,
         handlePerformStopActionRange,
         handleUpdateBinState,
@@ -462,6 +476,7 @@ export const useRun = () => {
         onRunStarted,
         getLocoID,
         setLocoID,
+        onCompletePressed,
         handlePerformStopAction,
         handlePerformStopActionRange,
         handleUpdateBinState,

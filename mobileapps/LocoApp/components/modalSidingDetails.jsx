@@ -29,6 +29,7 @@ const ModalSidingDetails = () => {
   // Data
   const stop = getStop(sidingToViewID);
   const loco = getLoco();
+  const complete = stop.collectComplete && stop.dropOffComplete;
 
   return (
     <CustomModal
@@ -36,7 +37,7 @@ const ModalSidingDetails = () => {
       isVisible={modalSidingVisible}
       style={[
         { width: '85%', height: '90%' },
-        stop.isCompleted && { backgroundColor: theme.spCompleteBG },
+        complete && { backgroundColor: theme.spCompleteBG },
         stop.stopID === selectedSidingID && {
           backgroundColor: theme.spSelectedBG,
         },
@@ -50,7 +51,7 @@ const ModalSidingDetails = () => {
           name='pin-drop'
           size={28}
           color={
-            stop.isCompleted
+            complete
               ? theme.spCompleteBGText
               : stop.stopID === selectedSidingID
               ? theme.spSelectedBGText
@@ -59,7 +60,7 @@ const ModalSidingDetails = () => {
         />
         <Title1
           style={[
-            stop.isCompleted
+            complete
               ? { color: theme.spCompleteBGText }
               : theme.spPendingText,
             stop.stopID === selectedSidingID
@@ -77,7 +78,7 @@ const ModalSidingDetails = () => {
             name='close-circle-outline'
             size={36}
             color={
-              stop.isCompleted
+              complete
                 ? theme.spCompleteBGText
                 : stop.stopID === selectedSidingID
                 ? theme.spSelectedBGText

@@ -19,7 +19,7 @@ import AddBinCamera from './addBinCamera';
 const BinList = ({ stopID, type }) => {
   // Provider
   const { theme } = useTheme();
-  const { getStop, getLoco, handlePerformStopActionRange } = useRun();
+  const { getStop, getLoco, handlePerformStopActionRange, onCompletePressed } = useRun();
   const { selectedSidingID, openAddBinModal } = useModal();
 
   // Data
@@ -30,15 +30,18 @@ const BinList = ({ stopID, type }) => {
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
   const [rangeSelectStartIndex, setRangeSelectStartIndex] = useState();
 
-  const textColour = false
+
+  const complete = type === 'SIDING' ? stop.collectComplete : stop.dropOffComplete;
+
+  const textColour = complete
       ? { color: theme.spCompleteText }
       : { color: theme.spPendingText };
 
   // Used to set the icon colour
-  const iconColour = false ? theme.spCompleteText : theme.spPendingText;
+  const iconColour = complete ? theme.spCompleteText : theme.spPendingText;
 
   // Used to set the background color
-  const backgroundColor = false
+  const backgroundColor = complete
       ? { backgroundColor: theme.spComplete }
       : { backgroundColor: theme.spPending };
 
@@ -110,7 +113,7 @@ const BinList = ({ stopID, type }) => {
             alignItems: 'center',
             paddingHorizontal: 8,
           },
-          stop.isCompleted
+          complete
             ? { backgroundColor: theme.spComplete }
             : stop.stopID == selectedSidingID
             ? { backgroundColor: theme.spSelected }
@@ -137,7 +140,7 @@ const BinList = ({ stopID, type }) => {
               borderRadius: 8,
               marginLeft: 'auto',
             },
-            stop.isCompleted
+            complete
               ? { backgroundColor: theme.spCompleteBG }
               : stop.stopID == selectedSidingID
               ? { backgroundColor: theme.spSelectedBG }
@@ -148,7 +151,7 @@ const BinList = ({ stopID, type }) => {
             name={'plus-circle-outline'}
             size={24}
             color={
-              stop.isCompleted
+              complete
                 ? theme.spCompleteText
                 : stop.stopID == selectedSidingID
                 ? theme.spSelectedText
@@ -181,15 +184,15 @@ const BinList = ({ stopID, type }) => {
             },
             backgroundColor,
           ]}
-          // TODO onPress={() => setIsCompleted(!isCompleted)}
+          onPress={() => onCompletePressed(stopID, type)}
         >
           <Feather
             size={24}
-            name={false ? 'check-circle' : 'circle'}
+            name={complete ? 'check-circle' : 'circle'}
             color={iconColour}
           />
           <Title2 style={textColour}>
-            {false ? 'Completed' : 'Incomplete'}
+            {complete ? 'Complete' : 'Incomplete'}
           </Title2>
         </TouchableOpacity>
       </View>

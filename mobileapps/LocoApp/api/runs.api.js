@@ -19,3 +19,7 @@ export function performStopAction(binID, locoID, stopID, type) {
 export function getCounts(stopID) {
     return handleFetch(fetch(`${apiUrl}/counts/${stopID}`, getConfig()), true);
 }
+
+export function completeStop(stopID, type) {
+    return handleFetch(fetch(`${apiUrl}/${stopID}/complete-stop/${type}`, postConfig(null)), false);
+}

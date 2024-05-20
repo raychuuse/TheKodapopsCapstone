@@ -16,20 +16,22 @@ const RunSheetSidingItem = ({ stop }) => {
   const { selectedSidingID, updateSelectedSidingID, openSidingModal } =
     useModal();
 
+  const complete = stop.collectComplete && stop.dropOffCoplete;
+
   // Background Color for the Siding, this is base on the siding data
-  const backgroundColor = stop.isCompleted
+  const backgroundColor = complete
     ? theme.spCompleteBG
     : stop.stopID === selectedSidingID
     ? theme.spSelectedBG
     : theme.spPendingBG;
   // Text Color for the Siding, this is base on the siding data
-  const TextColor = stop.isCompleted
+  const TextColor = complete
     ? theme.spCompleteText
     : stop.stopID === selectedSidingID
     ? theme.spSelectedText
     : theme.spPendingText;
   // Icon Name for the Siding Icon, this is base on the siding data
-  const Icon = stop.isCompleted
+  const Icon = complete
     ? 'checkbox-marked-circle-outline'
     : stop.stopID === selectedSidingID
     ? 'star-circle-outline'
@@ -61,7 +63,7 @@ const RunSheetSidingItem = ({ stop }) => {
         {stop.sidingName}
       </Title2>
       {/* Bin Details */}
-      {stop.isCompleted ? (
+      {complete ? (
         <Title2 style={{ color: TextColor, marginRight: 8 }}>Completed</Title2>
       ) : (
         <View

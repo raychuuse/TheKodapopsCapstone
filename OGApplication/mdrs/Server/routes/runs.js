@@ -1,6 +1,7 @@
 const express = require('express');
 const {processQueryResult} = require('../utils');
 const {isValidId} = require('../utils');
+const {verifyAuthorization} = require("../middleware/authorization");
 const router = express.Router();
 
 const createRuns = (rows) => {
@@ -257,6 +258,31 @@ router.post('/:locoID/stop-action/:stopID/:binID', (req, res) => {
                         });
                     });
             })
+        })
+        .catch(err => {
+            console.error(err);
+            if (err.status != null && err.message != null)
+                return res.status(err.status).json({message: err.message});
+            return res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+        })
+});
+
+router.post('/:stopID/complete-stop/:type', verifyAuthorization, (req, res) => {
+    const stopID = req.params.stopID;
+    if (!isValidId(stopID, res)) return;
+    const type = req.params.type;
+    if (type !== 'COLLECT' && type !== 'DROP_OFF')
+        return res.status(400).json({message: 'Type must be either COLLECT or DROP_OFF'});
+
+    req.db.raw(`SELECT * FROM run_stops WHERE stopID = ?`, [stopID])
+        .then(processQueryResult)
+        .then(response => {
+            if (response.length === 0)
+                throw {status: 404, message: 'No stop found with id: ' + stopID};
+            return req.db.raw(`UPDATE run_stops SET ` + (type === 'COLLECT' ? 'collectComplete = 1' : 'dropOffComplete = 1') + ` WHERE stopID = ?`, [stopID]);
+        })
+        .then(response => {
+            return res.status(204).send();
         })
         .catch(err => {
             console.error(err);

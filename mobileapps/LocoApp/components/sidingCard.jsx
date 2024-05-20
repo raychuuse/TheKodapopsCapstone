@@ -19,7 +19,8 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
 
   // Data
   const stop = getStop(stopID);
-  const length = getStops().length
+  const length = getStops().length;
+  const complete = stop.collectComplete && stop.dropOffComplete;
 
   // Animation Constants
   const inputRange = [(index - 1) * 170, index * 170, (index + 1) * 170];
@@ -36,7 +37,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
           backgroundColor: theme.spPending,
           borderColor: theme.spPendingBorder,
         },
-        stop.isCompleted
+        complete
           ? {
               backgroundColor: theme.spComplete,
               borderColor: theme.spCompleteBorder,
@@ -66,7 +67,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
                 paddingHorizontal: 8,
                 textAlign: 'center',
               },
-              stop.isCompleted
+              complete
                 ? { color: theme.spCompleteText }
                 : stop.stopID == selectedSidingID
                 ? { color: theme.spSelectedText }
@@ -85,7 +86,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
               name='download'
               size={18}
               color={
-                stop.isCompleted
+                complete
                   ? theme.spCompleteText
                   : stop.stopID == selectedSidingID
                   ? theme.spSelectedText
@@ -96,7 +97,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
               style={[
                 { marginRight: 9 },
                 { color: theme.spPendingText },
-                stop.isCompleted
+                complete
                   ? { color: theme.spCompleteText }
                   : stop.stopID == selectedSidingID
                   ? { color: theme.spSelectedText }
@@ -110,7 +111,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
             style={[
               styles.binCounter,
               { color: theme.spPendingText },
-              stop.isCompleted
+              complete
                 ? { color: theme.spCompleteText }
                 : stop.stopID == selectedSidingID
                 ? { color: theme.spSelectedText }
@@ -129,7 +130,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
               name='upload'
               size={18}
               color={
-                stop.isCompleted
+                complete
                   ? theme.spCompleteText
                   : stop.stopID == selectedSidingID
                   ? theme.spSelectedText
@@ -140,7 +141,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
               style={[
                 { marginRight: 9 },
                 { color: theme.spPendingText },
-                stop.isCompleted
+                complete
                   ? { color: theme.spCompleteText }
                   : stop.stopID == selectedSidingID
                   ? { color: theme.spSelectedText }
@@ -154,7 +155,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
             style={[
               styles.binCounter,
               { color: theme.spPendingText },
-              stop.isCompleted
+              complete
                 ? { color: theme.spCompleteText }
                 : stop.stopID == selectedSidingID
                 ? { color: theme.spSelectedText }
@@ -170,11 +171,11 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
         <View style={{ flex: 3, justifyContent: 'center' }}>
           <TouchableOpacity
             onPress={() => updateSelectedSidingID(stopID)}
-            disabled={false} // TODO
+            disabled={complete}
           >
             <MaterialCommunityIcons
               name={
-                stop.isCompleted
+                complete
                   ? 'checkbox-marked-circle-outline'
                   : stop.stopID == selectedSidingID
                   ? 'star-circle-outline'
@@ -182,7 +183,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
               }
               size={36}
               color={
-                stop.isCompleted
+                complete
                   ? theme.spCompleteText
                   : stop.stopID == selectedSidingID
                   ? theme.spSelectedText

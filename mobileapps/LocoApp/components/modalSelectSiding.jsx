@@ -24,20 +24,21 @@ const ModalSelectSiding = () => {
   } = useModal();
 
   const SidingListItem = ({ stop }) => {
+    const complete = stop.collectComplete && stop.dropOffComplete;
     // Background Color for the Siding, this is base on the siding data
-    const backgroundColor = stop.isCompleted
+    const backgroundColor = complete
       ? theme.spCompleteBG
       : stop.stopID == selectedSidingID
       ? theme.spSelectedBG
       : theme.spPendingBG;
     // Text Color for the Siding, this is base on the siding data
-    const TextColor = stop.isCompleted
+    const TextColor = complete
       ? theme.spCompleteText
       : stop.stopID == selectedSidingID
       ? theme.spSelectedText
       : theme.spPendingText;
     // Icon Name for the Siding Icon, this is base on the siding data
-    const Icon = stop.isCompleted
+    const Icon = complete
       ? 'checkbox-marked-circle-outline'
       : stop.stopID == selectedSidingID
       ? 'star-circle-outline'
