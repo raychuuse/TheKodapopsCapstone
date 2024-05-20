@@ -14,32 +14,31 @@ import {Colours} from '../styles/colours';
 
 // Import Mock Data
 import {getAllLocos} from "../api/loco.api";
+import {useRun} from "../context/runContext";
 
 const SetupPage = () => {
     const [locos, setLocos] = useState();
-    const [selectedLoco, setSelectedLoco] = useState();
+    const {getLocoID, setLocoID, onRunStarted} = useRun();
 
     useEffect(() => {
         getAllLocos()
             .then(response => {
-                setLocos(response.map(loco => {
-                    return {id: loco.locoID, label: loco.locoName};
-                }));
-              for (const loco of response) {
-                if (loco.locoID === 1)
-                  setSelectedLoco({id: loco.locoID, label: loco.locoName});
-              }
+                setLocos(response);
             })
             .catch(err => {
                 console.error(err);
             });
     }, []);
 
-    const onStart = () => {
-        if (selectedLoco != null) {
-            router.navigate('/dashboard');
-        }
-    };
+    const onLocoSelected = (locoID) => {
+        setLocoID(locoID);
+    }
+
+    const onStartPressed = () => {
+        const loco = locos?.find(l => l.locoID === getLocoID());
+        if (loco == null) return;
+        onRunStarted();
+    }
 
     return (
         <View style={styles.page}>
@@ -56,8 +55,10 @@ const SetupPage = () => {
                     {/* Locomotive Selector */}
                     {locos != undefined && <SettingsItem
                         label='Locomotive'
-                        options={locos}
-                        setSelectedItem={setSelectedLoco}
+                        options={locos?.map(loco => {
+                            return {id: loco.locoID, label: loco.locoName};
+                        })}
+                        setSelectedItem={onLocoSelected}
                     />}
                 </View>
                 {/* Actions */}
@@ -77,7 +78,7 @@ const SetupPage = () => {
                         title='Start'
                         textColor={Colours.textLevel3}
                         style={StyleSheet.create({flex: 1})}
-                        onPress={onStart}
+                        onPress={onStartPressed}
                     />
                 </View>
             </View>

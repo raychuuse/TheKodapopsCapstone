@@ -3,6 +3,7 @@ import { getConfig, handleFetch, postConfig, serverUrl } from './utils.api';
 const apiUrl = `${serverUrl}/runs`;
 
 export function getRunsByLocoAndDate(locoID, date) {
+    console.info(date);
     const dateStr = date.toISOString().split('T')[0];
     return handleFetch(fetch(`${apiUrl}/${locoID}/${dateStr}`, getConfig()), true);
 }

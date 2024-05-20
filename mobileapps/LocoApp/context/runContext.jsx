@@ -7,57 +7,10 @@ import {getCurrentLoadById} from '../api/loco.api';
 import {getSidingBreakdown} from '../api/siding.api';
 import {consignBin, findBin, updateBinFieldState} from '../api/bins.api.ts';
 import NetInfo from '@react-native-community/netinfo';
+import {router} from "expo-router";
 
 // Create a React context for storing and managing run data
 const RunContext = createContext();
-
-/**
- * Reducer function to handle actions that update the state of the run data
- * @param state The current state of the run data
- * @param action The action object that triggers state updates
- */
-function runReducer(state, action) {
-    switch (action.type) {
-        case 'UPDATE_RUN':
-            // Handles updates to the top-level run properties
-            return {...state, ...action.payload};
-        case 'UPDATE_SIDING':
-            // Updates a specific siding by id within the sidings array
-            return {
-                ...state,
-                sidings: state.sidings.map((siding) =>
-                    siding.id === action.payload.id
-                        ? {...siding, ...action.payload.updates}
-                        : siding,
-                ),
-            };
-        case 'UPDATE_BIN_DROP':
-        case 'UPDATE_BIN_COLLECT':
-            // Determines which bins array (drop or collect) to update
-            const binsKey =
-                action.type === 'UPDATE_BIN_DROP' ? 'binsDrop' : 'binsCollect';
-            return {
-                ...state,
-                sidings: state.sidings.map((siding) =>
-                    siding.id === action.sidingId
-                        ? {
-                            // Update specific bin details within either binsDrop or binsCollect array
-                            ...siding,
-                            [binsKey]: siding[binsKey].map((bin) =>
-                                bin.binNumber === action.payload.binNumber
-                                    ? {...bin, ...action.payload.updates}
-                                    : bin,
-                            ),
-                        }
-                        : siding,
-                ),
-            };
-        default:
-            // Throws an error if an action type is not handled
-            throw new Error(`Unhandled action type: ${action.type}`);
-    }
-}
-
 
 let connected = true;
 const offlineStopActions = [];
@@ -66,9 +19,9 @@ const offlineBinStateActions = [];
 
 // Context provider component that makes the run data accessible throughout the component tree
 export const RunProvider = ({children}) => {
-    const [state, dispatch] = useReducer(runReducer, RunMockData);
     const [run, setRun] = useState();
     const [loco, setLoco] = useState();
+    const [locoID, setLocoID] = useState();
 
     const onReconnected = () => {
         const performStopActions = () => {
@@ -110,7 +63,7 @@ export const RunProvider = ({children}) => {
             })
             .then(binStateComplete => {
                 if (!binStateComplete) throw new Error("Bin state actions failed");
-                loadData();
+                loadData(false);
             })
             .catch(err => {
                 console.error(err);
@@ -126,19 +79,23 @@ export const RunProvider = ({children}) => {
     }
 
     NetInfo.addEventListener(state => {
-        console.info(state.isConnected);
         if (!connected && state.isConnected)
             onReconnected();
         connected = state.isConnected;
     });
 
-    const loadData = () => {
+    const onRunStarted = () => {
+        if (locoID == null) return;
+        loadData(true);
+    };
+
+    const loadData = (navigate) => {
         let tempRun;
-        return getCurrentLoadById(1)
+        return getCurrentLoadById(locoID)
             .then(locoResponse => {
                 setLoco(locoResponse);
             })
-            .then(() => getRunsByLocoAndDate(1, new Date()))
+            .then(() => getRunsByLocoAndDate(locoID, new Date(new Date().getTime() + 10 * 3600 * 1000)))
             .then(response => {
                 const promises = [];
                 for (const stop of response.stops)
@@ -151,16 +108,14 @@ export const RunProvider = ({children}) => {
                     tempRun.stops[i].bins = responses[i].value;
                 }
                 setRun(tempRun);
+                if (navigate)
+                    router.navigate('/dashboard');
                 console.info('Setting everything');
             })
             .catch(err => {
                 console.error(err);
             });
     };
-
-    useEffect(() => {
-        loadData();
-    }, []);
 
     const getFromSource = (stop, type) => {
         return type === 'COLLECT' ? stop : loco;
@@ -407,49 +362,19 @@ export const RunProvider = ({children}) => {
         return loco;
     };
 
-    const updateSiding = (id, updates) =>
-        dispatch({type: 'UPDATE_SIDING', payload: {id, updates}});
-
-    //Dispatches an action to update specific bin details in drop or collect arrays
-    const updateBin = (sidingId, binNumber, updates, isDrop = true) => {
-        const type = isDrop ? 'UPDATE_BIN_DROP' : 'UPDATE_BIN_COLLECT';
-        dispatch({type, sidingId, payload: {binNumber, updates}});
-    };
-
-    // Retrieves the entire run data from the state
-    const getRun = () => state;
-
-    // Retrieves a specific siding by ID from the state
-    const getSiding = (id) => state.sidings.find((siding) => siding.id === id);
-
-    // Retrieves bins from a specific siding, either drop or collect
-    const getBins = (sidingId, isDrop = true) => {
-        const siding = getSiding(sidingId);
-        return siding ? (isDrop ? siding.binsDrop : siding.binsCollect) : [];
-    };
-
-    // Retrieves a specific bin from a specific siding, either drop or collect
-    const getBin = (sidingId, binNumber, isDrop) => {
-        const siding = getSiding(sidingId);
-        if (!siding) return undefined;
-        const binsKey = isDrop ? 'binsDrop' : 'binsCollect';
-        return siding[binsKey].find((bin) => bin.binNumber === binNumber);
-    };
+    const getLocoID = () => {
+        return locoID;
+    }
 
     return (
         <RunContext.Provider
             value={{
-                state,
-                getRun,
-                getSiding,
-                getBins,
-                getBin,
-                updateRun,
-                updateSiding,
-                updateBin,
                 getStop,
                 getStops,
                 getLoco,
+                onRunStarted,
+                getLocoID,
+                setLocoID,
                 handlePerformStopAction,
                 handlePerformStopActionRange,
                 handleUpdateBinState,
@@ -518,17 +443,12 @@ export const RunProvider = ({children}) => {
  */
 export const useRun = () => {
     const {
-        state,
-        getRun,
-        getSiding,
-        getBins,
-        getBin,
-        updateRun,
-        updateSiding,
-        updateBin,
         getStop,
         getStops,
         getLoco,
+        onRunStarted,
+        getLocoID,
+        setLocoID,
         handlePerformStopAction,
         handlePerformStopActionRange,
         handleUpdateBinState,
@@ -536,17 +456,12 @@ export const useRun = () => {
         handleConsignBin,
     } = useContext(RunContext);
     return {
-        state,
-        getRun,
-        getSiding,
-        getBins,
-        getBin,
-        updateRun,
-        updateSiding,
-        updateBin,
         getStop,
         getStops,
         getLoco,
+        onRunStarted,
+        getLocoID,
+        setLocoID,
         handlePerformStopAction,
         handlePerformStopActionRange,
         handleUpdateBinState,

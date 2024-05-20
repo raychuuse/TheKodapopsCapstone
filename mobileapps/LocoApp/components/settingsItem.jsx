@@ -16,7 +16,7 @@ const SettingsItem = ({
   type = '',
   startOption = 0,
   label = 'label',
-  options = [{ label: 'Label', id: 0 }],
+  options = [],
   style,
   setSelectedItem,
 }) => {
@@ -25,29 +25,9 @@ const SettingsItem = ({
 
   const { theme } = useTheme();
 
-  useEffect(() => {
-    const loadSelectedOption = async () => {
-      try {
-        const storedOption = await AsyncStorage.getItem(label);
-        if (storedOption !== null) {
-          setSelectedOption(parseInt(storedOption));
-        }
-      } catch (error) {
-        console.error('Failed to load the selected option from storage', error);
-      }
-    };
-
-    loadSelectedOption();
-  }, [label]);
-
   const handleValueChange = async (itemValue, itemIndex) => {
-    try {
-      await AsyncStorage.setItem(label, itemValue.toString());
       setSelectedItem(itemValue);
       setSelectedOption(itemValue);
-    } catch (error) {
-      console.error('Failed to save the selected option to storage', error);
-    }
   };
 
   return (

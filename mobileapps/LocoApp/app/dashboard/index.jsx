@@ -111,7 +111,7 @@ export default function Page() {
             />
           </View>
           <SidingListScrollBar
-            data={runData.sidings}
+            data={stops}
             flatListRef={sidingListRef}
             containerWidth={sidingCarouselWidth}
           />
