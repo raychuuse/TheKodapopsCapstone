@@ -24,14 +24,14 @@ import { useBins } from '../context/binContext';
  *
  * @returns {JSX.Element} The rendered BinList component
  */
-const BinList = ({ BinData, openAddBinModal }) => {
-  // Provider
-  const { binData, setBinData, getBinData } = useBins();
+const BinList = ({ openAddBinModal }) => {
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
-  const [selectedIndices, setSelectedIndices] = useState([]);
-  const [isSelected, setIsSelected] = useState(null);
+  const [rangeSelectStartIndex, setRangeSelectStartIndex] = useState();
   const [isLocked, setIsLocked] = useState(false);
+  const {handleConsignRange, getBins} = useBins();
+
+  const bins = getBins();
 
   // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
 
@@ -43,45 +43,18 @@ const BinList = ({ BinData, openAddBinModal }) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Provide haptic feedback
   };
 
-  /**
-   * Handle long press range selection on bins.
-   *
-   * @param {string} binNumber - The bin number being selected
-   * @param {number} index - The index of the bin in the list
-   */
-  const LongPressRangeSelect = (binNumber, index) => {
-    let newSelection = [...selectedIndices]; // Clone the current selection
-
-    if (newSelection.length === 0) {
-      newSelection.push({ binNumber, index });
-      setSelectedIndices(newSelection); // Update the state with the new selection
-      setIsSelected(index);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Provide haptic feedback
-    } else if (newSelection.length === 1) {
-      if (newSelection[0].index === index) {
-        setSelectedIndices([]); // Clear the selection if the same bin is selected again
-        setIsSelected(null);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Provide haptic feedback
+  const longPressHandler = (index) => {
+      if (rangeSelectStartIndex == null) {
+          setRangeSelectStartIndex(index);
       } else {
-        newSelection.push({ binNumber, index });
-        const _binData = binData; // Temporary copy of bin data
-
-        const indices = newSelection.map((selection) => selection.index);
-        const minIndex = Math.min(...indices);
-        const maxIndex = Math.max(...indices);
-
-        const toSet = !binData[newSelection[0].index].isFull; // Desired 'full' state
-
-        for (let i = minIndex; i <= maxIndex; i++) {
-          _binData[i].isFull = toSet; // Set each bin's 'full' state
-        }
-
-        setBinData(_binData); // Update the bin data state
-        setSelectedIndices([]); // Clear the selection
-        setIsSelected(null);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); // Provide haptic feedback
+          if (rangeSelectStartIndex === index) {
+              setRangeSelectStartIndex(null);
+          } else {
+              handleConsignRange(rangeSelectStartIndex, index);
+              setTimeout(() => setRangeSelectStartIndex(null), 1000); // States are annoying
+          }
       }
-    }
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   // ~ ~ ~ ~ ~ ~ ~ List Components ~ ~ ~ ~ ~ ~ ~ //
@@ -99,9 +72,9 @@ const BinList = ({ BinData, openAddBinModal }) => {
     return (
       <SwipeableBinItem
         index={index}
-        isSelected={isSelected}
-        binNumber={item.binNum}
-        longPressHandler={LongPressRangeSelect}
+        bin={item}
+        rangeSelectIndex={rangeSelectStartIndex}
+        longPressHandler={longPressHandler}
         style={{
           position: 'relative',
           paddingHorizontal: 8,
@@ -165,8 +138,8 @@ const BinList = ({ BinData, openAddBinModal }) => {
             alignItems: 'center',
           }}
         >
-          <Title3>{BinData.length}</Title3>
-          <Headline>{BinData.length > 1 ? 'Bins' : 'Bin'} at Siding</Headline>
+          <Title3>{bins?.length}</Title3>
+          <Headline>{bins?.length > 1 ? 'Bins' : 'Bin'} at Siding</Headline>
         </View>
         <TouchableOpacity
           onLongPress={() => toggleLock()}
@@ -259,7 +232,7 @@ const BinList = ({ BinData, openAddBinModal }) => {
       {isLocked && <LockView />}
       {/* Bin List Body */}
       <FlatList
-        data={BinData}
+        data={bins}
         renderItem={listRenderItem}
         style={{
           position: 'relative',

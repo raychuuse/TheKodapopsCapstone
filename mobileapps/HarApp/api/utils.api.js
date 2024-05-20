@@ -24,7 +24,7 @@ export function putConfig(data) {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + getToken(),
         },
-        body: b,
+        body: b
     }
 }
 
@@ -40,7 +40,7 @@ export function getConfig() {
 }
 
 function getToken() {
-    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzE1MzI0NTkyNzc0LCJpYXQiOjE3MTUyMzgxOTJ9.GmoH-dJpJVbrFPrwVFrBmRCsx5r_s9pPDPALZRBd-o4';
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzE1MDUxMTcwMzU0LCJpYXQiOjE3MTQ5NjQ3NzB9.7mRDeb8rlYAV3Q37aWUJ9KlBx-yMcDea2fZSChUrQB8';
 }
 
 function logout() {

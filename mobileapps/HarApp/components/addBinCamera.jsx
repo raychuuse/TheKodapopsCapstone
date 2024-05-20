@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera/legacy';
+import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera';
 import { useContext, useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 
@@ -33,7 +33,7 @@ const AddBinCamera = ({ modalCloser }) => {
   const [permission, requestPermission] = Camera.useCameraPermissions(); // Camera permissions
   const cameraRef = useRef(null); // Reference to the camera component
   const [imageUri, setImageUri] = useState(null); // State for the captured image URI
-  const { binData, createBin, getBinData } = useBins(); // Context for bin data and functions
+  const {handleFindBin} = useBins();
 
   const [binNumber, setBinNumber] = useState(); // State for the bin number input
   const inputRef = useRef(null); // Reference to the input component
@@ -92,17 +92,13 @@ const AddBinCamera = ({ modalCloser }) => {
    */
   function VerifyBinNumber(num) {
     // Regex from stack overflow, \d for digits
-    if (/^\d+$/.test(num)) {
-      // Check for undefined/ null
-      valIfExists = getBinData(num) == null;
-      if (valIfExists == null) {
-        issueAlert('An invalid number has been entered.');
-        return false;
+      if (/^\d+$/.test(num)) {
+        return true;
       } else {
+        issueAlert('An invalid number has been entered.');
         return true;
       }
     }
-  }
 
   /**
    * Handle the submission of the bin number.
@@ -110,7 +106,7 @@ const AddBinCamera = ({ modalCloser }) => {
   function handleSubmit() {
     if (VerifyBinNumber(binNumber)) {
       try {
-        createBin({ isFull: false, binNum: binNumber, isBurnt: false });
+        handleFindBin(binNumber);
         Alert.alert('Bin Creation Successful.');
         return;
       } catch (err) {

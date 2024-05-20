@@ -19,126 +19,53 @@ import AddBinCamera from './addBinCamera';
 const BinList = ({ stopID, type }) => {
   // Provider
   const { theme } = useTheme();
-  const { getStop, getLoco } = useRun();
+  const { getStop, getLoco, handlePerformStopActionRange } = useRun();
   const { selectedSidingID, openAddBinModal } = useModal();
 
   // Data
   const loco = getLoco();
   const stop = getStop(stopID);
-  console.info('Stop', stop, stopID, loco);
   const bins = type === 'SIDING' ? stop.bins : loco.bins;
-  const runData = [];
 
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
-  const [selectedIndices, setSelectedIndices] = useState([]);
-  const [longPressedIndex, setLongPressedIndex] = useState(null);
+  const [rangeSelectStartIndex, setRangeSelectStartIndex] = useState();
 
-  // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
-  const [isCompleted, setIsCompleted] = useState(stop.isCompleted);
-
-  // ~ ~ ~ ~ ~ ~ ~ ~ List Styles ~ ~ ~ ~ ~ ~ ~ ~ //
-  // Used to set the text colour
-  const textColour = isCompleted
-    ? { color: theme.spCompleteText }
-    : { color: theme.spPendingText };
+  const textColour = false
+      ? { color: theme.spCompleteText }
+      : { color: theme.spPendingText };
 
   // Used to set the icon colour
-  const iconColour = isCompleted ? theme.spCompleteText : theme.spPendingText;
+  const iconColour = false ? theme.spCompleteText : theme.spPendingText;
 
   // Used to set the background color
-  const backgroundColor = isCompleted
-    ? { backgroundColor: theme.spComplete }
-    : { backgroundColor: theme.spPending };
+  const backgroundColor = false
+      ? { backgroundColor: theme.spComplete }
+      : { backgroundColor: theme.spPending };
 
-  // ~ ~ ~ ~ ~ ~ ~ List Functions ~ ~ ~ ~ ~ ~ ~ //
-  // TODO: Fix this to use the context right and the re-render issue after updates
-  // Function to handle long press range selection on bins.
-  const LongPressRangeSelect = (binNumber, index) => {
-    // Clone the current selection to avoid direct state mutation.
-    let newSelection = [...selectedIndices];
 
-    // Case when no bins are currently selected.
-    if (newSelection.length === 0) {
-      // Add the first selected bin's details to the array.
-      newSelection.push({ binNumber, index });
-      // Update the state to reflect the new selection.
-      setSelectedIndices(newSelection);
-      // Set the is selected indicator
-      setLongPressedIndex(index);
-      // Provide haptic feedback to indicate successful selection.
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
-    // Case when there is already one bin selected.
-    else if (newSelection.length === 1) {
-      // Check if the same bin is selected again.
-      if (newSelection[0].index === index) {
-        // Clear the selection if the same bin is selected again.
-        setSelectedIndices([]);
-        // Unset the is selected indicator
-        setLongPressedIndex(null);
-        // Provide haptic feedback to indicate removal.
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  const longPressHandler = (index) => {
+    if (rangeSelectStartIndex == null) {
+      setRangeSelectStartIndex(index);
+    } else {
+      if (rangeSelectStartIndex === index) {
+        setRangeSelectStartIndex(null);
       } else {
-        // Add the newly selected bin to the selection array.
-        newSelection.push({ binNumber, index });
-
-        // Temporary copy of run data for mutation.
-        const _runData = runData;
-        // Temporary copy of bin data for mutation.
-        const _binData = runData.sidings.find(
-          (siding) => siding.id == stopID
-        )[type];
-
-        // Extract indices from the selected objects for range calculation.
-        const indices = newSelection.map((selection) => selection.index);
-        // Calculate the minimum and maximum indices to define the range.
-        const minIndex = Math.min(...indices);
-        const maxIndex = Math.max(...indices);
-
-        // Determine the desired 'full' state based on the first selected bin.
-        const toSet = !_binData[newSelection[0].index].isFull;
-
-        // Loop through the range of indices and set each bin's 'full' state.
-        for (let i = minIndex; i <= maxIndex; i++) {
-          _binData[i].isFull = toSet;
-        }
-
-        _runData.sidings = _runData.sidings.map((siding) => {
-          if (siding.id == stopID) {
-            // Create a new object combining the existing siding data with the new data
-            return { ...siding, binListName: _binData };
-          } else {
-            return siding;
-          }
-        });
-
-        // Update the bin data state with the new 'full' states.
-        updateRun(_runData);
-        // Clear the selection after the action is completed.
-        setSelectedIndices([]);
-        // Unset the is selected indicator
-        setLongPressedIndex(null);
-        // Provide haptic feedback to indicate successful processing.
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-        // console.log(
-        //   JSON.stringify(
-        //     _runData.sidings.find((siding) => siding.id == sidingId)
-        //   )
-        // );
+        handlePerformStopActionRange(rangeSelectStartIndex, index, stop, type === 'SIDING' ? 'COLLECT' : 'DROP_OFF');
+        setTimeout(() => setRangeSelectStartIndex(null), 1000); // States are annoying
       }
     }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   // ~ ~ ~ ~ ~ ~ ~ List Components ~ ~ ~ ~ ~ ~ ~ //
   const listRenderItem = ({ item, index }) => (
     <SwipeableBinItem
       index={index}
-      longPressedIndex={longPressedIndex}
       bin={item}
       type={type}
-      stopID={stopID}
-      longPressHandler={LongPressRangeSelect}
+      stop={stop}
+      rangeSelectIndex={rangeSelectStartIndex}
+      longPressHandler={longPressHandler}
     />
   );
 
@@ -165,10 +92,10 @@ const BinList = ({ stopID, type }) => {
       }}
     >
       {/* Add Bin Modal */}
-      <AddBinCamera
-        sidingID={sidingId}
+      {/*TODO <AddBinCamera
+        sidingID={stop.stopID}
         isDrop={binsKey}
-      />
+      />*/}
       {/* List Header */}
       <View
         style={[
@@ -199,8 +126,6 @@ const BinList = ({ stopID, type }) => {
         </Title2>
         <Title2>{bins.length}</Title2>
         <Title2>{bins.length > 1 ? 'Bins' : 'Bin'} at Siding</Title2>
-        <Title2>{BinData.length}</Title2>
-        <Title2>{BinData.length > 1 ? 'Bins' : 'Bin'} at Siding</Title2>
         <TouchableOpacity
           onPress={() => {
             openAddBinModal();
@@ -212,9 +137,9 @@ const BinList = ({ stopID, type }) => {
               borderRadius: 8,
               marginLeft: 'auto',
             },
-            siding.isCompleted
+            stop.isCompleted
               ? { backgroundColor: theme.spCompleteBG }
-              : siding.id == selectedSidingID
+              : stop.stopID == selectedSidingID
               ? { backgroundColor: theme.spSelectedBG }
               : { backgroundColor: theme.bgModal },
           ]}
@@ -223,9 +148,9 @@ const BinList = ({ stopID, type }) => {
             name={'plus-circle-outline'}
             size={24}
             color={
-              siding.isCompleted
+              stop.isCompleted
                 ? theme.spCompleteText
-                : siding.id == selectedSidingID
+                : stop.stopID == selectedSidingID
                 ? theme.spSelectedText
                 : theme.spPendingText
             }
@@ -256,15 +181,15 @@ const BinList = ({ stopID, type }) => {
             },
             backgroundColor,
           ]}
-          onPress={() => setIsCompleted(!isCompleted)}
+          // TODO onPress={() => setIsCompleted(!isCompleted)}
         >
           <Feather
             size={24}
-            name={isCompleted ? 'check-circle' : 'circle'}
+            name={false ? 'check-circle' : 'circle'}
             color={iconColour}
           />
           <Title2 style={textColour}>
-            {isCompleted ? 'Completed' : 'Incomplete'}
+            {false ? 'Completed' : 'Incomplete'}
           </Title2>
         </TouchableOpacity>
       </View>

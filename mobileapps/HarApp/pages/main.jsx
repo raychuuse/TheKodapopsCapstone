@@ -26,8 +26,6 @@ import { useAuth } from '../context/authContext';
 import { useSelections } from '../context/selectionContext';
 
 const MainPage = () => {
-  const { binData } = useBins();
-
   const {getSiding, setSelectionData} = useSelections();
   const setupPageRef = "dashboard/setup";
 
@@ -79,7 +77,6 @@ const MainPage = () => {
         <SidingSelector sidingName= {getSiding()}/>
         {/* Bin List */}
         <BinList
-          BinData={binData}
           openAddBinModal={setAddBinVisable}
         />
       </View>

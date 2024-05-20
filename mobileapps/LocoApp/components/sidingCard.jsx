@@ -66,7 +66,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
                 paddingHorizontal: 8,
                 textAlign: 'center',
               },
-              siding.isCompleted
+              stop.isCompleted
                 ? { color: theme.spCompleteText }
                 : stop.stopID == selectedSidingID
                 ? { color: theme.spSelectedText }
@@ -170,7 +170,7 @@ const SidingCard = ({ stopID, index, scrollX, containerWidth }) => {
         <View style={{ flex: 3, justifyContent: 'center' }}>
           <TouchableOpacity
             onPress={() => updateSelectedSidingID(stopID)}
-            disabled={false}
+            disabled={false} // TODO
           >
             <MaterialCommunityIcons
               name={

@@ -13,20 +13,20 @@ export const FinishedAlert = (data, func) => {
   ]);
 };
 
-export const RemoveBinAlert = (message, binNum, func/*, getFunc*/) => {
+export const RemoveBinAlert = (message, bin, func) => {
   Alert.alert(
     'Confirm Missing Bin?',
     `\nAre you sure you want to report ${message} as missing?`,
-    [{ text: "No, It's Here!"}, { text: 'Yes, Report', onPress: () => {func(binNum)}}]
+    [{ text: "No, It's Here!"}, { text: 'Yes, Report', onPress: func}]
       //func(binNum, !getFunc(binNum).isMissing)}}]
     );
 };
 
-export const RepairBinAlert = (message, binNum, func, getFunc) => {
+export const RepairBinAlert = (message, bin, func) => {
   Alert.alert(
     'Switch Bin Repair Status?',
     `\nAre you sure you want to request/ cancel a repair for #${message}?`,
-    [{ text: "No, It's Fine!"}, { text: 'Yes, Request', onPress: () => {func(binNum, !getFunc(binNum).isRepairNeeded)}}]
+    [{ text: "No, It's Fine!"}, { text: 'Yes, Request', onPress: func}]
   );
 };
 

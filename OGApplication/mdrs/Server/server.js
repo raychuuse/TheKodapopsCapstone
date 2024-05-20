@@ -6,6 +6,8 @@ const app = express();
 const router = express.Router();
 const WebSocket = require('ws');
 
+const port = 8080;
+
 const server = http.createServer(app);
 const ws = new WebSocket.Server({ server });
 const clients = {};
@@ -79,6 +81,11 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   // res.status(err.status || 500);
+});
+
+process.on('unhandledRejection', (error, p) => {
+  console.log('=== UNHANDLED REJECTION ===', p);
+  console.dir(error.stack);
 });
 
 ws.on("connection", (ws, req) => {

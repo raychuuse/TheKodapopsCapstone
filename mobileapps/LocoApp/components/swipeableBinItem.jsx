@@ -10,24 +10,34 @@ import { useTheme } from '../styles/themeContext';
 
 // Import Functions
 import { RemoveBinAlert, RepairBinAlert } from '../lib/alerts';
+
+// Import Provider
 import { useRun } from '../context/runContext';
 
 // Import Function
 
 const SwipeableBinItem = ({
   index,
-  longPressedIndex,
+  rangeSelectIndex,
   bin,
   type,
-  stopID,
+  stop,
   longPressHandler,
 }) => {
   // Providers
   const { theme } = useTheme();
-  const { handlePickUpBin, handleDropOffBin } = useRun();
+  const { handleUpdateBinState, handleConsignBin, handlePerformStopAction } = useRun();
 
   const message = type === 'SIDING' ? 'Dropped Off' : 'Picked Up';
-  const isSelected = bin.pickedUpInStop || bin.pickedUpInStop;
+  const isSelected = bin.pickedUpInRun || bin.droppedOffInRun;
+
+  const onBinRepair = () => {
+      handleUpdateBinState(bin, 'REPAIR', !bin.repair, stop, type === 'SIDING' ? 'COLLECT' : 'DROP_OFF');
+  };
+
+  const onBinMissing = () => {
+      handleUpdateBinState(bin, 'MISSING', !bin.missing, stop, type === 'SIDING' ? 'COLLECT' : 'DROP_OFF');
+  };
 
   // Define the right actions for swipe
   const renderRightActions = () => {
@@ -43,7 +53,7 @@ const SwipeableBinItem = ({
       >
         <TouchableOpacity
           onPress={() => {
-            RepairBinAlert(binData.binNumber);
+            RepairBinAlert(bin.binID, onBinRepair);
             Haptics.selectionAsync();
           }}
           style={[styles.actionButton, { backgroundColor: '#FFA000' }]}
@@ -58,7 +68,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: '#D32F2F' }]}
           onPress={() => {
-            RemoveBinAlert(`Bin #${binData.binNumber}`);
+            RemoveBinAlert(bin.binID, onBinMissing);
             Haptics.selectionAsync();
           }}
         >
@@ -87,12 +97,12 @@ const SwipeableBinItem = ({
       >
         <TouchableOpacity
           onPress={() => {
-            // SetIsFull(sidingId, binData.binNumber, binsKey);
+            handleConsignBin(bin, type === 'SIDING' ? stop : null);
             Haptics.selectionAsync();
           }}
           style={[
             styles.actionButton,
-            isSelected
+            bin.full
               ? { backgroundColor: theme.spCompleteBG }
               : { backgroundColor: theme.spPendingBG },
             { width: 150 },
@@ -111,7 +121,7 @@ const SwipeableBinItem = ({
               marginLeft: 'auto',
             }}
           >
-            Mark {bin.full ? 'as Full' : 'Empty'}
+            Mark {bin.full ? 'Empty' : 'as Full'}
           </Headline>
         </TouchableOpacity>
         <TouchableOpacity
@@ -123,7 +133,7 @@ const SwipeableBinItem = ({
             { width: 138 },
           ]}
           onPress={() => {
-            // SetIsBurnt(sidingId, binData.binNumber, binsKey);
+            handleUpdateBinState(bin, 'BURNT', !bin.burnt, stop, type === 'SIDING' ? 'COLLECT' : 'DROP_OFF');
             Haptics.selectionAsync();
           }}
         >
@@ -196,7 +206,7 @@ const SwipeableBinItem = ({
       <View
         style={[
           styles.binItem,
-          longPressedIndex === index && {
+          rangeSelectIndex === index && {
             borderColor: theme.spAtSidingText,
             borderWidth: 4,
             borderStyle: 'solid',
@@ -215,14 +225,9 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={styles.binPressable}
           onPress={() => {
-            // SetIsFull(sidingId, binData.binNumber, binsKey);
-              console.info('Yo', type);
-              if (type === 'SIDING')
-                  handlePickUpBin(bin.binID, stopID);
-              else
-                  handleDropOffBin(bin.binID, stopID);
+              handlePerformStopAction(bin.binID, stop, type === 'SIDING' ? 'COLLECT' : 'DROP_OFF');
           }}
-          onLongPress={() => longPressHandler(bin.binID, index)}
+          onLongPress={() => longPressHandler(index)}
         >
           <Feather
             style={[
@@ -260,7 +265,7 @@ const SwipeableBinItem = ({
               : null,
           ]}
         >
-        {(bin.droppedOffInStop || bin.pickedUpInStop) && message + ' | '} {bin.full ? 'Full' : 'Empty'} {bin.burnt ? ' |' +
+        {(bin.droppedOffInRun || bin.pickedUpInRun) && message + ' | '} {bin.full ? 'Full' : 'Empty'} {bin.burnt ? ' |' +
             ' Burnt' : ''}
         </Headline>
       </View>

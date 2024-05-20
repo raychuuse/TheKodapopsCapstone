@@ -9,37 +9,34 @@ import { useModal } from '../context/modalContext';
 // Import Styles
 import { Headline, Title2 } from '../styles/typography';
 
-const RunSheetSidingItem = ({ sidingId }) => {
+const RunSheetSidingItem = ({ stop }) => {
   // Providers
   const { theme } = useTheme();
   const { getSiding } = useRun();
   const { selectedSidingID, updateSelectedSidingID, openSidingModal } =
     useModal();
 
-  // Data
-  const sidingData = getSiding(sidingId);
-
   // Background Color for the Siding, this is base on the siding data
-  const backgroundColor = sidingData.isCompleted
+  const backgroundColor = stop.isCompleted
     ? theme.spCompleteBG
-    : sidingData.id === selectedSidingID
+    : stop.stopID === selectedSidingID
     ? theme.spSelectedBG
     : theme.spPendingBG;
   // Text Color for the Siding, this is base on the siding data
-  const TextColor = sidingData.isCompleted
+  const TextColor = stop.isCompleted
     ? theme.spCompleteText
-    : sidingData.id === selectedSidingID
+    : stop.stopID === selectedSidingID
     ? theme.spSelectedText
     : theme.spPendingText;
   // Icon Name for the Siding Icon, this is base on the siding data
-  const Icon = sidingData.isCompleted
+  const Icon = stop.isCompleted
     ? 'checkbox-marked-circle-outline'
-    : sidingData.id === selectedSidingID
+    : stop.stopID === selectedSidingID
     ? 'star-circle-outline'
     : 'checkbox-blank-circle-outline';
   return (
     <TouchableOpacity
-      onPress={() => openSidingModal(sidingId)}
+      onPress={() => openSidingModal(stop.stopID)}
       style={{
         flex: 1,
         flexDirection: 'row',
@@ -51,7 +48,7 @@ const RunSheetSidingItem = ({ sidingId }) => {
         backgroundColor: backgroundColor,
       }}
     >
-      <TouchableOpacity onPress={() => updateSelectedSidingID(sidingId)}>
+      <TouchableOpacity onPress={() => updateSelectedSidingID(stop.stopID)}>
         {/* Siding State Icon */}
         <MaterialCommunityIcons
           name={Icon}
@@ -61,10 +58,10 @@ const RunSheetSidingItem = ({ sidingId }) => {
       </TouchableOpacity>
       {/* Siding Name */}
       <Title2 style={{ color: TextColor, marginRight: 'auto' }}>
-        {sidingData.name}
+        {stop.sidingName}
       </Title2>
       {/* Bin Details */}
-      {sidingData.isCompleted ? (
+      {stop.isCompleted ? (
         <Title2 style={{ color: TextColor, marginRight: 8 }}>Completed</Title2>
       ) : (
         <View
@@ -85,7 +82,7 @@ const RunSheetSidingItem = ({ sidingId }) => {
           />
           {/* Label */}
           <Headline style={{ color: TextColor, width: 14 }}>
-            {sidingData.binsDrop.length}
+            {stop.dropOffQuantity}
           </Headline>
           {/* Vertical Rule */}
           <View
@@ -106,7 +103,7 @@ const RunSheetSidingItem = ({ sidingId }) => {
           />
           {/* Label */}
           <Headline style={{ color: TextColor, width: 14 }}>
-            {sidingData.binsCollect.length}
+            {stop.collectQuantity}
           </Headline>
         </View>
       )}
