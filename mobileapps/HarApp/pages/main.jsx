@@ -22,24 +22,13 @@ import { useBins } from '../context/binContext';
 
 
 // Import Contexts
-import { useAuth } from '../context/authContext';
-import { useSelections } from '../context/selectionContext';
 
 const MainPage = () => {
-  const {getSiding, setSelectionData} = useSelections();
-  const setupPageRef = "dashboard/setup";
-
-  const {signOut, sendJsonMessage, readyState, lastJsonMessage, mockMode} = useAuth();
+  const {getSelectedSiding} = useBins();
   const [addBinVisable, setAddBinVisable] = useState(false);
 
   const handleDone = () => {
-    if (!mockMode) {
-      // Checks etc before
-      FinishedAlert({Siding: getSiding(), Farm: "", Block:"", Sub: "", Pad: "", Burnt: "Neutral"},setSelectionData);
-    }
-    else {
-      FinishedAlert({Siding: getSiding(), Farm: "", Block:"", Sub: "", Pad: "", Burnt: "Neutral"},setSelectionData);
-    }
+    FinishedAlert();
   }
   return (
     <View style={styles.body}>
@@ -74,7 +63,7 @@ const MainPage = () => {
       {/* Page Content */}
       <View style={styles.content}>
         {/* Selected Siding */}
-        <SidingSelector sidingName= {getSiding()}/>
+        <SidingSelector sidingName={getSelectedSiding()?.sidingName}/>
         {/* Bin List */}
         <BinList
           openAddBinModal={setAddBinVisable}

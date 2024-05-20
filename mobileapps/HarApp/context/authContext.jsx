@@ -10,7 +10,7 @@ export const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   // Set this for testing
-  const [mockMode, setMockMode] = useState(false);
+  const [mockMode, setMockMode] = useState(true);
 
   const [isSignedIn, setIsSignedIn] = useState('false');
   const [isOnline, setIsOnline] = useState(false);

@@ -14,9 +14,10 @@ import { Colours } from '../components/colours';
 
 // Import Contexts
 import { useAuth } from '../context/authContext';
-import { useSelections } from '../context/selectionContext';
 import { useBins } from '../context/binContext';
 import { issueAlert } from '../lib/alerts';
+import {getSidings} from "../api/siding.api";
+import {getBlocks, getFarms, getSubBlocks} from "../api/user.api";
 
 const initialFarmOptions = [
   { label: 'Green Valley Farm', value: 1 },
@@ -71,331 +72,71 @@ const burntOptions = [
 ];
 
 const SetupPage = () => {
-  const loginRef = '/';
-  const dashboardRef = '/dashboard';
-  const {serverURL, signOut, lastJsonMessage, mockMode, setMockMode, getToken} = useAuth();
-  const [farmOptions, setFarmOptions] = useState(initialFarmOptions);
-  const [sidingOptions, setSidingOptions] = useState(initialSidingOptions);
-  const [blockOptions, setBlockOptions] = useState(initialBlockOptions);
-  const [subBlockOptions, setSubOptions] = useState(initialSubBlockOptions);
-  //const [padOptions, setPadOptions] = useState(initialPadOptions);
-  const [lastCheck, setLastCheck] = useState(new Date().getTime())
-  
-  const [farmPickDisabler, setFarmPickDisabler] = useState(false);
-  const [blockPickDisabler, setBlockPickDisabler] = useState(false);
-
-  const { setBurn } = useBins();
-  const { getSiding, getFarm, getBurnt, getFarmID, getBlockID } = useSelections();
-  
-  const sidingSelected = () => {
-    siding = getSiding();
-    if (siding == '' || siding == null) {
-      return false;
-    }
-    return true;
-  }
-
-
-  const handleLogout = () => {
-    if (mockMode) {
-      router.navigate(loginRef);
-      return;
-    }
-    try {
-      signOut();
-    } catch (err) {
-      console.log(err);
-    }
-    router.navigate(loginRef);
-  };
-
-  const handleStart = () => {
-    siding = getSiding();
-    if (!sidingSelected) {
-      issueAlert('It is required that a siding option is selected.');
-      return;
-    }
-    
-    // Updates default for bins as burnt or unburnt
-    // Make sure matches consign functionality
-    // current consign update whole data inc this
-    const burnOption = getBurnt();
-    if (burnOption != "Neutral" && burnOption !== null) {
-        setBurn(burnOption == "Yes");
-    }
-    if (mockMode) {
-      router.navigate(dashboardRef);
-      return;
-    }
-    try {
-      // Checking logic, is farming selected/ not invalid? etc
-      // If all checks pass, proceed
-      router.navigate(dashboardRef);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  // Re-renders everytime lastJsonMessage changes, i.e. when a message is received
-  useEffect(() => {
-    if (lastJsonMessage) {
-      if (!mockMode) {
-        if (!lastJsonMessage.notification) {
-          // Handle other events
-        } else {
-          // handle notifications
-        }
-      }
-    }
-  }, [lastJsonMessage]);
-
-  const getSidings = async () => {
-    if (mockMode) {
-      return;
-    }
-    try {
-      getToken() 
-      .then(token => {
-        if (!token) {
-          handleLogout();
-        }
-        const options = {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + token,
-          }
-        };
-        // ID passed as dummy, has no impact as sidings aren't harvester restricted at current.
-        fetch(`${serverURL}/user/1/sidings`, options)
-        .then(res => {
-          if (res.ok) {
-            res.json()
-            .then(data => {
-              setSidingOptions(data.map((obj) => ({
-                  label: obj.sidingName,
-                  value: obj.sidingID,
-              })))
-            })
-          }
-          else {
-            issueAlert("Couldn't load siding data.");
-            //setLoading(false);
-          }
-        })
-        .catch((err) => {
-          issueAlert("Server issues occured.");
-          console.log(err.message);
-        });
-      })
-      .catch((err) => {
-        issueAlert("Server issues occured.");
-        console.log(err.message);
-      });
-    }
-    catch (err) {
-        issueAlert(err.message);
-        console.log(err.message);
-    }
-  }
-
-  const getFarms = async () => {
-    if (mockMode) {
-      return;
-    }
-    try {
-      getToken() 
-      .then(token => {
-        if (!token) {
-          handleLogout();
-        }
-        const options = {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + token,
-          }
-        };
-        
-        // Again, ID isn't relevant in current use case
-        fetch(`${serverURL}/user/1/farms`, options)
-        .then(res => {
-          if (res.ok) {
-            res.json()
-            .then(data => {
-              setFarmOptions(data.map((obj) => ({
-                  label: obj.farmName,
-                  value: obj.farmID,
-              })))
-            })
-          }
-          else {
-            issueAlert("Couldn't load farm data.");
-            //setLoading(false);
-          }
-        })
-        .catch((err) => {
-          issueAlert("Server issues occured.");
-          console.log(err.message);
-        });
-      })
-      .catch((err) => {
-        issueAlert("Server issues occured.");
-        console.log(err.message);
-      });
-    }
-    catch (err) {
-        issueAlert(err.message);
-        console.log(err.message);
-    }
-  }
-  
-
-  const getBlocks = async (farmID) => {
-    if (mockMode) {
-      return;
-    }
-    try {
-      getToken() 
-      .then(token => {
-        if (!token) {
-          handleLogout();
-        }
-        const options = {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + token,
-          }
-        };
-        
-        fetch(`${serverURL}/user/farms/${farmID}/blocks`, options)
-        .then(res => {
-          if (res.ok) {
-            res.json()
-            .then(data => {
-              setBlockOptions(data.map((obj) => ({
-                  label: obj.blockID,
-                  value: obj.blockID,
-              })))
-            })
-          }
-          else {
-            issueAlert("Couldn't load block data.");
-            //setLoading(false);
-          }
-        })
-        .catch((err) => {
-          issueAlert("Server issues occured.");
-          console.log(err.message);
-        });
-      })
-      .catch((err) => {
-        issueAlert("Server issues occured.");
-        console.log(err.message);
-      });
-    }
-    catch (err) {
-        issueAlert(err.message);
-        console.log(err.message);
-    }
-  }
-
-  const getSubBlocks = async (farmID, blockID) => {
-    if (mockMode) {
-      return;
-    }
-    try {
-      getToken() 
-      .then(token => {
-        if (!token) {
-          handleLogout();
-        }
-        const options = {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + token,
-          }
-        };
-        
-        fetch(`${serverURL}/user/blocks/${farmID}/${blockID}/subs`, options)
-        .then(res => {
-          if (res.ok) {
-            res.json()
-            .then(data => {
-              setSubOptions(data.map((obj) => ({
-                  label: obj.subBlockID,
-                  value: obj.subBlockID,
-              })))
-            })
-          }
-          else {
-            issueAlert("Couldn't load sub-block data.");
-            //setLoading(false);
-          }
-        })
-        .catch((err) => {
-          issueAlert("Server issues occured.");
-          console.log(err.message);
-        });
-      })
-      .catch((err) => {
-        issueAlert("Server issues occured.");
-        console.log(err.message);
-      });
-    }
-    catch (err) {
-        issueAlert(err.message);
-        console.log(err.message);
-    }
-  }
+  const {setSelectedSiding, setSelectedFarm, getSelectedSiding, getSelectedFarm, onSetup} = useBins();
+  const [sidings, setSidings] = useState();
+  const [farms, setFarms] = useState();
+  const [blocks, setBlocks] = useState();
+  const [subBlocks, setSubOptions] = useState();
 
   useEffect(() => {
-    if (mockMode) {
+    getSidings()
+        .then(response => {
+          setSidings(response);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+
+    getFarms()
+        .then(response => {
+          setFarms(response);
+        })
+        .catch(err => {
+          console.error(err);
+        })
+  }, []);
+
+  const onSidingSelected = (selectedSidingID) => {
+    const siding = sidings.find(s => s.sidingID === selectedSidingID);
+    setSelectedSiding(siding);
+  };
+
+  const onFarmSelected = (selectedFarmID) => {
+    const farm = farms.find(f => f.farmID === selectedFarmID);
+    setSelectedFarm(farm);
+    getBlocks(farm.farmID)
+        .then(response => {
+          setBlocks(response);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+  };
+
+  const onBlockSelected = (selectedBlockID) => {
+    if (getSelectedFarm() == null) return;
+
+    getSubBlocks(getSelectedFarm().farmID, selectedBlockID)
+        .then(response => {
+          setSubOptions(response);
+        })
+        .catch(err => {
+          console.error(err);
+        });
+  };
+
+  const onDonePressed = () => {
+    if (getSelectedFarm() == null || getSelectedSiding() == null) {
+      issueAlert('Select a siding and a farm to begin consigning.');
       return;
     }
-    getSidings();
-    getFarms();
-    const farmID = getFarmID();
-    const blockID = getBlockID();
+    onSetup();
+    router.navigate('/dashboard');
+  };
 
-    // Simple check whether selections have been made and modifying activated elements
-
-    // Need to change dummy data
-    if (farmID == "" || farmID=== null) {
-      setFarmPickDisabler(true);
-      setBlockPickDisabler(true);
-    }
-    else if (blockID == "" || blockID === null) { 
-      setFarmPickDisabler(false);
-      setBlockPickDisabler(true);
-    }
-    else {
-      setFarmPickDisabler(false);
-      setBlockPickDisabler(false);
-    } 
-
-    const tempDate = new Date().getTime();
-
-    // Only update data per 15 seconds
-    if ((tempDate - lastCheck) / 1000 > 15) {
-      setLastCheck(tempDate);
-      
-
-      if (!farmPickDisabler) {
-        getBlocks(farmID);
-        if (!blockPickDisabler) {
-          getSubBlocks(farmID, blockID);
-        }
-      }
-    }
-    
-  },[farmOptions, blockOptions])
+  const onLogoutPressed = () => {
+    router.navigate('/');
+  };
 
   return (
     <View style={styles.body}>
@@ -411,26 +152,37 @@ const SetupPage = () => {
         <SettingsItem
           type='location'
           label='Siding'
-          options={sidingOptions}
+          startOption={getSelectedSiding()?.sidingID}
+          options={sidings?.map(s => {
+            return {id: s.sidingID, label: s.sidingName};
+          })}
+          setSelectedItem={onSidingSelected}
         />
         <Divider />
         <SettingsItem
           type='select'
           label='Farm'
-          options={farmOptions}
+          startOption={getSelectedFarm()?.farmID}
+          options={farms?.map(s => {
+            return {id: s.farmID, label: s.farmName};
+          })}
+          setSelectedItem={onFarmSelected}
         />
-        <SettingsItem
+        {blocks != null && <SettingsItem
           type='select'
           label='Block'
-          options={blockOptions}
-          isDisabled= {farmPickDisabler}
-        />
-        <SettingsItem
+          options={blocks?.map(s => {
+            return {id: s.blockID, label: s.blockName};
+          })}
+          setSelectedItem={onBlockSelected}
+        />}
+        {subBlocks != null && <SettingsItem
           type='select'
           label='Sub'
-          options={subBlockOptions}
-          isDisabled= {blockPickDisabler}
-        />
+          options={subBlocks?.map(s => {
+            return {id: s.subBlockID, label: s.subBlockName};
+          })}
+        />}
         {/* <SettingsItem type="select" label="Pad" options={padOptions} /> */}
         <SettingsItem
           type='select'
@@ -459,13 +211,13 @@ const SetupPage = () => {
           textColor={Colours.textLevel2}
           backgroundColor='transparent'
           border
-          onPress={handleLogout}
+          onPress={onLogoutPressed}
         />
         <AltButton
           title='Start'
           textColor={Colours.textLevel3}
           style={StyleSheet.create({ flex: 1 })}
-          onPress={handleStart}
+          onPress={onDonePressed}
         />
       </View>
     </View>

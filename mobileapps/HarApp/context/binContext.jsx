@@ -57,21 +57,11 @@ const initialExceptionBinData = [
  */
 
 const BinContext = createContext({
-  binData: initialBinData,
-  exceptionBinData: initialExceptionBinData,
-  setBinData: () => {},
-  setExceptionBinData: () => {},
-  updateBin: () => {},
-  updateExceptionBin: () => {},
-  getBinData: () => {},
-  getExceptionBinData: () => {},
-  setBinFull: () => {},
-  setBinBurnt: () => {},
-  setBinToRepair: () => {},
-  setBinMissing: () => {},
-  deleteBin: () => {},
-  setBurn: () => {},
-  checkRepair: () => {},
+  onSetup: () => {},
+  getSelectedSiding: () => {},
+  setSelectedSiding: () => {},
+  getSelectedFarm: () => {},
+  setSelectedFarm: () => {},
   getBins: () => {},
   handleConsignBin: () => {},
   handleConsignRange: () => {},
@@ -93,16 +83,28 @@ const offlineConsignActions = [];
 const offlineBinStateActions = [];
 
 export const BinProvider = ({ children }) => {
-  const [binData, _setBinData] = useState(initialBinData);
-  const [exceptionBinData, _setExceptionBinData] = useState(initialExceptionBinData);
   const [bins, setBins] = useState();
+  const [selectedSiding, setSelectedSiding] = useState();
+  const [selectedFarm, setSelectedFarm] = useState();
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const getBins = () => {
+      return bins;
+  };
+
+  const getSelectedSiding = () => {
+      return selectedSiding;
+  }
+
+  const getSelectedFarm = () => {
+      return selectedFarm;
+  }
+
+  const onSetup = () => {
+      loadData();
+  };
 
   const loadData = () => {
-      getBinsFromSiding(1)
+      getBinsFromSiding(selectedSiding.sidingID)
           .then(response => {
               setBins(response);
           })
@@ -112,7 +114,6 @@ export const BinProvider = ({ children }) => {
   };
 
   NetInfo.addEventListener(state => {
-      console.info('Connected', state.isConnected);
       if (!connected && state.isConnected)
           onReconnected();
       connected = state.isConnected;
@@ -159,10 +160,6 @@ export const BinProvider = ({ children }) => {
               good = true;
       return good;
   }
-
-  const getBins = () => {
-    return bins;
-  };
 
   const handleConsignRange = (startIndex, endIndex) => {
       if (!connected) {
@@ -280,183 +277,14 @@ export const BinProvider = ({ children }) => {
           });
   };
 
-  /**
-   * Replaces the current bin data with a new array of bin data.
-   * This function should be used when you need to refresh the entire list of bins or set an entirely new state.
-   *
-   * @param {Array<Object>} newData - The new data that will replace the current bin data array. Each object should
-   * contain at least the properties `isFull`, `binNum`, and `isBurnt`.
-   */
-  const setBinData = (newData) => {
-    _setBinData(newData);
-  };
-
-  /**
-   * Same as prior function but for the exception data
-   *
-   * @param {Array<Object>} newData - The new data that will replace the current exception bin data array. Each object should
-   * contain at least the properties `binNum`, `isRepairNeeded`, and `isMissing`.
-   */
-    const setExceptionBinData = (newData) => {
-      _setExceptionBinData(newData);
-    };
-
-  /**
-   * updateBin updates specific properties of a bin identified by its bin number. This is a general-purpose function
-   * that can be used to update any property of a bin.
-   *
-   * @function
-   * @param {number} binNum - The unique identifier of the bin to be updated.
-   * @param {Object} updates - An object containing the properties to update and their new values.
-   */
-  const updateBin = (binNum, updates) => {
-    const updatedData = binData.map((bin) =>
-      bin.binNum === binNum ? { ...bin, ...updates } : bin
-    );
-    setBinData(updatedData);
-  };
-
-
-  /**
-   * updateExceptionBin does the same as the former, but for missing and repair bins that have been flagged. Note
-   * the update bin functionality uses a ternary function in mind of existent bins.
-   *
-   * @function
-   * @param {number} binNum - The unique identifier of the bin to be updated.
-   * @param {Object} updates - An object containing the properties to update and their new values.
-   */
-  const updateExceptionBin = (binNum, updates) => {
-    const updatedData = exceptionBinData.map((bin) =>
-      bin.binNum === binNum ? { ...bin, ...updates } : bin
-    );
-    setExceptionBinData(updatedData);
-  };
-
-  /**
-   * setBinBurnt is a specific function to set the 'isBurnt' status of a bin. It uses the `updateBin` function to change the status.
-   *
-   * @function
-   * @param {number} binNum - The unique identifier of the bin to update.
-   * @param {boolean} isBurnt - The new 'isBurnt' status to be set for the bin.
-   */
-  const setBinBurnt = (binNum, isBurnt) => {
-    updateBin(binNum, { isBurnt });
-  };
-
-  /**
-   * setBinFull is a specific function to set the 'isFull' status of a bin. It uses the `updateBin` function to change the status.
-   *
-   * @function
-   * @param {number} binNum - The unique identifier of the bin to update.
-   * @param {boolean} isFull - The new 'isFull' status to be set for the bin.
-   */
-  const setBinFull = (binNum, isFull) => {
-    updateBin(binNum, { isFull });
-  };
-
-  /**
-   * setBinMissing is a specific function to set the 'isMissing' status of a bin. It uses the `updateExceptionBin` function to change the status.
-   *
-   * @function
-   * @param {number} binNum - The unique identifier of the bin to update.
-   * @param {boolean} isMissing - The new 'isMissing' status to be set for the bin.
-   */
-  const setBinMissing = (binNum, isMissing) => {
-    updateBin(binNum, { isMissing });
-  };
-
-  /**
-   * setBinToRepair is a specific function to set the 'isRepairNeeded' status of a bin. It uses the `updateBin` function to change the status.
-   *
-   * @function
-   * @param {number} binNum - The unique identifier of the bin to update.
-   * @param {boolean} isRe - The new 'isRepairNeeded' status to be set for the bin.
-   */
-  const setBinToRepair = (binNum, isRepairNeeded) => {
-    updateBin(binNum, { isRepairNeeded });
-  };
-
-  /**
-   * getBinData retrieves the data for a specific bin, identified by its bin number.
-   * This function searches the current bin data array and returns the corresponding bin object.
-   *
-   * @function
-   * @param {number} binNum - The unique identifier of the bin whose data is to be retrieved.
-   * @returns {Object|null} The bin object if found, or null if there is no bin with the given identifier.
-   */
-  const getBinData = (binNum) => {
-    return binData.find((bin) => bin.binNum === binNum);
-  };
-
-  /**
-   * getExceptionBinData does the same as 'getBinData' but for the exception cases, i.e. missing and repair needing bins.
-   *
-   * @function
-   * @param {number} binNum - The unique identifier of the bin whose data is to be retrieved.
-   * @returns {Object|null} The bin object if found, or null if there is no flagged bin with the given identifier.
-   */
-  const getExceptionBinData = (binNum) => {
-    return exceptionBinData.find((bin) => bin.binNum === binNum);
-  };
-
-  const checkRepair = (binNum) => {
-    const val = exceptionBinData.find((bin) => bin.binNum === binNum)
-    if (!val) {
-      return false;
-    }
-    else {
-      return val.isRepairNeeded;
-    }
-  };
-
-  const deleteBin = (binNum) => {
-    var filtered = binData.filter(function(func) { return func.binNum != binNum; });
-    setBinData(filtered);
-  }
-
-  /**
-   * Adds a new bin to the current bin data array.
-   * This function allows dynamically adding new bins with specific attributes to the bin list.
-   *
-   * @param {Object} newBin - The new bin object to add to the bin data. It should contain properties like `isFull`, `binNum`, and `isBurnt`.
-   */
-  const createBin = (newBin) => {
-    setBinData((prevBins) => [...prevBins, newBin]);
-  };
-
- /**
-   * flagBin is the same as 'CreateBin' but for dynamically adding to a flagged bin list.
-   *
-   * @param {Object} flaggedBin - The bin object to add to the bin exception data.
-   * It should contain properties like `binNum`, `setBinMissing`
-   */
- const flagBin = (bin) => {
-  setBinData(binData.map((bin) => {bin.isBurnt = bool; return bin}));
-};
-
-const setBurn = (bool) => {
-  setBinData(binData.map((bin) => {bin.isBurnt = bool; return bin}));
-}
-
   return (
     <BinContext.Provider
       value={{
-        binData,
-        setBinData,
-        setExceptionBinData,
-        updateBin,
-        updateExceptionBin,
-        getBinData,
-        getExceptionBinData,
-        setBinFull,
-        setBinBurnt,
-        setBinToRepair,
-        setBinMissing,
-        createBin,
-        flagBin,
-        deleteBin,
-        setBurn,
-        checkRepair,
+        onSetup,
+        getSelectedSiding,
+        setSelectedSiding,
+        getSelectedFarm,
+        setSelectedFarm,
         getBins,
         handleConsignBin,
         handleConsignRange,

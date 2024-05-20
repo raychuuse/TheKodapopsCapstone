@@ -9,7 +9,6 @@ import Modal from './modal';
 // Import Style Components
 import * as Type from './typography';
 import { Colours } from './colours';
-import { useSelections } from '../context/selectionContext';
 
 /**
  * SettingsItem Component
@@ -31,162 +30,100 @@ const SettingsItem = ({
   type = '',
   startOption = 0,
   label = 'label',
-  options = [{ label: 'Label', value: 0 }],
+  options = [],
   style,
-  isDisabled = false,
+  setSelectedItem,
 }) => {
-  const [selectedOption, setSelectedOption] = useState(startOption); // State for the selected option
-  const [pickerVisible, setPickerVisible] = useState(false); // State for the visibility of the picker modal
+  const [selectedOption, setSelectedOption] = useState(startOption);
+  const [pickerVisable, setPickerVisable] = useState(false);
 
-  // Context to get and update selections
-  const {
-    updateSiding,
-    updateFarm,
-    updateBlock,
-    updateSub,
-    updatePad,
-    updateBurnt,
-    getSiding,
-    getFarm,
-    getBlock,
-    getSub,
-    getPad,
-    getBurnt,
-    setFarmID,
-    setBlockID,
-  } = useSelections();
-
-  /**
-   * Change data based on the selected option
-   * @param {Array} values - The list of options
-   */
-  const changeData = (values) => {
-    const newVal = getCurItem(values);
-    switch (label) {
-      case 'Siding':
-        updateSiding(newVal);
-        break;
-      case 'Farm':
-        updateFarm(newVal);
-        setFarmID(selectedOption);
-        break;
-      case 'Block':
-        updateBlock(newVal);
-        setBlockID(selectedOption);
-        break;
-      case 'Sub':
-        updateSub(newVal);
-        break;
-      case 'Pad':
-        updatePad(newVal);
-        break;
-      case 'Burnt':
-        updateBurnt(newVal);
-        break;
-    }
-  };
-
-  /**
-   * Get the current item based on the selected option
-   * @param {Array} values - The list of options
-   * @returns {string} The label of the selected option
-   */
-  const getCurItem = (values) => {
-    return values.find((item) => item.value == selectedOption)?.label;
+  const handleValueChange = (itemValue) => {
+      if (setSelectedItem != null )
+        setSelectedItem(itemValue);
+      setSelectedOption(itemValue);
   };
 
   return (
-    <>
-      {/* Modal to select the option */}
-      <Modal
-        isVisible={pickerVisible}
-        onClose={() => {
-          setPickerVisible(!pickerVisible);
-          changeData(options);
-        }}
-        buttonIcon='check-circle-outline'
-      >
-        <View style={{ gap: 16, width: '100%' }}>
-          <Type.Title1 style={{ textAlign: 'center' }}>
-            Select {label}
-          </Type.Title1>
-          <Picker
-            selectedValue={selectedOption}
-            onValueChange={(itemValue) => setSelectedOption(itemValue)}
-            style={{
-              borderRadius: 16,
-              backgroundColor: Colours.bgLevel6,
-              width: '100%',
-            }}
-          >
-            <Picker.Item
-              value={0}
-              label='Please Select an Option'
-              style={{ width: '100%' }}
-            />
-            {options.map((option) => (
-              <Picker.Item
-                key={option.value}
-                value={option.value}
-                label={option.label}
-                style={{ width: '100%' }}
-              />
-            ))}
-          </Picker>
-        </View>
-      </Modal>
-
-      {/* Main view for the settings item */}
-      <View style={[styles.item, style]}>
-        {/* Label */}
-        <Type.Title3 style={styles.label}>{label}:</Type.Title3>
-
-        {/* Display the selected option */}
-        <Text
-          style={[Type.styles.body, styles.body]}
-          numberOfLines={1}
+      <>
+        <Modal
+            isVisible={pickerVisable}
+            onClose={() => setPickerVisable(!pickerVisable)}
+            buttonIcon='check-circle-outline'
+            style={{ maxWidth: 400 }}
         >
-          {label == 'Siding' ? getSiding() : getCurItem(options)}
-        </Text>
+          <View style={{ gap: 16, width: '100%' }}>
+            <Type.Title1 style={{ textAlign: 'center' }}>
+              Select {label}
+            </Type.Title1>
+            <Picker
+                selectedValue={selectedOption}
+                onValueChange={handleValueChange}
+                style={{
+                  borderRadius: 16,
+                  backgroundColor: Colours.bgLevel6,
+                  width: '100%',
+                }}
+            >
+              <Picker.Item
+                  value={0}
+                  label='Please Select an Option'
+                  style={{ width: '100%' }}
+              />
+              {options.map((option) => (
+                  <Picker.Item
+                      key={option.id}
+                      value={option.id}
+                      label={option.label}
+                      style={{ width: '100%' }}
+                  />
+              ))}
+            </Picker>
+          </View>
+        </Modal>
+        <View style={[styles.item, style]}>
+          <Type.Title3 style={styles.label}>{label}:</Type.Title3>
+          <Text
+              style={[Type.styles.body, styles.body]}
+              numberOfLines={1}
+          >
+            {options.find((item) => item.id == selectedOption)?.label ?? 'Please Select an Option'}
+          </Text>
 
-        {/* Button to open the picker modal */}
-        <Button
-          iconName={type == 'location' ? 'edit-location-alt' : 'edit'}
-          iconColor={Colours.textLevel3}
-          textColor={Colours.textLevel3}
-          backgroundColor={Colours.bgLevel3}
-          border
-          borderWidth={1}
-          iconSize={28}
-          style={styles.button}
-          onPress={() => setPickerVisible(!pickerVisible)}
-          isDisabled={isDisabled}
-        />
-      </View>
-    </>
+          <Button
+              iconName={type == 'location' ? 'edit-location-alt' : 'edit'}
+              iconColor={Colours.textLevel3}
+              textColor={Colours.textLevel3}
+              backgroundColor={Colours.bgLevel3}
+              border
+              borderWidth={1}
+              iconSize={28}
+              style={styles.button}
+              onPress={() => setPickerVisable(!pickerVisable)}
+          />
+        </View>
+      </>
   );
 };
 
-// Styles for the component
 const styles = StyleSheet.create({
   item: {
-    flexDirection: 'row', // Layout children in a row
-    width: '100%', // Full width
-    gap: 22, // Space between elements
-    paddingHorizontal: 16, // Horizontal padding
-    paddingVertical: 4, // Vertical padding
-    alignItems: 'center', // Align items to center
+    flexDirection: 'row',
+    width: '100%',
+    gap: 22,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    alignItems: 'center',
   },
   button: {
-    paddingHorizontal: 4, // Horizontal padding
-    paddingVertical: 4, // Vertical padding
+    paddingHorizontal: 4,
+    paddingVertical: 4,
   },
   body: {
-    flex: 1, // Flex to fill available space
-    textTransform: 'capitalize', // Capitalize text
+    flex: 1,
+    textTransform: 'capitalize',
   },
   label: {
-    textTransform: 'capitalize', // Capitalize text
+    textTransform: 'capitalize',
   },
 });
 
