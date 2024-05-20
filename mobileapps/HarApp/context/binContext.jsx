@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { consignBin, findBin, updateBinFieldState } from '../api/bins.api';
 import {getBinsFromSiding}  from '../api/siding.api'
+import NetInfo from "@react-native-community/netinfo";
 
 /**
  * initialBinData represents the initial state of bins in an array format. Each bin object contains the bin number,
@@ -87,26 +88,97 @@ const BinContext = createContext({
  * @param {ReactNode} props.children - The children nodes that this provider will wrap, giving them access to the bin context.
  * @returns {ReactNode} A Provider component that passes down bin data and manipulation functions to its children.
  */
+let connected = true;
+const offlineConsignActions = [];
+const offlineBinStateActions = [];
+
 export const BinProvider = ({ children }) => {
   const [binData, _setBinData] = useState(initialBinData);
   const [exceptionBinData, _setExceptionBinData] = useState(initialExceptionBinData);
   const [bins, setBins] = useState();
 
   useEffect(() => {
-    getBinsFromSiding(1)
-        .then(response => {
-          setBins(response);
-        })
-        .catch(err => {
-          console.error(err);
-        });
+    loadData();
   }, []);
+
+  const loadData = () => {
+      getBinsFromSiding(1)
+          .then(response => {
+              setBins(response);
+          })
+          .catch(err => {
+              console.error(err);
+          });
+  };
+
+  NetInfo.addEventListener(state => {
+      console.info('Connected', state.isConnected);
+      if (!connected && state.isConnected)
+          onReconnected();
+      connected = state.isConnected;
+  });
+
+  const onReconnected = () => {
+      const performConsignActions = () => {
+          if (offlineConsignActions.length === 0) return Promise.resolve(true);
+          const consignActionPromises = offlineConsignActions.map(s => consignBin(s.binID, s.full));
+          return Promise.allSettled(consignActionPromises).then(responses => {
+              console.info('ConsignActions', responses);
+              return responsesGood(responses);
+          });
+      };
+
+      const performBinStateActions = () => {
+          if (offlineBinStateActions.length === 0) return Promise.resolve(true);
+          const binStateActionPromises = offlineBinStateActions.map(s => updateBinFieldState(s.binID, s.field, s.state));
+          return Promise.allSettled(binStateActionPromises).then(responses => {
+              console.info('BinStateActions', responses);
+              return responsesGood(responses);
+          });
+      };
+
+      console.info('onReconnect');
+      return performConsignActions()
+          .then(consignComplete => {
+              if (!consignComplete) throw new Error("Consign actions failed");
+              return performBinStateActions();
+          })
+          .then(binStateComplete => {
+              if (!binStateComplete) throw new Error("Bin state actions failed");
+              loadData();
+          })
+          .catch(err => {
+              console.error(err);
+          });
+  };
+
+  const responsesGood = (responses) => {
+      let good = false;
+      for (const response of responses)
+          if (response.status === 'fulfilled')
+              good = true;
+      return good;
+  }
 
   const getBins = () => {
     return bins;
   };
 
   const handleConsignRange = (startIndex, endIndex) => {
+      if (!connected) {
+          for (let i = startIndex; i <= endIndex; i++) {
+              const bin = bins[i];
+              if (bin == null) {
+                  console.error('Shouldn\'t be here');
+                  continue;
+              }
+              offlineConsignActions.push({binID: bin.binID, full: !bin.full});
+              handleSuccessfulConsignBin(bin);
+          }
+          setBins([...bins]);
+          return;
+      }
+
       // I'm lazy
       const promises = [];
       for (let i = startIndex; i <= endIndex; i++) {
@@ -127,7 +199,7 @@ export const BinProvider = ({ children }) => {
                       console.error('Shouldn\'t be here');
                       continue;
                   }
-                  onBinConsigned(bin);
+                  handleSuccessfulConsignBin(bin);
               }
               setBins([...bins]);
           })
@@ -137,9 +209,15 @@ export const BinProvider = ({ children }) => {
   };
 
   const handleConsignBin = (bin) => {
+    if (!connected) {
+        offlineConsignActions.push({binID: bin.binID, full: !bin.full});
+        if (handleSuccessfulConsignBin(bin))
+            setBins([...bins]);
+        return;
+    }
     consignBin(bin.binID, !bin.full)
         .then(response => {
-            if (onBinConsigned(bin))
+            if (handleSuccessfulConsignBin(bin))
                 setBins([...bins]);
         })
         .catch(err => {
@@ -147,7 +225,7 @@ export const BinProvider = ({ children }) => {
         });
   };
 
-  const onBinConsigned = (bin) => {
+  const handleSuccessfulConsignBin = (bin) => {
       bin.full = !bin.full;
       const index = bins.findIndex(b => b.binID === bin.binID);
       if (index >= 0) {
@@ -158,29 +236,41 @@ export const BinProvider = ({ children }) => {
   };
 
   const handleUpdateBinState = (bin, field, state) => {
+      if (!connected) {
+          offlineBinStateActions.push({binID: bin.binID, field: field, state: state});
+          handleSuccessfulUpdateBinState(bin, field, state);
+          return;
+      }
+
       updateBinFieldState(bin.binID, field, state)
           .then(response => {
-              if (field === 'BURNT') bin.burnt = state;
-              else if (field === 'MISSING') bin.missing = state;
-              else bin.repair = state;
-
-              const index = bins.findIndex(b => b.binID === bin.binID);
-              if (index >= 0) {
-                  if (field === 'MISSING') bins.splice(index, 1);
-                  else bins[index] = bin;
-
-                  setBins([...bins]);
-              } else {
-                  // rip
-                  console.error('Shouldn\'t be here');
-              }
+              handleSuccessfulUpdateBinState(bin, field, state);
           })
           .catch(err => {
               console.error(err);
           });
   };
 
+  const handleSuccessfulUpdateBinState = (bin, field, state) => {
+      if (field === 'BURNT') bin.burnt = state;
+      else if (field === 'MISSING') bin.missing = state;
+      else bin.repair = state;
+
+      const index = bins.findIndex(b => b.binID === bin.binID);
+      if (index >= 0) {
+          if (field === 'MISSING') bins.splice(index, 1);
+          else bins[index] = bin;
+
+          setBins([...bins]);
+      } else {
+          // rip
+          console.error('Shouldn\'t be here');
+      }
+  };
+
   const handleFindBin = (code) => {
+      if (!connected) return;
+
       findBin(code, 1)
           .then(bin => {
               bins.push(bin);

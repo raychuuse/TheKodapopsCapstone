@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useEffect, useReducer, useState } from 'react';
+import React, {createContext, useContext, useEffect, useReducer, useState} from 'react';
 
 // Import Mock Data from a relative path
-import { RunMockData } from '../data/RunMockData';
-import { dropOffBin, getRunsByLocoAndDate, performStopAction, pickUpBin } from '../api/runs.api';
-import { getCurrentLoadById } from '../api/loco.api';
-import { getSidingBreakdown } from '../api/siding.api';
+import {RunMockData} from '../data/RunMockData';
+import {getRunsByLocoAndDate, performStopAction} from '../api/runs.api';
+import {getCurrentLoadById} from '../api/loco.api';
+import {getSidingBreakdown} from '../api/siding.api';
+import {consignBin, findBin, updateBinFieldState} from '../api/bins.api.ts';
+import NetInfo from '@react-native-community/netinfo';
 
 // Create a React context for storing and managing run data
 const RunContext = createContext();
@@ -18,14 +20,14 @@ function runReducer(state, action) {
     switch (action.type) {
         case 'UPDATE_RUN':
             // Handles updates to the top-level run properties
-            return { ...state, ...action.payload };
+            return {...state, ...action.payload};
         case 'UPDATE_SIDING':
             // Updates a specific siding by id within the sidings array
             return {
                 ...state,
                 sidings: state.sidings.map((siding) =>
                     siding.id === action.payload.id
-                        ? { ...siding, ...action.payload.updates }
+                        ? {...siding, ...action.payload.updates}
                         : siding,
                 ),
             };
@@ -43,7 +45,7 @@ function runReducer(state, action) {
                             ...siding,
                             [binsKey]: siding[binsKey].map((bin) =>
                                 bin.binNumber === action.payload.binNumber
-                                    ? { ...bin, ...action.payload.updates }
+                                    ? {...bin, ...action.payload.updates}
                                     : bin,
                             ),
                         }
@@ -56,117 +58,337 @@ function runReducer(state, action) {
     }
 }
 
+
+let connected = true;
+const offlineStopActions = [];
+const offlineConsignActions = [];
+const offlineBinStateActions = [];
+
 // Context provider component that makes the run data accessible throughout the component tree
-export const RunProvider = ({ children }) => {
+export const RunProvider = ({children}) => {
     const [state, dispatch] = useReducer(runReducer, RunMockData);
     const [run, setRun] = useState();
     const [loco, setLoco] = useState();
 
-    useEffect(() => {
-        getCurrentLoadById(1)
-            .then(response => {
-                setLoco(response);
-                console.info('Yoooo', response);
-                getRunsByLocoAndDate(response.locoID, new Date())
-                    .then(response => {
-                        const promises = [];
-                        for (const stop of response.stops)
-                            promises.push(getSidingBreakdown(stop.sidingID, stop.stopID));
-
-                        Promise.allSettled(promises)
-                            .then(responses => {
-                                for (let i = 0; i < responses.length; i++) {
-                                    response.stops[i].bins = responses[i].value;
-                                }
-                            })
-                            .catch(err => {
-                                console.error(err);
-                            });
-                        setRun(response);
-                    })
-                    .catch(err => {
-                        console.error(err);
-                    });
-            })
-            .catch(err => {
-                console.error(err);
+    const onReconnected = () => {
+        const performStopActions = () => {
+            if (offlineStopActions.length === 0) return Promise.resolve(true);
+            const stopActionPromises = offlineStopActions.map(s => performStopAction(s.binID, s.locoID, s.stopID, s.type));
+            return Promise.allSettled(stopActionPromises).then(responses => {
+                console.info('StopActions', responses);
+                return responsesGood(responses);
             });
-    }, []);
+        };
 
-    const handlePickUpBin = (binID, stopID) => {
-        performStopAction(binID, 1, stopID, 'COLLECT')
-            .then(response => {
-                const stop = run.stops.find(s => s.stopID === stopID);
-                if (stop == null) return console.warn('No stop');
+        const performConsignActions = () => {
+            if (offlineConsignActions.length === 0) return Promise.resolve(true);
+            const consignActionPromises = offlineConsignActions.map(s => consignBin(s.binID, s.full));
+            return Promise.allSettled(consignActionPromises).then(responses => {
+                console.info('ConsignActions', responses);
+                return responsesGood(responses);
+            });
+        };
 
-                const binIdx = stop.bins.findIndex(b => b.binID === binID);
-                const bin = stop.bins[binIdx];
-                if (bin == null) return console.warn('No bin');
-                stop.bins.splice(binIdx, 1);
+        const performBinStateActions = () => {
+            if (offlineBinStateActions.length === 0) return Promise.resolve(true);
+            const binStateActionPromises = offlineBinStateActions.map(s => updateBinFieldState(s.binID, s.field, s.state));
+            return Promise.allSettled(binStateActionPromises).then(responses => {
+                console.info('BinStateActions', responses);
+                return responsesGood(responses);
+            });
+        };
 
-                if (bin.droppedOffInRun) {
-                    stop.dropOffCount--;
-                    bin.droppedOffInRun = false;
-                } else {
-                    stop.collectCount++;
-                    bin.pickedUpInRun = true;
-                }
-                stop.isCompleted = stop.collectCount >= stop.collectQuantity && stop.dropOffCount >= stop.dropOffQuantity;
-                loco.bins.push(bin);
-                loco.bins.sort((a, b) => {
-                    if (a.full === b.full)
-                        return a.droppedOffInRun - b.droppedOffInRun;
-                    return a.full - b.full;
-                });
-
-                setLoco({
-                    ...loco,
-                    bins: loco.bins,
-                });
-                setRun({
-                    ...run,
-                    stops: run.stops,
-                });
+        console.info('onReconnect');
+        performStopActions()
+            .then(stopActionComplete => {
+                if (!stopActionComplete) throw new Error("Stop actions failed");
+                return performConsignActions();
+            })
+            .then(consignComplete => {
+                if (!consignComplete) throw new Error("Consign actions failed");
+                return performBinStateActions();
+            })
+            .then(binStateComplete => {
+                if (!binStateComplete) throw new Error("Bin state actions failed");
+                loadData();
             })
             .catch(err => {
                 console.error(err);
             });
     };
 
-    const handleDropOffBin = (binID, stopID) => {
-        performStopAction(binID, 1, stopID, 'DROP_OFF')
+    const responsesGood = (responses) => {
+        let good = false;
+        for (const response of responses)
+            if (response.status === 'fulfilled')
+                good = true;
+        return good;
+    }
+
+    NetInfo.addEventListener(state => {
+        console.info(state.isConnected);
+        if (!connected && state.isConnected)
+            onReconnected();
+        connected = state.isConnected;
+    });
+
+    const loadData = () => {
+        let tempRun;
+        return getCurrentLoadById(1)
+            .then(locoResponse => {
+                setLoco(locoResponse);
+            })
+            .then(() => getRunsByLocoAndDate(1, new Date()))
             .then(response => {
-                const binIdx = loco.bins.findIndex(b => b.binID === binID);
-                const bin = loco.bins[binIdx];
-                if (bin == null) return console.warn('No bin');
-                loco.bins.splice(binIdx, 1);
-
-                const stop = run.stops.find(s => s.stopID === stopID);
-                if (stop == null) return console.warn('No stop');
-
-                if (bin.pickedUpInRun) {
-                    stop.collectCount--;
-                    bin.pickedUpInRun = false;
-                } else {
-                    stop.dropOffCount++;
-                    bin.droppedOffInRun = true;
+                const promises = [];
+                for (const stop of response.stops)
+                    promises.push(getSidingBreakdown(stop.sidingID, stop.stopID));
+                tempRun = response;
+                return Promise.allSettled(promises);
+            })
+            .then(responses => {
+                for (let i = 0; i < responses.length; i++) {
+                    tempRun.stops[i].bins = responses[i].value;
                 }
-                stop.isCompleted = stop.collectCount >= stop.collectQuantity && stop.dropOffCount >= stop.dropOffQuantity;
-                stop.bins.push(bin);
-                stop.bins.sort((a, b) => {
-                    if (a.full === b.full)
-                        return a.droppedOffInRun - b.droppedOffInRun;
-                    return a.full - b.full;
-                });
+                setRun(tempRun);
+                console.info('Setting everything');
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    };
 
-                setLoco({
-                    ...loco,
-                    bins: loco.bins,
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const getFromSource = (stop, type) => {
+        return type === 'COLLECT' ? stop : loco;
+    };
+
+    const getToSource = (stop, type) => {
+        return type === 'COLLECT' ? loco : stop;
+    }
+
+    const adjustStopState = (bin, stop, type) => {
+        if (type === 'COLLECT') {
+            if (bin.droppedOffInRun) {
+                stop.dropOffCount--;
+                bin.droppedOffInRun = false;
+            } else {
+                stop.collectCount++;
+                bin.pickedUpInRun = true;
+            }
+        } else {
+            if (bin.pickedUpInRun) {
+                stop.collectCount--;
+                bin.pickedUpInRun = false;
+            } else {
+                stop.dropOffCount++;
+                bin.droppedOffInRun = true;
+            }
+        }
+
+        stop.dropOffComplete = stop.dropOffCount >= stop.dropOffQuantity;
+        stop.collectComplete = stop.collectCount >= stop.collectQuantity;
+        console.info(stop.dropOffComplete, stop.dropOffCount, stop.dropOffQuantity);
+        console.info(stop.collectComplete, stop.collectCount, stop.collectQuantity);
+    }
+
+    const handleSuccessfulStopAction = (binID, stop, type, operatingOverRange) => {
+        const binIdx = getFromSource(stop, type).bins.findIndex(b => b.binID === binID);
+        const bin = getFromSource(stop, type).bins[binIdx];
+        if (bin == null) return console.warn('No bin');
+        if (!operatingOverRange)
+            getFromSource(stop, type).bins.splice(binIdx, 1);
+
+        adjustStopState(bin, stop, type);
+
+        getToSource(stop, type).bins.push(bin);
+        getToSource(stop, type).bins.sort((a, b) => {
+            if (a.full === b.full)
+                return a.droppedOffInRun - b.droppedOffInRun;
+            return a.full - b.full;
+        });
+    };
+
+    const handlePerformStopActionRange = (startIndex, endIndex, stop, type) => {
+        const source = type === 'COLLECT' ? stop : loco;
+
+        if (!connected) {
+            for (let i = startIndex; i <= endIndex; i++) {
+                console.info(i, source.bins[i]);
+                offlineStopActions.push({binID: source.bins[i].binID, locoID: 1, stopID: stop.stopID, type: type});
+                const bin = source.bins[i];
+                if (bin == null) {
+                    console.error('Shouldn\'t be here');
+                    continue;
+                }
+                handleSuccessfulStopAction(bin.binID, stop, type, true);
+            }
+            getFromSource(stop, type).bins.splice(startIndex, endIndex - startIndex + 1);
+            updateLoco();
+            updateRun();
+            return;
+        }
+
+        const promises = [];
+        for (let i = startIndex; i <= endIndex; i++) {
+            console.info(i, source.bins[i]);
+            promises.push(performStopAction(source.bins[i].binID, 1, stop.stopID, type));
+        }
+
+        Promise.allSettled(promises)
+            .then(responses => {
+                console.info(responses);
+                for (let i = startIndex; i < responses.length + startIndex; i++) {
+                    const response = responses[i - startIndex];
+                    if (response.status === 'rejected') {
+                        console.error(response.reason);
+                        continue;
+                    }
+                    console.info(i, source.bins[i]);
+
+                    const bin = source.bins[i];
+                    if (bin == null) {
+                        console.error('Shouldn\'t be here');
+                        continue;
+                    }
+                    handleSuccessfulStopAction(bin.binID, stop, type, true);
+                }
+                getFromSource(stop, type).bins.splice(startIndex, endIndex - startIndex + 1);
+                updateLoco();
+                updateRun();
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
+
+    const updateRun = () => {
+        setRun({
+            ...run,
+            stops: run.stops,
+        });
+    };
+
+    const updateLoco = () => {
+        setLoco({
+            ...loco,
+            bins: loco.bins,
+        });
+    };
+
+    const handlePerformStopAction = (binID, stop, type) => {
+        if (connected) {
+            performStopAction(binID, 1, stop.stopID, type)
+                .then(response => {
+                    handleSuccessfulStopAction(binID, stop, type, false);
+                    updateRun();
+                    updateLoco();
+                })
+                .catch(err => {
+                    console.error(err);
                 });
-                setRun({
-                    ...run,
-                    stops: run.stops,
+        } else {
+            offlineStopActions.push({binID: binID, locoID: 1, stopID: stop.stopID, type: type});
+            console.info('stop-action', offlineStopActions);
+            handleSuccessfulStopAction(binID, stop, type, false);
+            updateRun();
+            updateLoco();
+        }
+    };
+
+    const handleSuccessfulUpdateBinState = (bin, field, state, stop, type) => {
+        if (field === 'BURNT') bin.burnt = state;
+        else if (field === 'MISSING') bin.missing = state;
+        else bin.repair = state;
+
+        if (type === 'COLLECT') {
+            const index = stop.bins.findIndex(b => b.binID === bin.binID);
+            if (index >= 0) {
+                if (field === 'MISSING') stop.bins.splice(index, 1);
+                else stop.bins[index] = bin;
+                updateRun();
+            } else {
+                console.error('Shouldn\'t be here');
+            }
+        } else {
+            const index = loco.bins.findIndex(b => b.binID === bin.binID);
+            if (index >= 0) {
+                if (field === 'MISSING') loco.bins.splice(index, 1);
+                else loco.bins[index] = bin;
+                updateLoco();
+            } else {
+                console.error('Shouldn\'t be here');
+            }
+        }
+    }
+
+    const handleUpdateBinState = (bin, field, state, stop, type) => {
+        if (connected) {
+            updateBinFieldState(bin.binID, field, state)
+                .then(response => {
+                    handleSuccessfulUpdateBinState(bin, field, state, stop, type);
+                })
+                .catch(err => {
+                    console.error(err);
                 });
+        } else {
+            offlineBinStateActions.push({binID: bin.binID, field: field, state: state});
+            console.info(offlineBinStateActions);
+            handleSuccessfulUpdateBinState(bin, field, state, stop, type);
+        }
+    };
+
+    const handleSuccessfulConsignBin = (bin, stop) => {
+        bin.full = !bin.full;
+        if (stop != null) {
+            const index = stop.bins.findIndex(b => b.binID === bin.binID);
+            if (index >= 0) {
+                stop.bins[index] = bin;
+                updateRun();
+            } else {
+                console.error('Shouldn\'t be here');
+            }
+        } else {
+            const index = loco.bins.findIndex(b => b.binID === bin.binID);
+            if (index >= 0) {
+                loco.bins[index] = bin;
+                updateLoco();
+            } else {
+                console.error('Shouldn\'t be here');
+            }
+        }
+    };
+
+    const handleConsignBin = (bin, stop) => {
+        if (connected) {
+            consignBin(bin.binID, !bin.full)
+                .then(response => {
+                    handleSuccessfulConsignBin(bin, stop);
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        } else {
+            offlineConsignActions.push({binID: bin.binID, full: !bin.full});
+            console.info(offlineConsignActions);
+                onReconnected();
+            handleSuccessfulConsignBin(bin, stop);
+        }
+    };
+
+    const handleFindBin = (code, stop) => {
+        findBin(code, stop != null ? stop.sidingID : null, stop == null ? 1 : null)
+            .then(bin => {
+                if (stop != null) {
+                    stop.bins.push(bin);
+                    updateRun();
+                } else {
+                    loco.bins.push(bin);
+                    updateLoco();
+                }
             })
             .catch(err => {
                 console.error(err);
@@ -185,19 +407,13 @@ export const RunProvider = ({ children }) => {
         return loco;
     };
 
-    // Dispatches an action to update the entire run object
-    const updateRun = (updates) =>
-        dispatch({ type: 'UPDATE_RUN', payload: updates });
-
-    // Dispatches an action to update specific properties of a siding
-
     const updateSiding = (id, updates) =>
-        dispatch({ type: 'UPDATE_SIDING', payload: { id, updates } });
+        dispatch({type: 'UPDATE_SIDING', payload: {id, updates}});
 
     //Dispatches an action to update specific bin details in drop or collect arrays
     const updateBin = (sidingId, binNumber, updates, isDrop = true) => {
         const type = isDrop ? 'UPDATE_BIN_DROP' : 'UPDATE_BIN_COLLECT';
-        dispatch({ type, sidingId, payload: { binNumber, updates } });
+        dispatch({type, sidingId, payload: {binNumber, updates}});
     };
 
     // Retrieves the entire run data from the state
@@ -234,8 +450,11 @@ export const RunProvider = ({ children }) => {
                 getStop,
                 getStops,
                 getLoco,
-                handlePickUpBin,
-                handleDropOffBin,
+                handlePerformStopAction,
+                handlePerformStopActionRange,
+                handleUpdateBinState,
+                handleFindBin,
+                handleConsignBin,
             }}
         >
             {children}
@@ -310,11 +529,14 @@ export const useRun = () => {
         getStop,
         getStops,
         getLoco,
-        handlePickUpBin,
-        handleDropOffBin,
+        handlePerformStopAction,
+        handlePerformStopActionRange,
+        handleUpdateBinState,
+        handleFindBin,
+        handleConsignBin,
     } = useContext(RunContext);
     return {
-        runData: state,
+        state,
         getRun,
         getSiding,
         getBins,
@@ -325,7 +547,10 @@ export const useRun = () => {
         getStop,
         getStops,
         getLoco,
-        handlePickUpBin,
-        handleDropOffBin,
+        handlePerformStopAction,
+        handlePerformStopActionRange,
+        handleUpdateBinState,
+        handleFindBin,
+        handleConsignBin,
     };
 };

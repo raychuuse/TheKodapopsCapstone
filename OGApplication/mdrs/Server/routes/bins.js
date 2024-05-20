@@ -141,11 +141,11 @@ router.post('/consign', verifyAuthorization, (req, res) => {
         .then(processQueryResult)
         .then(response => {
             user = response[0];
-            console.info(user);
             if (user == null)
                 throw {status: 404, message: 'No user found with the id: ' + req.userID};
-            if (user.harvesterID == null || user.userRole !== 'Harvester')
-                throw {status: 403, message: 'Only harvester users can consign bins'};
+
+            if ((user.harvesterID == null || user.userRole !== 'Harvester') && user.userRole !== 'Locomotive')
+                throw {status: 403, message: 'Only harvester and locomotive users can consign bins'};
             return req.db.raw(`SELECT * FROM bin WHERE binID = ?`, [req.body.binID]);
         })
         .then(processQueryResult)
@@ -178,7 +178,7 @@ router.post('/consign', verifyAuthorization, (req, res) => {
                         trx.rollback();
                     });
 
-                if (previousTransaction != null) {
+                if (previousTransaction != null && user.userRole === 'Harvester') {
                     trx.raw(`DELETE
                                 FROM transactionlog
                                 WHERE transactionID = ?`, previousTransaction.transactionID)

@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-export const serverUrl = "http://10.0.0.147:8080";
+export const serverUrl = "http://10.0.0.90:8080";
 
 export function postConfig(data) {
     const b = data != null ? JSON.stringify(data) : '';
@@ -12,6 +12,19 @@ export function postConfig(data) {
             'Authorization': 'Bearer ' + getToken(),
         },
         body: b
+    }
+}
+
+export function putConfig(data) {
+    const b = data != null ? JSON.stringify(data) : '';
+    return {
+        method: 'PUT',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken(),
+        },
+        body: b,
     }
 }
 
@@ -27,7 +40,7 @@ export function getConfig() {
 }
 
 function getToken() {
-    return Cookies.get('token');
+    return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzE1MzI0NTkyNzc0LCJpYXQiOjE3MTUyMzgxOTJ9.GmoH-dJpJVbrFPrwVFrBmRCsx5r_s9pPDPALZRBd-o4';
 }
 
 function logout() {

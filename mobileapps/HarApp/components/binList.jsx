@@ -106,8 +106,8 @@ const BinList = ({ openAddBinModal }) => {
             alignItems: 'center',
           }}
         >
-          <Title3>{bins.length}</Title3>
-          <Headline>{bins.length > 1 ? 'Bins' : 'Bin'} at Siding</Headline>
+          <Title3>{bins?.length}</Title3>
+          <Headline>{bins?.length > 1 ? 'Bins' : 'Bin'} at Siding</Headline>
         </View>
         <TouchableOpacity
           onLongPress={() => toggleLock()}

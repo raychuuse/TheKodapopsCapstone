@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-export const serverUrl = "http://10.0.0.147:8080";
+export const serverUrl = "http://10.0.0.90:8080";
 
 export function postConfig(data) {
     const b = data != null ? JSON.stringify(data) : '';

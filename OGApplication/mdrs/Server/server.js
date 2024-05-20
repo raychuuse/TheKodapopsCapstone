@@ -84,6 +84,11 @@ app.use(function(err, req, res, next) {
   // res.status(err.status || 500);
 });
 
+process.on('unhandledRejection', (error, p) => {
+  console.log('=== UNHANDLED REJECTION ===', p);
+  console.dir(error.stack);
+});
+
 ws.on('connection', (ws, req) => {
   const userId = uuidv4();
 
