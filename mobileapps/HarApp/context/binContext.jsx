@@ -2,7 +2,8 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { consignBin, findBin, updateBinFieldState } from '../api/bins.api';
 import {getBinsFromSiding}  from '../api/siding.api'
 import NetInfo from "@react-native-community/netinfo";
-import {errorToast} from "../lib/alerts";
+import {errorToast, showToast} from "../lib/alerts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /**
  * initialBinData represents the initial state of bins in an array format. Each bin object contains the bin number,
@@ -72,6 +73,7 @@ const BinContext = createContext({
   handleFindBin: () => {},
   refreshSidingData: () => {},
   onReconnected: () => {},
+  loadData: () => {},
 });
 
 /**
@@ -84,14 +86,30 @@ const BinContext = createContext({
  * @returns {ReactNode} A Provider component that passes down bin data and manipulation functions to its children.
  */
 let connected = true;
+
+let selectedSiding;
+let selectedFarm;
+
 const offlineConsignActions = [];
 const offlineBinStateActions = [];
 
 export const BinProvider = ({ children }) => {
   const [bins, setBins] = useState();
-  const [selectedSiding, setSelectedSiding] = useState();
-  const [selectedFarm, setSelectedFarm] = useState();
   const [onMainPage, setOnMainPage] = useState(false); // I suck
+
+  useEffect(() => {
+    AsyncStorage.getItem('offline')
+        .then(json => {
+          if (json == null) return;
+          const arr = JSON.parse(json);
+          if (arr[0].length !== 0)
+            offlineConsignActions.push(...arr[0]);
+          if (arr[1].length !== 0)
+            offlineBinStateActions.push(...arr[1]);
+          console.info('Offline data restored: ', arr);
+        })
+        .catch(err => console.error('Restoring offline data', err));
+  }, []);
 
   const getOnMainPage = () => {
       return onMainPage;
@@ -103,18 +121,29 @@ export const BinProvider = ({ children }) => {
 
   const getSelectedSiding = () => {
       return selectedSiding;
-  }
+  };
+
+  const setSelectedSiding = (siding) => {
+    selectedSiding = siding;
+  };
 
   const getSelectedFarm = () => {
       return selectedFarm;
-  }
+  };
+
+  const setSelectedFarm = (farm) => {
+    selectedFarm = farm;
+  };
 
   const onSetup = () => {
       setOnMainPage(true);
       loadData();
+      if (haveOfflineData())
+        onReconnected();
   };
 
   const loadData = () => {
+      console.info('tent', selectedSiding);
       if (selectedSiding == null) return;
       getBinsFromSiding(selectedSiding.sidingID)
           .then(response => {
@@ -127,13 +156,18 @@ export const BinProvider = ({ children }) => {
   };
 
   NetInfo.addEventListener(state => {
-      if (!connected && state.isConnected)
-          onReconnected();
-      connected = state.isConnected;
+      if (!connected && state.isConnected) {
+        connected = state.isConnected;
+        onReconnected();
+      } else {
+        connected = state.isConnected;
+      }
   });
 
   const onReconnected = () => {
       if (!connected || selectedSiding == null) return;
+      showToast('Syncing Offline Data', 'info');
+
       const performConsignActions = () => {
           if (offlineConsignActions.length === 0) return Promise.resolve(true);
           const consignActionPromises = offlineConsignActions.map(s => consignBin(s.binID, s.full));
@@ -172,12 +206,24 @@ export const BinProvider = ({ children }) => {
           .then(binStateComplete => {
               if (!binStateComplete)
                 errorToast({message: 'Failed to upload some bin changes, press send in the settings menu to try again.'});
+              persistOfflineData();
               loadData();
+              showToast('Finished Syncing Offline Data', 'success');
           })
           .catch(err => {
               console.error(err);
               errorToast(err);
           });
+  };
+
+  const haveOfflineData = () => {
+    return offlineConsignActions.length !== 0 || offlineBinStateActions.length !== 0;
+  };
+
+  const persistOfflineData = () => {
+    AsyncStorage.setItem('offline', JSON.stringify([offlineConsignActions, offlineBinStateActions]))
+        .then(() => {console.info('Offline data persisted')})
+        .catch(err => console.error('Persisting offline data', err));
   };
 
   const handleConsignRange = (startIndex, endIndex) => {
@@ -189,6 +235,7 @@ export const BinProvider = ({ children }) => {
                   continue;
               }
               offlineConsignActions.push({binID: bin.binID, full: !bin.full});
+              persistOfflineData();
               handleSuccessfulConsignBin(bin);
           }
           setBins([...bins]);
@@ -230,6 +277,7 @@ export const BinProvider = ({ children }) => {
   const handleConsignBin = (bin) => {
     if (!connected) {
         offlineConsignActions.push({binID: bin.binID, full: !bin.full});
+        persistOfflineData();
         if (handleSuccessfulConsignBin(bin))
             setBins([...bins]);
         return;
@@ -258,6 +306,7 @@ export const BinProvider = ({ children }) => {
   const handleUpdateBinState = (bin, field, state) => {
       if (!connected) {
           offlineBinStateActions.push({binID: bin.binID, field: field, state: state});
+          persistOfflineData();
           handleSuccessfulUpdateBinState(bin, field, state);
           return;
       }
@@ -319,6 +368,7 @@ export const BinProvider = ({ children }) => {
         getSelectedFarm,
         setSelectedFarm,
         getBins,
+        loadData,
         handleConsignBin,
         handleConsignRange,
         handleUpdateBinState,

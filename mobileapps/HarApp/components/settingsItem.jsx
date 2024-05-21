@@ -38,7 +38,7 @@ const SettingsItem = ({
   const [pickerVisable, setPickerVisable] = useState(false);
 
   const handleValueChange = (itemValue) => {
-      if (setSelectedItem != null )
+      if (setSelectedItem != null)
         setSelectedItem(itemValue);
       setSelectedOption(itemValue);
   };

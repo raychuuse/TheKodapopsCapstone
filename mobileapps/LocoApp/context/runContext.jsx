@@ -107,7 +107,7 @@ export const RunProvider = ({children}) => {
                 showToast('Finished Syncing Offline Data', 'success');
             })
             .catch(err => {
-                console.error(err, 'hello122');
+                console.error(err);
                 errorToast(err);
             });
     };

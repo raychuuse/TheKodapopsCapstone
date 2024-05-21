@@ -99,11 +99,15 @@ const SetupPage = () => {
   }, []);
 
   const onSidingSelected = (selectedSidingID) => {
+    if (selectedSidingID === 0)
+      return setSelectedSiding(null);
     const siding = sidings.find(s => s.sidingID === selectedSidingID);
     setSelectedSiding(siding);
   };
 
   const onFarmSelected = (selectedFarmID) => {
+    if (selectedFarmID === 0)
+      return setSelectedFarm(null);
     const farm = farms.find(f => f.farmID === selectedFarmID);
     setSelectedFarm(farm);
     getBlocks(farm.farmID)

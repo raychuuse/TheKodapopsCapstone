@@ -25,7 +25,7 @@ const ModalProvider = ({ children }) => {
   const closeSidingModal = () => setModalSidingVisible(false);
 
   // Function to open and close the Select Siding Modal
-  const openSelectSidingModal = () => setModalSelectSidingVisible(true);
+  const openSelectSidingModal = () => setModalSelectSidingVisible(false);
   const closeSelectSidingModal = () => setModalSelectSidingVisible(false);
 
   // Function to open and close the Add Bin Modal

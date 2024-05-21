@@ -58,11 +58,6 @@ const Layout = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      {/* SettingsModals */}
-      <ModalSettings
-        isVisable={settingsVisable}
-        setIsVisable={setSettingsVisable}
-      />
       {/* Notification Modal */}
       <ModalNotifications
         isVisable={notificationVisable}
@@ -77,6 +72,11 @@ const Layout = () => {
       />
       {/* Page */}
       <BinProvider>
+        {/* SettingsModals */}
+        <ModalSettings
+            isVisable={settingsVisable}
+            setIsVisable={setSettingsVisable}
+        />
         <Slot />
         {/* Navigation */}
         <BottomBar
