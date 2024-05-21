@@ -1,10 +1,15 @@
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
 
-export const FinishedAlert = () => {
+export const FinishedAlert = (func) => {
   Alert.alert('Finished?', "\nAre you sure you're finished at this Siding?", [
     {text: "I'm not"},
-    {text: 'Yes, I am!', onPress: () => router.back()},
+    {
+      text: 'Yes, I am!', onPress: () => {
+        func()
+        router.back()
+      }
+    },
   ]);
 };
 

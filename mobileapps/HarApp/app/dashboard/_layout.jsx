@@ -78,14 +78,14 @@ const Layout = () => {
       {/* Page */}
       <BinProvider>
         <Slot />
+        {/* Navigation */}
+        <BottomBar
+          notifications={notifications}
+          setNotificationVisable={setNotificationVisable}
+          setSettingsVisable={setSettingsVisable}
+          setTutorialVisable={setTutorialVisable}
+        />
       </BinProvider>
-      {/* Navigation */}
-      <BottomBar
-        notifications={notifications}
-        setNotificationVisable={setNotificationVisable}
-        setSettingsVisable={setSettingsVisable}
-        setTutorialVisable={setTutorialVisable}
-      />
       <StatusBar style='light' />
     </GestureHandlerRootView>
   );

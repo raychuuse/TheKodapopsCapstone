@@ -24,11 +24,11 @@ import { useBins } from '../context/binContext';
 // Import Contexts
 
 const MainPage = () => {
-  const {getSelectedSiding} = useBins();
+  const {getSelectedSiding, setOnMainPage} = useBins();
   const [addBinVisable, setAddBinVisable] = useState(false);
 
   const handleDone = () => {
-    FinishedAlert();
+    FinishedAlert(() => setOnMainPage(false));
   }
   return (
     <View style={styles.body}>

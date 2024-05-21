@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 // Import Components
 import Button from './button';
 import NotificationBell from './notificationBell';
+import {useBins} from "../context/binContext";
 
 /**
  * BottomBar Component
@@ -23,6 +24,8 @@ const BottomBar = ({
   setTutorialVisable,
   setSettingsVisable,
 }) => {
+  const { getOnMainPage } = useBins();
+
   return (
     <View
       style={{
@@ -49,6 +52,14 @@ const BottomBar = ({
         notificationCount={notifications.length} // Number of notifications
         onPress={() => setNotificationVisable(true)} // Show notifications modal
       />
+      {/* Open Settings Modal Button */}
+      {getOnMainPage() && <Button
+          backgroundColor='transparent'
+          iconName='settings'
+          iconSize={48}
+          iconColor={'#fff'}
+          onPress={() => setSettingsVisable(true)}
+      />}
     </View>
   );
 };

@@ -58,6 +58,8 @@ const initialExceptionBinData = [
 
 const BinContext = createContext({
   onSetup: () => {},
+  getOnMainPage: () => {},
+  setOnMainPage: () => {},
   getSelectedSiding: () => {},
   setSelectedSiding: () => {},
   getSelectedFarm: () => {},
@@ -67,6 +69,8 @@ const BinContext = createContext({
   handleConsignRange: () => {},
   handleUpdateBinState: () => {},
   handleFindBin: () => {},
+  refreshSidingData: () => {},
+  onReconnected: () => {},
 });
 
 /**
@@ -86,6 +90,11 @@ export const BinProvider = ({ children }) => {
   const [bins, setBins] = useState();
   const [selectedSiding, setSelectedSiding] = useState();
   const [selectedFarm, setSelectedFarm] = useState();
+  const [onMainPage, setOnMainPage] = useState(false); // I suck
+
+  const getOnMainPage = () => {
+      return onMainPage;
+  };
 
   const getBins = () => {
       return bins;
@@ -100,10 +109,12 @@ export const BinProvider = ({ children }) => {
   }
 
   const onSetup = () => {
+      setOnMainPage(true);
       loadData();
   };
 
   const loadData = () => {
+      if (selectedSiding == null) return;
       getBinsFromSiding(selectedSiding.sidingID)
           .then(response => {
               setBins(response);
@@ -120,6 +131,7 @@ export const BinProvider = ({ children }) => {
   });
 
   const onReconnected = () => {
+      if (!connected || selectedSiding == null) return;
       const performConsignActions = () => {
           if (offlineConsignActions.length === 0) return Promise.resolve(true);
           const consignActionPromises = offlineConsignActions.map(s => consignBin(s.binID, s.full));
@@ -277,10 +289,18 @@ export const BinProvider = ({ children }) => {
           });
   };
 
+    const refreshSidingData = () => {
+        if (!connected) return;
+
+        loadData();
+    };
+
   return (
     <BinContext.Provider
       value={{
         onSetup,
+        getOnMainPage,
+        setOnMainPage,
         getSelectedSiding,
         setSelectedSiding,
         getSelectedFarm,
@@ -289,7 +309,9 @@ export const BinProvider = ({ children }) => {
         handleConsignBin,
         handleConsignRange,
         handleUpdateBinState,
-        handleFindBin
+        handleFindBin,
+        refreshSidingData,
+        onReconnected,
       }}
     >
       {children}

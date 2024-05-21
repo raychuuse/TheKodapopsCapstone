@@ -1,13 +1,16 @@
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, StyleSheet} from 'react-native';
 
 // Import Styles
 import { Colours } from './colours';
-import { Title1, Subhead, Footnote, Strong, Title2 } from './typography';
+import {Title1, Subhead, Footnote, Strong, Title2, Title3} from './typography';
 
 // Import components
 import SettingsItem from './settingsItem';
 import CustomModal from './modal';
 import Divider from './divider';
+import Button from "./button";
+import {MaterialIcons} from "@expo/vector-icons";
+import {useBins} from "../context/binContext";
 
 // Mock Data
 const farmOptions = [
@@ -73,84 +76,117 @@ const burntOptions = [
  * @returns {JSX.Element} The rendered ModalSettings component
  */
 const ModalSettings = ({ isVisable, setIsVisable }) => {
+  const { onReconnected, refreshSidingData } = useBins();
   return (
-    <CustomModal
-      isVisible={isVisable} // Control modal visibility
-      onClose={() => setIsVisable(false)} // Close modal handler
-      buttonIcon='check-circle-outline' // Icon for the modal close button
-    >
-      <View style={{ width: '100%', gap: 8, maxHeight: 600 }}>
-        <Title1 style={{ textAlign: 'center', marginBottom: 24 }}>
-          Settings
-        </Title1>
-        <ScrollView
-          style={{
-            maxHeight: 600, // Maximum height for the ScrollView
-            backgroundColor: Colours.bgLevel6, // Background color
-            padding: 8, // Padding inside the ScrollView
-            borderRadius: 10, // Rounded corners
-          }}
-        >
-          <Title2 style={{ marginBottom: 16 }}>Consignment Settings</Title2>
-          <Subhead>
-            Configure your consignment details for where you will be dropping
-            off your loads.
-          </Subhead>
-          <SettingsItem
-            type='location' // Type of settings item
-            label='Siding' // Label for the settings item
-            options={sidingOptions} // Options for the picker
+      <CustomModal
+          isVisible={isVisable}
+          onClose={() => setIsVisable(false)}
+          style={{width: '80%', maxWidth: 800, height: '70%'}}
+      >
+        {/* Header */}
+        <View style={[styles.HeaderContainer, {borderColor: Colours.textLevel2}]}>
+          <MaterialIcons
+              name='settings'
+              size={28}
+              color={Colours.textLevel2}
           />
-          <Divider style={{ marginVertical: 8 }} />
-          <SettingsItem
-            type='select'
-            label='Farm'
-            options={farmOptions}
-            style={{ marginTop: 8 }}
-          />
-          <SettingsItem
-            type='select'
-            label='Block'
-            options={blockOptions}
-            style={{ marginTop: 8 }}
-          />
-          <SettingsItem
-            type='select'
-            label='Sub'
-            options={subBlockOptions}
-            style={{ marginTop: 8 }}
-          />
-          <SettingsItem
-            type='select'
-            label='Pad'
-            options={padOptions}
-            style={{ marginTop: 8 }}
-          />
-          <SettingsItem
-            type='select'
-            label='Burnt'
-            options={burntOptions}
-            style={{ marginTop: 8 }}
-          />
-          <Footnote
-            style={{
-              marginTop: 32,
-              color: '#fff', // Text color
-              textAlign: 'center', // Center align text
-              backgroundColor: `${Colours.dangerBg}80`, // Background color with transparency
-              padding: 8, // Padding inside the footnote
-              borderRadius: 16, // Rounded corners
-              overflow: 'hidden', // Hide overflow content
-            }}
+          <Title1>Settings</Title1>
+        </View>
+        {/* Page Content */}
+        <View style={styles.content}>
+          {/* Refresh Data */}
+          <View
+              style={{
+                flexDirection: 'row',
+                width: '100%',
+                gap: 22,
+                paddingHorizontal: 16,
+                paddingVertical: 4,
+                alignItems: 'center',
+              }}
           >
-            <Strong>Warning: </Strong>Ensure accurate settings for smooth
-            operations at the rail siding bins.
-          </Footnote>
-          <Divider style={{ marginVertical: 16 }} />
-        </ScrollView>
-      </View>
-    </CustomModal>
+            <Button
+                title='Refresh Siding'
+                iconName={'refresh'}
+                iconColor={Colours.textLevel3}
+                textColor={Colours.textLevel3}
+                backgroundColor={Colours.bgLevel3}
+                border
+                borderWidth={1}
+                iconSize={28}
+                style={{paddingVertical: 4, width: '100%'}}
+                onPress={() => refreshSidingData()}
+            />
+          </View>
+          {/* Refresh Data */}
+          <View
+              style={{
+                flexDirection: 'row',
+                width: '100%',
+                gap: 22,
+                paddingHorizontal: 16,
+                paddingVertical: 4,
+                alignItems: 'center',
+              }}
+          >
+            <Button
+                title='Send Offline Data'
+                iconName={'swap-vert'}
+                iconColor={Colours.textLevel3}
+                textColor={Colours.textLevel3}
+                backgroundColor={Colours.bgLevel3}
+                border
+                borderWidth={1}
+                iconSize={28}
+                style={{paddingVertical: 4, width: '100%'}}
+                onPress={() => onReconnected()}
+            />
+          </View>
+          {/* Log Out */}
+          <View
+              style={{
+                flexDirection: 'row',
+                width: '100%',
+                gap: 22,
+                paddingHorizontal: 16,
+                paddingVertical: 4,
+                alignItems: 'center',
+              }}
+          >
+            <Button
+                title='Log Out'
+                iconName={'logout'}
+                iconColor={Colours.textLevel3}
+                textColor={Colours.textLevel3}
+                backgroundColor={Colours.bgLevel3}
+                border
+                borderWidth={1}
+                iconSize={28}
+                style={{paddingVertical: 4, width: '100%'}}
+                onPress={() => router.replace('/')}
+            />
+          </View>
+        </View>
+      </CustomModal>
   );
 };
 
+const styles = StyleSheet.create({
+  content: {
+    flex: 1,
+    width: '100%',
+    gap: 8,
+    paddingVertical: 16,
+  },
+  HeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    gap: 8,
+    borderStyle: 'solid',
+    borderBottomWidth: 2,
+    paddingLeft: 6,
+    paddingBottom: 6,
+  },
+});
 export default ModalSettings;

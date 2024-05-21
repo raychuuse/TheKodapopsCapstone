@@ -5,23 +5,18 @@ import { router } from 'expo-router';
 // Import Styles
 import { Title1, Title3 } from '../styles/typography';
 
-// Import Mock Data
-import {
-  SettingMockData_Run,
-  SettingsMockData_Loco,
-} from '../data/settingsMockData';
-
 // Import Componetns
 import CustomModal from './modal';
-import SettingsItem from './settingsItem';
 import Button from './button';
 import { useTheme } from '../styles/themeContext';
 import { lightTheme } from '../styles/themes';
+import {useRun} from "../context/runContext";
 
 // Import Colours
 
 const ModalSettings = ({ isVisible, onClose }) => {
   const { theme, toggleTheme } = useTheme();
+  const { refreshRunData, onReconnected } = useRun();
   return (
     <CustomModal
       isVisible={isVisible}
@@ -75,11 +70,11 @@ const ModalSettings = ({ isVisible, onClose }) => {
                   style={{ flex: 1, textTransform: 'capitalize' }}
                   numberOfLines={1}
               >
-                  John Smith
+                  Refresh Run Data
               </Title3>
               <Button
-                  title='Log Out'
-                  iconName={'logout'}
+                  title='Refresh'
+                  iconName={'refresh'}
                   iconColor={theme.textLevel3}
                   textColor={theme.textLevel3}
                   backgroundColor={theme.bgLevel3}
@@ -87,7 +82,37 @@ const ModalSettings = ({ isVisible, onClose }) => {
                   borderWidth={1}
                   iconSize={28}
                   style={{ paddingVertical: 4 }}
-                  onPress={() => router.replace('/')}
+                  onPress={() => refreshRunData()}
+              />
+          </View>
+          {/* Refresh Data */}
+          <View
+              style={{
+                  flexDirection: 'row',
+                  width: '100%',
+                  gap: 22,
+                  paddingHorizontal: 16,
+                  paddingVertical: 4,
+                  alignItems: 'center',
+              }}
+          >
+              <Title3
+                  style={{ flex: 1, textTransform: 'capitalize' }}
+                  numberOfLines={1}
+              >
+                  Send Offline Data
+              </Title3>
+              <Button
+                  title='Send'
+                  iconName={'swap-vert'}
+                  iconColor={theme.textLevel3}
+                  textColor={theme.textLevel3}
+                  backgroundColor={theme.bgLevel3}
+                  border
+                  borderWidth={1}
+                  iconSize={28}
+                  style={{ paddingVertical: 4 }}
+                  onPress={() => onReconnected()}
               />
           </View>
         {/* Log Out */}

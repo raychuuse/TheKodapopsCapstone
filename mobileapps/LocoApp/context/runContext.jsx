@@ -1,7 +1,6 @@
-import React, {createContext, useContext, useEffect, useReducer, useState} from 'react';
+import React, {createContext, useContext, useState} from 'react';
 
 // Import Mock Data from a relative path
-import {RunMockData} from '../data/RunMockData';
 import {completeStop, getRunsByLocoAndDate, performStopAction} from '../api/runs.api';
 import {getCurrentLoadById} from '../api/loco.api';
 import {getSidingBreakdown} from '../api/siding.api';
@@ -24,6 +23,8 @@ export const RunProvider = ({children}) => {
     const [locoID, setLocoID] = useState();
 
     const onReconnected = () => {
+        if (!connected) return;
+
         const performStopActions = () => {
             if (offlineStopActions.length === 0) return Promise.resolve(true);
             const stopActionPromises = offlineStopActions.map(s => performStopAction(s.binID, s.locoID, s.stopID, s.type));
@@ -364,6 +365,12 @@ export const RunProvider = ({children}) => {
             });
     };
 
+    const refreshRunData = () => {
+        if (!connected) return;
+
+        loadData(false);
+    };
+
     const getStop = (stopID) => {
         return run.stops.find(stop => stop.stopID === stopID);
     };
@@ -395,6 +402,8 @@ export const RunProvider = ({children}) => {
                 handleUpdateBinState,
                 handleFindBin,
                 handleConsignBin,
+                refreshRunData,
+                onReconnected,
             }}
         >
             {children}
@@ -470,6 +479,8 @@ export const useRun = () => {
         handleUpdateBinState,
         handleFindBin,
         handleConsignBin,
+        refreshRunData,
+        onReconnected,
     } = useContext(RunContext);
     return {
         getStop,
@@ -484,5 +495,7 @@ export const useRun = () => {
         handleUpdateBinState,
         handleFindBin,
         handleConsignBin,
+        refreshRunData,
+        onReconnected,
     };
 };
