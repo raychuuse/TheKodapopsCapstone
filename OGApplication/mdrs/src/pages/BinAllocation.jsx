@@ -25,16 +25,13 @@ export default function BinAllocation() {
     const navigate = useNavigate();
     const search = useLocation().search;
     const id = new URLSearchParams(search).get("id");
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [searchResult, setSearchResult] = useState([]);
 
     const changeState = (bin) => {
-        setLoading(true);
         setSearchResult(bin);
         navigate(`?id=${bin.id}`);
-        setLoading(false);
     };
 
     return (
@@ -49,9 +46,8 @@ export default function BinAllocation() {
                         </div>
                     </div>
                     <div className="col-sm-9">
-                        {loading && <LoadingSpinner/>}
                         {error && <ErrorAlert message={error.message}/>}
-                        {!loading && !error && (
+                        {!error && (
                             <section className="data-table">
                                 <div className="container-fluid">
                                     <div className="row">
