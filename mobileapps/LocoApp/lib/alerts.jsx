@@ -34,3 +34,13 @@ export const errorToast = (err) => {
     position: 'bottom',
   });
 }
+
+export const showToast = (message, type) => {
+  Toast.show({
+    text1: message,
+    type: type,
+    visibilityTime: 4000,
+    autoHide: true,
+    position: 'bottom',
+  });
+}

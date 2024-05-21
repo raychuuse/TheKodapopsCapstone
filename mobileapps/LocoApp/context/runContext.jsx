@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 
 // Import Mock Data from a relative path
 import {completeStop, getRunsByLocoAndDate, performStopAction} from '../api/runs.api';
@@ -7,12 +7,14 @@ import {getSidingBreakdown} from '../api/siding.api';
 import {consignBin, findBin, updateBinFieldState} from '../api/bins.api.ts';
 import NetInfo from '@react-native-community/netinfo';
 import {router} from "expo-router";
-import {errorToast} from "../lib/alerts";
+import {errorToast, showToast} from "../lib/alerts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Create a React context for storing and managing run data
 const RunContext = createContext();
 
 let connected = true;
+let locoID;
 const offlineStopActions = [];
 const offlineConsignActions = [];
 const offlineBinStateActions = [];
@@ -21,10 +23,27 @@ const offlineBinStateActions = [];
 export const RunProvider = ({children}) => {
     const [run, setRun] = useState();
     const [loco, setLoco] = useState();
-    const [locoID, setLocoID] = useState();
+
+    useEffect(() => {
+        AsyncStorage.getItem('offline')
+            .then(json => {
+                if (json == null) return;
+                const arr = JSON.parse(json);
+                if (arr[0].length !== 0)
+                    offlineStopActions.push(...arr[0]);
+                if (arr[1].length !== 0)
+                    offlineConsignActions.push(...arr[1]);
+                if (arr[2].length !== 0)
+                    offlineBinStateActions.push(...arr[2]);
+                console.info('Offline data restored: ', arr);
+            })
+            .catch(err => console.error('Restoring offline data', err));
+    }, []);
 
     const onReconnected = () => {
         if (!connected) return;
+
+        showToast('Syncing Offline Data', 'info');
 
         const performStopActions = () => {
             if (offlineStopActions.length === 0) return Promise.resolve(true);
@@ -83,23 +102,40 @@ export const RunProvider = ({children}) => {
             .then(binStateComplete => {
                 if (!binStateComplete)
                     errorToast({message: 'Failed to upload some bin changes, press send in the settings menu to try again.'});
+                persistOfflineData();
                 loadData(false);
+                showToast('Finished Syncing Offline Data', 'success');
             })
             .catch(err => {
-                console.error(err);
+                console.error(err, 'hello122');
                 errorToast(err);
             });
     };
 
+    const persistOfflineData = () => {
+        AsyncStorage.setItem('offline', JSON.stringify([offlineStopActions, offlineConsignActions, offlineBinStateActions]))
+            .then(() => {console.info('Offline data persisted')})
+            .catch(err => console.error('Persisting offline data', err));
+    };
+
+    const haveOfflineData = () => {
+        return offlineStopActions.length !== 0 || offlineConsignActions.length !== 0 || offlineBinStateActions.length !== 0;
+    };
+
     NetInfo.addEventListener(state => {
-        if (!connected && state.isConnected)
+        if (!connected && state.isConnected && locoID != null) {
+            connected = state.isConnected;
             onReconnected();
-        connected = state.isConnected;
+        } else {
+            connected = state.isConnected;
+        }
     });
 
     const onRunStarted = () => {
         if (locoID == null) return;
         loadData(true);
+        if (haveOfflineData())
+            onReconnected();
     };
 
     const loadData = (navigate) => {
@@ -285,6 +321,7 @@ export const RunProvider = ({children}) => {
         } else {
             offlineStopActions.push({binID: binID, locoID: locoID, stopID: stop.stopID, type: type});
             console.info('stop-action', offlineStopActions);
+            persistOfflineData();
             handleSuccessfulStopAction(binID, stop, type, false);
             updateRun();
             updateLoco();
@@ -330,6 +367,7 @@ export const RunProvider = ({children}) => {
         } else {
             offlineBinStateActions.push({binID: bin.binID, field: field, state: state});
             console.info(offlineBinStateActions);
+            persistOfflineData();
             handleSuccessfulUpdateBinState(bin, field, state, stop, type);
         }
     };
@@ -367,6 +405,7 @@ export const RunProvider = ({children}) => {
                 });
         } else {
             offlineConsignActions.push({binID: bin.binID, full: !bin.full});
+            persistOfflineData();
             handleSuccessfulConsignBin(bin, stop);
         }
     };
@@ -410,7 +449,11 @@ export const RunProvider = ({children}) => {
 
     const getLocoID = () => {
         return locoID;
-    }
+    };
+
+    const setLocoID = (id) => {
+        locoID = id;
+    };
 
     return (
         <RunContext.Provider
