@@ -10,24 +10,29 @@ import { Title1, Subhead, Title2 } from '../styles/typography';
 import CustomModal from './modal';
 import { useTheme } from '../styles/themeContext';
 
+// import Images
+const image1 = require('../assets/tutorial_1.gif');
+const image2 = require('../assets/tutorial_2.gif');
+const image3 = require('../assets/tutorial_3.gif');
+
 const TutorialData = [
   {
-    header: 'Marking Bins as Full',
+    header: 'Marking Bins as Complete',
     description:
-      'See how to mark a bin as full with a simple swipe at the siding.',
-    image: '',
+      'See how to mark a bin as complete with a simple press or long press to select mutiple at the siding.',
+    image: image1,
   },
   {
-    header: 'Quick Swipe Actions for Bin Reports',
+    header: 'Quick Swipe Actions for Bin Updates',
     description:
-      'Learn how to swipe to report missing, damaged, or burnt bins with this easy tutorial.',
-    image: '',
+      'Learn how to swipe to report missing, damaged, Full, or burnt bins with this easy tutorial.',
+    image: image2,
   },
   {
     header: 'Add Bins with Camera',
     description:
       'Discover how to use your camera to add a bin to the siding in just a few taps.',
-    image: '',
+    image: image3,
   },
 ];
 
