@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { consignBin, findBin, updateBinFieldState } from '../api/bins.api';
 import {getBinsFromSiding}  from '../api/siding.api'
 import NetInfo from "@react-native-community/netinfo";
+import {errorToast} from "../lib/alerts";
 
 /**
  * initialBinData represents the initial state of bins in an array format. Each bin object contains the bin number,
@@ -121,6 +122,7 @@ export const BinProvider = ({ children }) => {
           })
           .catch(err => {
               console.error(err);
+              errorToast(err)
           });
   };
 
@@ -137,7 +139,12 @@ export const BinProvider = ({ children }) => {
           const consignActionPromises = offlineConsignActions.map(s => consignBin(s.binID, s.full));
           return Promise.allSettled(consignActionPromises).then(responses => {
               console.info('ConsignActions', responses);
-              return responsesGood(responses);
+              for (let i = responses.length - 1; i >= 0; i--) {
+                const response = responses[i];
+                if (response.status === 'fulfilled')
+                  offlineConsignActions.splice(i, 1);
+              }
+              return offlineConsignActions.length === 0;
           });
       };
 
@@ -145,33 +152,33 @@ export const BinProvider = ({ children }) => {
           if (offlineBinStateActions.length === 0) return Promise.resolve(true);
           const binStateActionPromises = offlineBinStateActions.map(s => updateBinFieldState(s.binID, s.field, s.state));
           return Promise.allSettled(binStateActionPromises).then(responses => {
-              console.info('BinStateActions', responses);
-              return responsesGood(responses);
+            console.info('BinStateActions', responses);
+            for (let i = responses.length - 1; i >= 0; i--) {
+              const response = responses[i];
+              if (response.status === 'fulfilled')
+                offlineBinStateActions.splice(i, 1);
+            }
+            return offlineBinStateActions.length === 0;
           });
       };
 
       console.info('onReconnect');
       return performConsignActions()
           .then(consignComplete => {
-              if (!consignComplete) throw new Error("Consign actions failed");
+              if (!consignComplete)
+                errorToast({message: 'Failed to upload some consignments, press send in the settings menu to try again.'});
               return performBinStateActions();
           })
           .then(binStateComplete => {
-              if (!binStateComplete) throw new Error("Bin state actions failed");
+              if (!binStateComplete)
+                errorToast({message: 'Failed to upload some bin changes, press send in the settings menu to try again.'});
               loadData();
           })
           .catch(err => {
               console.error(err);
+              errorToast(err);
           });
   };
-
-  const responsesGood = (responses) => {
-      let good = false;
-      for (const response of responses)
-          if (response.status === 'fulfilled')
-              good = true;
-      return good;
-  }
 
   const handleConsignRange = (startIndex, endIndex) => {
       if (!connected) {
@@ -200,6 +207,8 @@ export const BinProvider = ({ children }) => {
                   const response = responses[i - startIndex];
                   if (response.status === 'rejected') {
                       console.error(response.reason);
+                      if (bins[i] != null)
+                        errorToast({message: `Failed to consign bin: ${bins[i]?.binID}. Please try again.`});
                       continue;
                   }
 
@@ -214,6 +223,7 @@ export const BinProvider = ({ children }) => {
           })
           .catch(err => {
               console.error(err);
+              errorToast(err);
           });
   };
 
@@ -231,6 +241,7 @@ export const BinProvider = ({ children }) => {
         })
         .catch(err => {
           console.error(err);
+          errorToast(err);
         });
   };
 
@@ -257,6 +268,7 @@ export const BinProvider = ({ children }) => {
           })
           .catch(err => {
               console.error(err);
+              errorToast(err);
           });
   };
 
@@ -286,6 +298,7 @@ export const BinProvider = ({ children }) => {
           })
           .catch(err => {
               console.error(err);
+              errorToast(err);
           });
   };
 

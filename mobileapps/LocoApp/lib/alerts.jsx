@@ -1,5 +1,6 @@
 import { Alert } from 'react-native';
 import { router } from 'expo-router';
+import Toast from "react-native-toast-message";
 
 export const FinishedAlert = () => {
   Alert.alert('Finished?', "\nAre you sure you're finished at this Siding?", [
@@ -23,3 +24,13 @@ export const RepairBinAlert = (message, func) => {
       [{ text: "No, It's Fine!"}, { text: 'Yes, Request', onPress: func}]
   );
 };
+
+export const errorToast = (err) => {
+  Toast.show({
+    text1: err.message != null ? err.message : 'An unknown error occurred. Please try again.',
+    type: 'error',
+    visibilityTime: 4000,
+    autoHide: true,
+    position: 'bottom',
+  });
+}

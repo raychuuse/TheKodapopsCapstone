@@ -2,6 +2,7 @@ import { useState } from "react";
 import MainPage from "../../pages/main";
 import { SafeAreaView, View } from "react-native";
 import { BlurView } from "expo-blur";
+import Toast, {ErrorToast, InfoToast, SuccessToast} from "react-native-toast-message";
 
 export default function Page() {
   const [hasModal, setHasModal] = useState(false);
@@ -19,6 +20,29 @@ export default function Page() {
       />
       <SafeAreaView style={{ flex: 1, zIndex: 0 }}>
         <MainPage />
+        <Toast
+            position={'bottom'}
+            config={{
+              success: (props) => (
+                  <SuccessToast
+                      {...props}
+                      text1Style={{fontSize: 18}}
+                  />
+              ),
+              error: (props) => (
+                  <ErrorToast
+                      {...props}
+                      text1Style={{fontSize: 18}}
+                  />
+              ),
+              info: (props) => (
+                  <InfoToast
+                      {...props}
+                      text1Style={{fontSize: 18}}
+                  />
+              ),
+            }}
+        />
       </SafeAreaView>
     </>
   );

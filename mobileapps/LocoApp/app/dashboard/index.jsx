@@ -20,9 +20,9 @@ import { useTheme } from '../../styles/themeContext';
 import { useRun } from '../../context/runContext';
 import SidingListScrollBar from '../../components/sidingListScrollBar';
 
-import {getRunById} from "../../api/runs.api";
 import {getCurrentLoadById} from "../../api/loco.api";
 import AddBinCamera from "../../components/addBinCamera";
+import Toast, {ErrorToast, InfoToast, SuccessToast} from "react-native-toast-message";
 
 export default function Page() {
   // Providers
@@ -50,7 +50,31 @@ export default function Page() {
     >
       {/* Add Bin Modal */}
       <AddBinCamera stop={null}/>
-      <ModalSidingDetails />
+      <ModalSidingDetails >
+        <Toast
+            position={'bottom'}
+            config={{
+              success: (props) => (
+                  <SuccessToast
+                      {...props}
+                      text1Style={{fontSize: 18}}
+                  />
+              ),
+              error: (props) => (
+                  <ErrorToast
+                      {...props}
+                      text1Style={{fontSize: 18}}
+                  />
+              ),
+              info: (props) => (
+                  <InfoToast
+                      {...props}
+                      text1Style={{fontSize: 18}}
+                  />
+              ),
+            }}
+        />
+      </ModalSidingDetails>
       <ModalSelectSiding />
       <View style={{ flex: 1 }}>
         <View
@@ -125,6 +149,29 @@ export default function Page() {
         notifications={notifications}
         setNotifications={setNotifications}
       />
+      <Toast
+        position={'bottom'}
+        config={{
+          success: (props) => (
+              <SuccessToast
+                  {...props}
+                  text1Style={{fontSize: 18}}
+              />
+          ),
+          error: (props) => (
+              <ErrorToast
+                  {...props}
+                  text1Style={{fontSize: 18}}
+              />
+          ),
+          info: (props) => (
+              <InfoToast
+                  {...props}
+                  text1Style={{fontSize: 18}}
+              />
+          ),
+        }}
+        />
     </View>
   );
 }

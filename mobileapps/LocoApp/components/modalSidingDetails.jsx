@@ -12,6 +12,7 @@ import { Title1 } from '../styles/typography';
 import { useTheme } from '../styles/themeContext';
 import { useRun } from '../context/runContext';
 import { useModal } from '../context/modalContext';
+import React from "react";
 
 const ModalSidingDetails = () => {
   // Providers

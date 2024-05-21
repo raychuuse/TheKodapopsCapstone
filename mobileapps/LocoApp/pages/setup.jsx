@@ -15,6 +15,7 @@ import {Colours} from '../styles/colours';
 // Import Mock Data
 import {getAllLocos} from "../api/loco.api";
 import {useRun} from "../context/runContext";
+import {errorToast} from "../lib/alerts";
 
 const SetupPage = () => {
     const [locos, setLocos] = useState();
@@ -27,6 +28,7 @@ const SetupPage = () => {
             })
             .catch(err => {
                 console.error(err);
+                errorToast(err);
             });
     }, []);
 

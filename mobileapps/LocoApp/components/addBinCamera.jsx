@@ -6,7 +6,7 @@ import {
   View,
 } from 'react-native';
 import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera/legacy';
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 
 // Import Components
@@ -18,6 +18,7 @@ import CustomModal from './modal';
 // Import Provider
 import { useModal } from '../context/modalContext';
 import { useRun } from '../context/runContext';
+import Toast, {ErrorToast, InfoToast, SuccessToast} from "react-native-toast-message";
 
 const AddBinCamera = ({ stop }) => {
   // Providers
@@ -207,6 +208,29 @@ const AddBinCamera = ({ stop }) => {
         iconSize={56}
         backgroundColor='transparent'
         style={{ position: 'absolute', bottom: -88, right: -16 }}
+      />
+      <Toast
+          position={'bottom'}
+          config={{
+            success: (props) => (
+                <SuccessToast
+                    {...props}
+                    text1Style={{fontSize: 18}}
+                />
+            ),
+            error: (props) => (
+                <ErrorToast
+                    {...props}
+                    text1Style={{fontSize: 18}}
+                />
+            ),
+            info: (props) => (
+                <InfoToast
+                    {...props}
+                    text1Style={{fontSize: 18}}
+                />
+            ),
+          }}
       />
     </CustomModal>
   );

@@ -15,7 +15,7 @@ import { Colours } from '../components/colours';
 // Import Contexts
 import { useAuth } from '../context/authContext';
 import { useBins } from '../context/binContext';
-import { issueAlert } from '../lib/alerts';
+import {errorToast, issueAlert} from '../lib/alerts';
 import {getSidings} from "../api/siding.api";
 import {getBlocks, getFarms, getSubBlocks} from "../api/user.api";
 
@@ -85,6 +85,7 @@ const SetupPage = () => {
         })
         .catch(err => {
           console.error(err);
+          errorToast(err);
         });
 
     getFarms()
@@ -93,6 +94,7 @@ const SetupPage = () => {
         })
         .catch(err => {
           console.error(err);
+          errorToast(err);
         })
   }, []);
 
@@ -110,6 +112,7 @@ const SetupPage = () => {
         })
         .catch(err => {
           console.error(err);
+          errorToast(err);
         });
   };
 
@@ -122,6 +125,7 @@ const SetupPage = () => {
         })
         .catch(err => {
           console.error(err);
+          errorToast(err);
         });
   };
 

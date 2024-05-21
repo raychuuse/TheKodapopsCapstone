@@ -7,6 +7,7 @@ import {getSidingBreakdown} from '../api/siding.api';
 import {consignBin, findBin, updateBinFieldState} from '../api/bins.api.ts';
 import NetInfo from '@react-native-community/netinfo';
 import {router} from "expo-router";
+import {errorToast} from "../lib/alerts";
 
 // Create a React context for storing and managing run data
 const RunContext = createContext();
@@ -30,7 +31,12 @@ export const RunProvider = ({children}) => {
             const stopActionPromises = offlineStopActions.map(s => performStopAction(s.binID, s.locoID, s.stopID, s.type));
             return Promise.allSettled(stopActionPromises).then(responses => {
                 console.info('StopActions', responses);
-                return responsesGood(responses);
+                for (let i = responses.length - 1; i >= 0; i--) {
+                    const response = responses[i];
+                    if (response.status === 'fulfilled')
+                        offlineStopActions.splice(i, 1);
+                }
+                return offlineStopActions.length === 0;
             });
         };
 
@@ -39,7 +45,12 @@ export const RunProvider = ({children}) => {
             const consignActionPromises = offlineConsignActions.map(s => consignBin(s.binID, s.full));
             return Promise.allSettled(consignActionPromises).then(responses => {
                 console.info('ConsignActions', responses);
-                return responsesGood(responses);
+                for (let i = responses.length - 1; i >= 0; i--) {
+                    const response = responses[i];
+                    if (response.status === 'fulfilled')
+                        offlineConsignActions.splice(i, 1);
+                }
+                return offlineConsignActions.length === 0;
             });
         };
 
@@ -48,36 +59,37 @@ export const RunProvider = ({children}) => {
             const binStateActionPromises = offlineBinStateActions.map(s => updateBinFieldState(s.binID, s.field, s.state));
             return Promise.allSettled(binStateActionPromises).then(responses => {
                 console.info('BinStateActions', responses);
-                return responsesGood(responses);
+                for (let i = responses.length - 1; i >= 0; i--) {
+                    const response = responses[i];
+                    if (response.status === 'fulfilled')
+                        offlineBinStateActions.splice(i, 1);
+                }
+                return offlineBinStateActions.length === 0;
             });
         };
 
         console.info('onReconnect');
         performStopActions()
             .then(stopActionComplete => {
-                if (!stopActionComplete) throw new Error("Stop actions failed");
+                if (!stopActionComplete)
+                    errorToast({message: 'Failed to upload bin movements, press send in the settings menu to try again.'});
                 return performConsignActions();
             })
             .then(consignComplete => {
-                if (!consignComplete) throw new Error("Consign actions failed");
+                if (!consignComplete)
+                    errorToast({message: 'Failed to upload some consignments, press send in the settings menu to try again.'});
                 return performBinStateActions();
             })
             .then(binStateComplete => {
-                if (!binStateComplete) throw new Error("Bin state actions failed");
+                if (!binStateComplete)
+                    errorToast({message: 'Failed to upload some bin changes, press send in the settings menu to try again.'});
                 loadData(false);
             })
             .catch(err => {
                 console.error(err);
+                errorToast(err);
             });
     };
-
-    const responsesGood = (responses) => {
-        let good = false;
-        for (const response of responses)
-            if (response.status === 'fulfilled')
-                good = true;
-        return good;
-    }
 
     NetInfo.addEventListener(state => {
         if (!connected && state.isConnected)
@@ -105,16 +117,23 @@ export const RunProvider = ({children}) => {
                 return Promise.allSettled(promises);
             })
             .then(responses => {
+                let missed = false;
                 for (let i = 0; i < responses.length; i++) {
-                    tempRun.stops[i].bins = responses[i].value;
+                    const response = responses[i];
+                    if (response.status === 'fulfilled')
+                        tempRun.stops[i].bins = responses[i].value;
+                    else
+                        missed = true;
                 }
+                if (missed)
+                    errorToast({message: 'Failed to retrieve all bins. Please refresh data through the settings menu.'});
                 setRun(tempRun);
                 if (navigate)
                     router.navigate('/dashboard');
-                console.info('Setting everything');
             })
             .catch(err => {
                 console.error(err);
+                errorToast(err);
             });
     };
 
@@ -129,6 +148,7 @@ export const RunProvider = ({children}) => {
             })
             .catch(err => {
                 console.error(err);
+                errorToast(err);
             });
     };
 
@@ -215,6 +235,8 @@ export const RunProvider = ({children}) => {
                     const response = responses[i - startIndex];
                     if (response.status === 'rejected') {
                         console.error(response.reason);
+                        if (source.bins[i] != null)
+                            errorToast({message: `Failed to move bin: ${source.bins[i]?.binID}. Please try again.`});
                         continue;
                     }
                     console.info(i, source.bins[i]);
@@ -232,6 +254,7 @@ export const RunProvider = ({children}) => {
             })
             .catch(err => {
                 console.error(err);
+                errorToast(err);
             });
     }
 
@@ -259,6 +282,7 @@ export const RunProvider = ({children}) => {
                 })
                 .catch(err => {
                     console.error(err);
+                    errorToast(err);
                 });
         } else {
             offlineStopActions.push({binID: binID, locoID: locoID, stopID: stop.stopID, type: type});
@@ -303,6 +327,7 @@ export const RunProvider = ({children}) => {
                 })
                 .catch(err => {
                     console.error(err);
+                    errorToast(err);
                 });
         } else {
             offlineBinStateActions.push({binID: bin.binID, field: field, state: state});
@@ -340,6 +365,7 @@ export const RunProvider = ({children}) => {
                 })
                 .catch(err => {
                     console.error(err);
+                    errorToast(err);
                 });
         } else {
             offlineConsignActions.push({binID: bin.binID, full: !bin.full});
@@ -362,6 +388,7 @@ export const RunProvider = ({children}) => {
             })
             .catch(err => {
                 console.error(err);
+                errorToast(err);
             });
     };
 
