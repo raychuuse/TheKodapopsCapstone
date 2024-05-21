@@ -1,4 +1,4 @@
-import {handleFetch, postConfig, putConfig, serverUrl} from "./utils";
+import {getConfig, handleFetch, postConfig, putConfig, serverUrl} from "./utils";
 
 const apiUrl = `${serverUrl}/user`;
 
@@ -7,18 +7,7 @@ export function login(user) {
 }
 
 export function getAll() {
-    //return handleFetch(fetch(`${apiUrl}/`));
-    return fetch(`${apiUrl}/`)
-    .then((body) => body.json())
-        .then((data) =>{
-            // Data formatting
-            return data.map((obj) => ({
-                userID: obj.userID,
-                firstName: obj.firstName,
-                lastName: obj.lastName,
-                userRole: obj.userRole === "Locomotive" ? "Locomotive Driver" : obj.userRole
-            }))
-        })
+    return handleFetch(fetch(`${apiUrl}/`, getConfig()), true);
 }
 export function getById(id) {
     return handleFetch(fetch(`${apiUrl}/${id}`));

@@ -775,7 +775,7 @@ router.get("/", (req, res) => {
     .raw(
       `SELECT u.*, h.harvesterName
                 FROM users u
-                LEFT JOIN harvester h ON h.harvesterID = u.userID`
+                LEFT JOIN harvester h ON h.harvesterID = u.harvesterID`
     )
     .then(processQueryResult)
     .then((result) => {

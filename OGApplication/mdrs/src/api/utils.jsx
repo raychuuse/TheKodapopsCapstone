@@ -20,6 +20,14 @@ export function putConfig(data) {
     }
 }
 
+export function getConfig() {
+    return {
+        method: 'GET',
+        mode: 'cors',
+        headers: {'Content-Type': 'application/json'},
+    }
+}
+
 export function handleFetch(promise, hasJson=true) {
     return promise
         .then(response => {

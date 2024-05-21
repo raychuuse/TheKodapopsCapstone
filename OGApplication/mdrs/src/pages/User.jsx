@@ -40,8 +40,19 @@ const UserPage = () => {
         {headerName: "ID", field: "userID"},
         {headerName: "First Name", field: "firstName"},
         {headerName: "Last Name", field: "lastName"},
-        {headerName: "Role", field: "userRole"},
+        {headerName: "Role", valueGetter: params => params.data.userRole === 'Locomotive' ? 'Locomotive Driver' : params.data.userRole},
+        {headerName: 'Status', colId: 'status', valueGetter: params => params.data.active ? 'Active' : 'Archived'}
     ];
+
+    const onGridReady = (e) => {
+        e.api.setFilterModel({
+            status: {
+                filterType: 'text',
+                type: 'contains',
+                filter: 'Active'
+            }
+        })
+    }
 
     return (
         <div className="container-fluid">
@@ -54,7 +65,7 @@ const UserPage = () => {
                             </div>
                             <div className="row">
                                 {error && <ErrorAlert message={error}/>}
-                                {users ? <Table columns={columns} data={users} onRowClicked={handleUserSelect}/> : null}
+                                {users ? <Table columns={columns} data={users} onRowClicked={handleUserSelect} onGridReadyCallback={onGridReady}/> : null}
                             </div>
                         </div>
                     </div>
