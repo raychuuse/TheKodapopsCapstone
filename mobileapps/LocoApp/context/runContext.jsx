@@ -179,10 +179,8 @@ export const RunProvider = ({children}) => {
             }
         }
 
-        stop.dropOffComplete = stop.dropOffCount >= stop.dropOffQuantity;
-        stop.collectComplete = stop.collectCount >= stop.collectQuantity;
-        console.info(stop.dropOffComplete, stop.dropOffCount, stop.dropOffQuantity);
-        console.info(stop.collectComplete, stop.collectCount, stop.collectQuantity);
+        stop.dropOffComplete = stop.dropOffCount >= stop.dropOffQuantity || stop.dropOffComplete;
+        stop.collectComplete = stop.collectCount >= stop.collectQuantity || stop.collectComplete;
     }
 
     const handleSuccessfulStopAction = (binID, stop, type, operatingOverRange) => {
