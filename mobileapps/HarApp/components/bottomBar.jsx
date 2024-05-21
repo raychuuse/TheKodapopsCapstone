@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 // Import Components
 import Button from './button';
 import NotificationBell from './notificationBell';
-import {useBins} from "../context/binContext";
+import { useBins } from '../context/binContext';
 
 /**
  * BottomBar Component
@@ -37,29 +37,33 @@ const BottomBar = ({
         paddingRight: 32, // Right padding
       }}
     >
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{ flexDirection: 'row', gap: 16, width: '100%' }}>
+        {/* Open Settings Modal Button */}
+        {getOnMainPage() && (
+          <Button
+            backgroundColor='transparent'
+            iconName='settings'
+            iconSize={48}
+            iconColor={'#fff'}
+            onPress={() => setSettingsVisable(true)}
+          />
+        )}
         <Button
           iconName='help-outline' // Icon for the button
           backgroundColor='transparent' // Transparent background
           iconSize={48} // Icon size
           iconColor='#fff' // Icon color
           onPress={() => setTutorialVisable(true)} // Show tutorial modal
+          style={{ marginLeft: 'auto' }}
+        />
+
+        <NotificationBell
+          backgroundColor='transparent' // Transparent background
+          iconSize={48} // Icon size
+          notificationCount={notifications.length} // Number of notifications
+          onPress={() => setNotificationVisable(true)} // Show notifications modal
         />
       </View>
-      <NotificationBell
-        backgroundColor='transparent' // Transparent background
-        iconSize={48} // Icon size
-        notificationCount={notifications.length} // Number of notifications
-        onPress={() => setNotificationVisable(true)} // Show notifications modal
-      />
-      {/* Open Settings Modal Button */}
-      {getOnMainPage() && <Button
-          backgroundColor='transparent'
-          iconName='settings'
-          iconSize={48}
-          iconColor={'#fff'}
-          onPress={() => setSettingsVisable(true)}
-      />}
     </View>
   );
 };

@@ -8,6 +8,9 @@ export const AuthContext = createContext({
   setMockMode: () => {},
 });
 
+const serverIP = process.env.EXPO_PUBLIC_SERVER_IP;
+const serverPort = process.env.EXPO_PUBLIC_SERVER_PORT;
+
 export const AuthProvider = ({ children }) => {
   // Set this for testing
   const [mockMode, setMockMode] = useState(true);
@@ -19,8 +22,9 @@ export const AuthProvider = ({ children }) => {
   const [val, setVal] = useState(null);
   const [jToken, setToken] = useState('');
 
-  const serverURL = 'http://127.0.0.1:8080';
-  const wsURL = 'ws://127.0.0.1:8080';
+  const serverURL = `http://${serverIP}:${serverPort}`;
+  const wsURL = `ws://${serverIP}:${serverPort}`;
+
   const { sendJsonMessage, lastJsonMessage, readyState } = useWebSocket(wsURL, {
     share: true,
     token: getToken,

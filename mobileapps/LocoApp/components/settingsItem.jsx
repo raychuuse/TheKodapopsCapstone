@@ -25,8 +25,8 @@ const SettingsItem = ({
   const { theme } = useTheme();
 
   const handleValueChange = async (itemValue, itemIndex) => {
-      setSelectedItem(itemValue);
-      setSelectedOption(itemValue);
+    setSelectedItem(itemValue);
+    setSelectedOption(itemValue);
   };
 
   return (
@@ -46,7 +46,7 @@ const SettingsItem = ({
             onValueChange={handleValueChange}
             style={{
               borderRadius: 16,
-              backgroundColor: Colours.bgLevel6,
+              backgroundColor: theme.bgLevel6,
               width: '100%',
             }}
           >
@@ -72,7 +72,8 @@ const SettingsItem = ({
           style={[Type.styles.body, styles.body, { color: theme.body }]}
           numberOfLines={1}
         >
-          {options.find((item) => item.id == selectedOption)?.label ?? 'Please Select an Option'}
+          {options.find((item) => item.id == selectedOption)?.label ??
+            'Please Select an Option'}
         </Text>
 
         <Button
