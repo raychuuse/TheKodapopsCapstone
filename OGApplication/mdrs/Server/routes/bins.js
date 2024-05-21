@@ -139,7 +139,7 @@ router.post('/consign', verifyAuthorization, (req, res) => {
     let bin;
     let user;
     let previousTransaction;
-    req.db.raw(`SELECT * FROM users WHERE userID = 50`, [])
+    req.db.raw(`SELECT * FROM users WHERE userID = ?`, [req.userID])
         .then(processQueryResult)
         .then(response => {
             user = response[0];
