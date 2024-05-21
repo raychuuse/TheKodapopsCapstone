@@ -436,8 +436,7 @@ router.post("/", createValidationRules, (req, res) => {
   }
 
   const { password, firstName, lastName, email, role } = req.body;
-  const selectedHarvester =
-    role === "Harvester" ? req.body.selectedHarvester : null;
+  const selectedHarvester = role === "Harvester" ? req.body.selectedHarvester : null;
   if (role === "Harvester" && selectedHarvester == undefined) {
     console.error("Need selected harvester");
     return res.status(400).json({
@@ -468,9 +467,9 @@ router.post("/", createValidationRules, (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        res
-          .status(500)
-          .json({ message: "An unknown error occurred, please try again." });
+        if (err?.code === 'ER_DUP_ENTRY' && err?.sqlMessage.includes('users.email'))
+          return res.status(409).json({message: 'Account already exists with that email.'});
+        res.status(500).json({ message: "An unknown error occurred, please try again." });
       });
   });
 });
