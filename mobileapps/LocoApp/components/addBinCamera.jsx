@@ -19,10 +19,10 @@ import CustomModal from './modal';
 import { useModal } from '../context/modalContext';
 import { useRun } from '../context/runContext';
 
-const AddBinCamera = ({ sidingID, isDrop }) => {
+const AddBinCamera = ({ stop }) => {
   // Providers
-  const { modalAddBinVisible, closeAddBinModal } = useModal();
-  const { addBin } = useRun();
+  const { modalAddBinVisible, closeAddBinModal, getAddBinModelStop } = useModal();
+  const { handleFindBin } = useRun();
 
   const [type, setType] = useState(CameraType.back);
   const [flashMode, setFlashMode] = useState(FlashMode.off);
@@ -33,7 +33,7 @@ const AddBinCamera = ({ sidingID, isDrop }) => {
 
   const [binNumber, setBinNumber] = useState('');
   const inputRef = useRef(null);
-  const MAX_LENGTH = 6;
+  const MAX_LENGTH = 4;
 
   const takePicture = async () => {
     if (cameraRef.current) {
@@ -54,7 +54,7 @@ const AddBinCamera = ({ sidingID, isDrop }) => {
   };
 
   const addBinHandeler = () => {
-    addBin(sidingID, binNumber, isDrop);
+    handleFindBin(binNumber, getAddBinModelStop())
     setBinNumber('');
     closeAddBinModal();
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -83,7 +83,7 @@ const AddBinCamera = ({ sidingID, isDrop }) => {
         closeAddBinModal();
       }}
       buttonIcon='close-circle-outline'
-      style={{ height: '60%', marginTop: 56, width: 600 }}
+      style={{ height: '60%', marginTop: 56, width: 600, zIndex: 1000 }}
     >
       <View
         style={{
@@ -194,7 +194,7 @@ const AddBinCamera = ({ sidingID, isDrop }) => {
           } else {
             Alert.alert(
               'Are you sure?',
-              `Are you sure you waould like to add Bin ${binNumber} to this siding?`,
+              `Are you sure you would like to add Bin ${binNumber} to this siding?`,
               [
                 { text: "No, Don't!" },
                 { text: 'Yes, Add it.', onPress: addBinHandeler },

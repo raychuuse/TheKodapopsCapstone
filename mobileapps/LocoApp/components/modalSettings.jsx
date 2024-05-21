@@ -60,6 +60,36 @@ const ModalSettings = ({ isVisible, onClose }) => {
       </View>
       {/* Page Content */}
       <View style={styles.content}>
+          {/* Refresh Data */}
+          <View
+              style={{
+                  flexDirection: 'row',
+                  width: '100%',
+                  gap: 22,
+                  paddingHorizontal: 16,
+                  paddingVertical: 4,
+                  alignItems: 'center',
+              }}
+          >
+              <Title3
+                  style={{ flex: 1, textTransform: 'capitalize' }}
+                  numberOfLines={1}
+              >
+                  John Smith
+              </Title3>
+              <Button
+                  title='Log Out'
+                  iconName={'logout'}
+                  iconColor={theme.textLevel3}
+                  textColor={theme.textLevel3}
+                  backgroundColor={theme.bgLevel3}
+                  border
+                  borderWidth={1}
+                  iconSize={28}
+                  style={{ paddingVertical: 4 }}
+                  onPress={() => router.replace('/')}
+              />
+          </View>
         {/* Log Out */}
         <View
           style={{
@@ -90,18 +120,6 @@ const ModalSettings = ({ isVisible, onClose }) => {
             onPress={() => router.replace('/')}
           />
         </View>
-        {/* Locomotive Selector */}
-        <SettingsItem
-          label='Locomotive'
-          options={SettingsMockData_Loco}
-          startOption={SettingsMockData_Loco[0].id}
-        />
-        {/* Run Selector */}
-        <SettingsItem
-          label='Run'
-          options={SettingMockData_Run}
-          startOption={SettingMockData_Run[0].id}
-        />
       </View>
     </CustomModal>
   );

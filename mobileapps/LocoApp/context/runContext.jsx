@@ -347,6 +347,8 @@ export const RunProvider = ({children}) => {
     };
 
     const handleFindBin = (code, stop) => {
+        if (!connected) return;
+
         findBin(code, stop != null ? stop.sidingID : null, stop == null ? locoID : null)
             .then(bin => {
                 if (stop != null) {

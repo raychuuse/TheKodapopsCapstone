@@ -22,6 +22,7 @@ import SidingListScrollBar from '../../components/sidingListScrollBar';
 
 import {getRunById} from "../../api/runs.api";
 import {getCurrentLoadById} from "../../api/loco.api";
+import AddBinCamera from "../../components/addBinCamera";
 
 export default function Page() {
   // Providers
@@ -47,6 +48,8 @@ export default function Page() {
         paddingTop: 32,
       }}
     >
+      {/* Add Bin Modal */}
+      <AddBinCamera stop={null}/>
       <ModalSidingDetails />
       <ModalSelectSiding />
       <View style={{ flex: 1 }}>

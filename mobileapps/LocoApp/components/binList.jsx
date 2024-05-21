@@ -14,7 +14,6 @@ import SwipeableBinItem from './swipeableBinItem';
 import { useRun } from '../context/runContext';
 import { useTheme } from '../styles/themeContext';
 import { useModal } from '../context/modalContext';
-import AddBinCamera from './addBinCamera';
 
 const BinList = ({ stopID, type }) => {
   // Provider
@@ -94,11 +93,6 @@ const BinList = ({ stopID, type }) => {
         position: 'relative',
       }}
     >
-      {/* Add Bin Modal */}
-      {/*TODO <AddBinCamera
-        sidingID={stop.stopID}
-        isDrop={binsKey}
-      />*/}
       {/* List Header */}
       <View
         style={[
@@ -131,7 +125,7 @@ const BinList = ({ stopID, type }) => {
         <Title2>{bins.length > 1 ? 'Bins' : 'Bin'} at Siding</Title2>
         <TouchableOpacity
           onPress={() => {
-            openAddBinModal();
+            openAddBinModal(type === 'SIDING' ? stop : null);
             Haptics.selectionAsync();
           }}
           style={[

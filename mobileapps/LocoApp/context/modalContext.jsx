@@ -6,7 +6,7 @@ const ModalContext = createContext();
 // Context provider component
 const ModalProvider = ({ children }) => {
   // State for modals visibility
-  const [modalAddBinVisible, setModalAddBinVisible] = useState(false);
+  const [modalAddBinVisible, setModalAddBinVisible] = useState(true);
   const [modalSidingVisible, setModalSidingVisible] = useState(false);
   const [modalSelectSidingVisible, setModalSelectSidingVisible] =
     useState(false);
@@ -14,6 +14,8 @@ const ModalProvider = ({ children }) => {
   // State for siding IDs
   const [selectedSidingID, setSelectedSidingID] = useState();
   const [sidingToViewID, setSidingToViewID] = useState();
+  const [addBinModelStop, setAddBinModelStop] = useState();
+
 
   // Function to open siding modal and update the ID to view
   const openSidingModal = (id) => {
@@ -27,8 +29,18 @@ const ModalProvider = ({ children }) => {
   const closeSelectSidingModal = () => setModalSelectSidingVisible(false);
 
   // Function to open and close the Add Bin Modal
-  const openAddBinModal = () => setModalAddBinVisible(true);
-  const closeAddBinModal = () => setModalAddBinVisible(false);
+  const openAddBinModal = (stop) => {
+    setAddBinModelStop(stop);
+    setModalAddBinVisible(true);
+  }
+  const closeAddBinModal = () => {
+    setAddBinModelStop(null);
+    setModalAddBinVisible(false);
+  }
+
+  const getAddBinModelStop = () => {
+    return addBinModelStop;
+  }
 
   // Function to update the selected siding ID
   const updateSelectedSidingID = (id) => setSelectedSidingID(id);
@@ -46,6 +58,7 @@ const ModalProvider = ({ children }) => {
     closeSelectSidingModal,
     openAddBinModal,
     closeAddBinModal,
+    getAddBinModelStop,
     updateSelectedSidingID,
   };
 
