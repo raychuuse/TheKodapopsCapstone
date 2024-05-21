@@ -155,8 +155,10 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     borderRadius: 10,
-    aspectRatio: '3/4',
+    aspectRatio: '16/9',
     overflow: 'hidden',
+    marginHorizontal: 'auto',
+    marginBottom: 16,
   },
   image: {
     resizeMode: 'contain',
