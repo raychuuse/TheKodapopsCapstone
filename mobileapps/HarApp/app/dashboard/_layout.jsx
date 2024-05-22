@@ -49,7 +49,7 @@ const notificationsData = [
   // More notifications as needed...
 ];
 
-const Layout = () => {
+export default function Layout() {
   const [settingsVisable, setSettingsVisable] = useState(false);
   const [notificationVisable, setNotificationVisable] = useState(false);
   const [tutorialVisable, setTutorialVisable] = useState(false);
@@ -74,8 +74,8 @@ const Layout = () => {
       <BinProvider>
         {/* SettingsModals */}
         <ModalSettings
-            isVisable={settingsVisable}
-            setIsVisable={setSettingsVisable}
+          isVisable={settingsVisable}
+          setIsVisable={setSettingsVisable}
         />
         <Slot />
         {/* Navigation */}
@@ -89,6 +89,4 @@ const Layout = () => {
       <StatusBar style='light' />
     </GestureHandlerRootView>
   );
-};
-
-export default Layout;
+}
