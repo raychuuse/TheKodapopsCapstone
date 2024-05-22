@@ -13,9 +13,12 @@ import {ErrorAlert} from "../components/Alerts";
 import {
     createBin,
     deleteBin, editBin,
-    getAllBins,
-    getSidingBreakdown,
+    getAllBins, getBin,
+    getSidingBreakdown, moveBin,
 } from "../api/bins";
+import {FormGroup, Input, Label} from "reactstrap";
+import {getById} from "../api/users";
+import {getAllSidings} from "../api/sidings";
 
 
 
@@ -26,12 +29,44 @@ export default function BinAllocation() {
     const search = useLocation().search;
     const id = new URLSearchParams(search).get("id");
     const [error, setError] = useState(null);
+    const [sidings, setSidings] = useState([]);
+    const [selectedSiding, setSelectedSiding] = useState();
+    const [bin, setBin] = useState();
+
 
     const [searchResult, setSearchResult] = useState([]);
 
     const changeState = (bin) => {
         setSearchResult(bin);
         navigate(`?id=${bin.id}`);
+    };
+
+    useEffect(() => {
+        getBin(id)
+            .then(response => {
+                setBin(response);
+                getSidings();
+                setSelectedSiding(response.sidingID != null ? response.sidingID : 0);
+            })
+            .catch(err => {
+                setError(err);
+            });
+    }, []);
+
+    const getSidings = () => {
+        getAllSidings()
+            .then(response => {
+                setSidings(response);
+            })
+            .catch(err => {
+                setError(err);
+            });
+    };
+
+    const onSidingChanged = (newSiding) => {
+        if (bin == null || sidings == null) return;
+        moveBin(id, newSiding);
+        setSelectedSiding(newSiding);
     };
 
     return (
@@ -53,11 +88,31 @@ export default function BinAllocation() {
                                     <div className="row">
                                         <div className="table-wrapper">
                                             <div className="table-header-wrapper">
-                                                <h1 className="table-header">Bin: {id ? id: "Select Bin"}</h1>
+                                                <h1 className="table-header">Bin: {bin != null ? bin.code : "Select Bin"}</h1>
                                             </div>
                                         </div>
                                     </div>
                                     <hr/>
+                                    <div className="row">
+                                        <div className="col">
+                                            <FormGroup>
+                                                <Label for="siding">Move bin to Siding</Label>
+                                                <Input
+                                                    type="select"
+                                                    id="siding"
+                                                    value={selectedSiding}
+                                                    onChange={(e) => onSidingChanged(e.target.value)}
+                                                >
+                                                    <option value="0">Not At Siding</option>
+                                                    {sidings.map(s => (
+                                                        <option key={s.sidingID} value={s.sidingID}>
+                                                            {s.sidingName}
+                                                        </option>
+                                                    ))}
+                                                </Input>
+                                            </FormGroup>
+                                        </div>
+                                    </div>
                                     <div className="row">
                                         <div className="col">
                                             <div className="row">

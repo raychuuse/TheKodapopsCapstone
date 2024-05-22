@@ -71,6 +71,10 @@ export function getAllBins(){
         });
 }
 
+export function moveBin(binID, sidingID) {
+    return handleFetch(fetch(`${apiUrl}/${binID}/move-bin/${sidingID}`, postConfig()), false);
+}
+
 export function getDashBins(){
     return fetch(`${apiUrl}/dash`)
         .then(response => {
@@ -93,12 +97,7 @@ export function getSidingBreakdown(id) {
 }
 
 export function getBin(binID) {
-    return fetch(`${apiUrl}/${binID}`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        })
+    return handleFetch(fetch(`${apiUrl}/${binID}`), true);
 }
 
 export function createBin(code) {

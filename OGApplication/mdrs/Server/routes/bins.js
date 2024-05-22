@@ -4,6 +4,23 @@ const router = express.Router();
 const {processQueryResult, isValidId} = require("../utils");
 const { verifyAuthorization } = require('../middleware/authorization');
 
+router.get('/:binID', (req, res) => {
+  const binID = req.params.binID;
+  if (!isValidId(binID, res)) return;
+
+  req.db.raw(`SELECT * FROM bin WHERE binID = ?`, [binID])
+      .then(processQueryResult)
+      .then(response => {
+        if (response.length === 0)
+          return res.status(404).json({message: 'No bin found with the id: ' + binID});
+        res.status(200).json(response[0]);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+      });
+});
+
 router.get("/", (req, res) => {
   req.db.raw(`SELECT *, s.sidingName, l.locoName FROM bin b
              LEFT JOIN siding s ON b.sidingID = s.sidingID
@@ -14,6 +31,26 @@ router.get("/", (req, res) => {
       })
       .catch((err) => {
         res.status(500).json(err);
+      });
+});
+
+router.post('/:binID/move-bin/:sidingID', (req, res) => {
+  const binID = req.params.binID;
+  if (!isValidId(binID, res))
+    return;
+  const sidingID = req.params.sidingID;
+  if (!isValidId(sidingID, res))
+    return;
+
+  req.db.raw(`UPDATE bin SET ${sidingID !== '0' ? 'sidingID=?' : 'sidingID=null'}, locoID=null WHERE binID=?`, sidingID !== '0' ? [sidingID, binID] : [binID])
+      .then(response => {
+        res.status(204).send();
+      })
+      .catch(err => {
+        console.error(err);
+        if (err?.code === 'ER_NO_REFERENCED_ROW_2' && err?.sqlMessage.includes('bin_siding_sidingID_fk'))
+          return res.status(400).json({message: 'No siding found with id: ' + sidingID});
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
       });
 });
 
