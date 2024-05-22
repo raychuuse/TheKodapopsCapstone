@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera';
+import { AutoFocus, Camera, CameraType, FlashMode } from 'expo-camera/legacy';
 import { useContext, useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 
@@ -33,7 +33,7 @@ const AddBinCamera = ({ modalCloser }) => {
   const [permission, requestPermission] = Camera.useCameraPermissions(); // Camera permissions
   const cameraRef = useRef(null); // Reference to the camera component
   const [imageUri, setImageUri] = useState(null); // State for the captured image URI
-  const {handleFindBin} = useBins();
+  const { handleFindBin } = useBins();
 
   const [binNumber, setBinNumber] = useState(); // State for the bin number input
   const inputRef = useRef(null); // Reference to the input component
@@ -92,13 +92,13 @@ const AddBinCamera = ({ modalCloser }) => {
    */
   function VerifyBinNumber(num) {
     // Regex from stack overflow, \d for digits
-      if (/^\d+$/.test(num)) {
-        return true;
-      } else {
-        issueAlert('An invalid number has been entered.');
-        return true;
-      }
+    if (/^\d+$/.test(num)) {
+      return true;
+    } else {
+      issueAlert('An invalid number has been entered.');
+      return true;
     }
+  }
 
   /**
    * Handle the submission of the bin number.
