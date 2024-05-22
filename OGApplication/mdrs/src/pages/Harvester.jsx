@@ -79,7 +79,7 @@ const HarvesterDetails = ({id}) => {
                     <div className="row">
                         <div className="table-wrapper">
                             <div className="table-header-wrapper">
-                                <h1 className="bin-count-header"> Siding Breakdown:</h1>
+                                <h1 className="bin-count-header"> Harvester: {id ? id: "Select a Harvester"}</h1>
                                 {/*<h1 className="bin-count-number">{`${harvesterData.data.full.length + harvesterData.data.empty.length}`}</h1>*/}
                             </div>
                         </div>

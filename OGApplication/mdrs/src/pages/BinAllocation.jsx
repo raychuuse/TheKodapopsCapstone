@@ -25,7 +25,8 @@ export default function BinAllocation() {
     const navigate = useNavigate();
     const search = useLocation().search;
     const id = new URLSearchParams(search).get("id");
-    const [loading, setLoading] = useState(true);
+    // Across calls in intial appication was never set to true
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
     const [searchResult, setSearchResult] = useState([]);
@@ -57,7 +58,7 @@ export default function BinAllocation() {
                                     <div className="row">
                                         <div className="table-wrapper">
                                             <div className="table-header-wrapper">
-                                                <h1 className="table-header">Bin: {id ? id: "Select Bin"}</h1>
+                                                <h1 className="table-header">{id ? `Bin: ${id}`: "Select a Bin on the left."}</h1>
                                             </div>
                                         </div>
                                     </div>

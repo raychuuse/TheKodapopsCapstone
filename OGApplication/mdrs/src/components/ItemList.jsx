@@ -174,7 +174,7 @@ const ItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi, updat
         </div>
         <div className="form-wrapper">
             <button style={{display: state === 'CREATE' ? 'none' : 'block'}}
-                    className={`w-100 btn-md btn btn-primary mt-1`} onClick={setStateCreate}>Create Siding
+                    className={`w-100 btn-md btn btn-primary mt-1`} onClick={setStateCreate}>Create {itemName}
             </button>
             <hr/>
             <h3>{formTitle}</h3>
@@ -270,13 +270,20 @@ const NoEditItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi,
     }
 
     const onFormButtonClick = () => {
-        if ((state === 'CREATE') && formInput === '') {
-            setError({message: "Please enter a name to submit"})
+        if (formInput === '') {
+            setError({message: "Please enter a bin name when submitting."});
             return;
         }
         setError(null);
 
         if (state === 'CREATE') {
+
+            // Check for numeric entry
+            if (!formInput.match(/^\d+$/)) {
+                setError({message: "Please enter a numeric bin name."});
+                return;
+            }
+
             createItemApi(formInput).then(response => {
                 fetchItems();
                 setSuccess({message: itemName + ' Successfully Created'});
@@ -288,6 +295,9 @@ const NoEditItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi,
         } 
         else {
             deleteItemApi(formSelectedId).then(result => {
+                if (formInput != formSelectedId) {
+                    // Ask if this is allowed or not with team?
+                }
                 fetchItems();
                 setSuccess({message: itemName + ' Successfully Deleted'});
                 setInterval(() => setSuccess(null), 2500);
@@ -308,7 +318,7 @@ const NoEditItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi,
             <hr />
         </div>
         <div className="list-wrapper" style={{ flex: 1, overflowY: 'auto' }}>
-            {!loading && !error && (
+            {!loading && (
                 <List
                     data={selectedItem}
                     onClick={updateSearch}
@@ -320,7 +330,7 @@ const NoEditItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi,
         </div>
         <div className="form-wrapper">
             <button style={{display: state === 'CREATE' ? 'none' : 'block'}}
-                    className={`w-100 btn-md btn btn-primary mt-1`} onClick={setStateCreate}>Create Siding
+                    className={`w-100 btn-md btn btn-primary mt-1`} onClick={setStateCreate}>Create {itemName}
             </button>
             <hr/>
             <h3>{formTitle}</h3>

@@ -805,7 +805,7 @@ router.put("/", updateValidationRules, (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { userID, firstName, lastName, role } = req.body;
+  const { userID, firstName, lastName, role, email } = req.body;
   const selectedHarvester =
     role === "Harvester" ? req.body.selectedHarvester : null;
   if (role === "Harvester" && selectedHarvester == undefined) {
@@ -821,9 +821,10 @@ router.put("/", updateValidationRules, (req, res) => {
                 SET firstName=?,
                     lastName=?,
                     userRole=?,
-                    harvesterID=?
+                    harvesterID=?,
+                    email=?
                 WHERE userID = ?`,
-      [firstName, lastName, role, selectedHarvester, userID]
+      [firstName, lastName, role, selectedHarvester, email, userID]
     )
     .then(processQueryResult)
     .then((result) => {
