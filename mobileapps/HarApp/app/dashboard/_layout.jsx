@@ -1,7 +1,6 @@
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import Components
 import ModalSettings from '../../components/modalSettings';
@@ -11,6 +10,7 @@ import BottomBar from '../../components/bottomBar';
 
 // Import Providers
 import { BinProvider } from '../../context/binContext';
+import { View } from 'react-native';
 // Mock Data
 const notificationsData = [
   {
@@ -57,7 +57,7 @@ export default function Layout() {
   const [notifications, setNotifications] = useState(notificationsData);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
       {/* Notification Modal */}
       <ModalNotifications
         isVisable={notificationVisable}
@@ -87,6 +87,6 @@ export default function Layout() {
         />
       </BinProvider>
       <StatusBar style='light' />
-    </GestureHandlerRootView>
+    </View>
   );
 }

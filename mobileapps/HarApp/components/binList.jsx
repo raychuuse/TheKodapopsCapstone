@@ -11,6 +11,7 @@ import { Colours } from './colours';
 // Import Components
 import SwipeableBinItem from './swipeableBinItem';
 import { useBins } from '../context/binContext';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 /**
  * BinList Component
@@ -25,11 +26,10 @@ import { useBins } from '../context/binContext';
  * @returns {JSX.Element} The rendered BinList component
  */
 const BinList = ({ openAddBinModal }) => {
-
   // ~ ~ ~ ~ ~ ~ ~ ~ List State ~ ~ ~ ~ ~ ~ ~ ~ //
   const [rangeSelectStartIndex, setRangeSelectStartIndex] = useState();
   const [isLocked, setIsLocked] = useState(false);
-  const {handleConsignRange, getBins} = useBins();
+  const { handleConsignRange, getBins } = useBins();
 
   const bins = getBins();
 
@@ -44,17 +44,17 @@ const BinList = ({ openAddBinModal }) => {
   };
 
   const longPressHandler = (index) => {
-      if (rangeSelectStartIndex == null) {
-          setRangeSelectStartIndex(index);
+    if (rangeSelectStartIndex == null) {
+      setRangeSelectStartIndex(index);
+    } else {
+      if (rangeSelectStartIndex === index) {
+        setRangeSelectStartIndex(null);
       } else {
-          if (rangeSelectStartIndex === index) {
-              setRangeSelectStartIndex(null);
-          } else {
-              handleConsignRange(rangeSelectStartIndex, index);
-              setTimeout(() => setRangeSelectStartIndex(null), 1000); // States are annoying
-          }
+        handleConsignRange(rangeSelectStartIndex, index);
+        setTimeout(() => setRangeSelectStartIndex(null), 1000); // States are annoying
       }
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   // ~ ~ ~ ~ ~ ~ ~ List Components ~ ~ ~ ~ ~ ~ ~ //
@@ -218,35 +218,37 @@ const BinList = ({ openAddBinModal }) => {
   };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        position: 'relative',
-        borderRadius: 16,
-        overflow: 'hidden',
-      }}
-    >
-      {/* Bin List Header */}
-      <ListHeader />
-      {/* Bin List Lock */}
-      {isLocked && <LockView />}
-      {/* Bin List Body */}
-      <FlatList
-        data={bins}
-        renderItem={listRenderItem}
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View
         style={{
+          flex: 1,
           position: 'relative',
-          paddingHorizontal: 8,
-          paddingTop: 72,
           borderRadius: 16,
-          backgroundColor: Colours.bgOverlay,
-          zIndex: 0,
+          overflow: 'hidden',
         }}
-        ItemSeparatorComponent={listSeperator}
-        ListFooterComponent={listFooter}
-        showsVerticalScrollIndicator={false}
-      />
-    </View>
+      >
+        {/* Bin List Header */}
+        <ListHeader />
+        {/* Bin List Lock */}
+        {isLocked && <LockView />}
+        {/* Bin List Body */}
+        <FlatList
+          data={bins}
+          renderItem={listRenderItem}
+          style={{
+            position: 'relative',
+            paddingHorizontal: 8,
+            paddingTop: 72,
+            borderRadius: 16,
+            backgroundColor: Colours.bgOverlay,
+            zIndex: 0,
+          }}
+          ItemSeparatorComponent={listSeperator}
+          ListFooterComponent={listFooter}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
+    </GestureHandlerRootView>
   );
 };
 
