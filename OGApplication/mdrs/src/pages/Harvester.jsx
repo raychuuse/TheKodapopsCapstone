@@ -54,6 +54,19 @@ export default function Harvester() {
 
 const HarvesterDetails = ({id}) => {
     const [error, setError] = useState(null);
+    const [harrData, setHarrData] = useState([]);
+
+    useEffect(() => {
+        getAllHarvesters(id)
+            .then(data => {
+                setHarrData(data);
+                setError(null);
+            })
+            .catch(err => {
+                setError(err);
+                setHarrData(null);
+            });
+    });
 
     return (
         <>
@@ -63,7 +76,7 @@ const HarvesterDetails = ({id}) => {
                     <div className="row">
                         <div className="table-wrapper">
                             <div className="table-header-wrapper">
-                                <h1 className="bin-count-header"> Harvester: {id ? id: "Select a Harvester"}</h1>
+                                <h1 className="bin-count-header"> Harvester: {id && harrData ? harrData.find(i => i.harvesterID == id)?.harvesterName: "Select a Harvester"}</h1>
                                 {/*<h1 className="bin-count-number">{`${harvesterData.data.full.length + harvesterData.data.empty.length}`}</h1>*/}
                             </div>
                         </div>

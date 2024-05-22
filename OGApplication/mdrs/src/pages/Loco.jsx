@@ -83,7 +83,7 @@ const LocoDetails = ({id}) => {
                                 <div className="table-header-wrapper">
                                     {/*<h1 className="table-header">{locoData.name}</h1>*/}
                                     <div className="table-bin-count-wrapper">
-                                        <h1 className="bin-count-header">Locomotive: {id ? id: "Select a Loco"}</h1>
+                                        <h1 className="bin-count-header">Locomotive: {id && locoData ? locoData.find(i => i.locoID == id)?.locoName: "Select a Loco"}</h1>
                                         {/*<h1 className="bin-count-number">{`${locoData.data.full.length + locoData.data.empty.length}`}</h1>*/}
                                     </div>
                                 </div>
