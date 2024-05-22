@@ -443,4 +443,18 @@ router.post('/missing/:id'), (req, res) => {
       })
 }
 
+router.post('/burn-siding/:sidingID', (req, res) => {
+  const sidingID = req.params.sidingID;
+  if (!isValidId(sidingID, res)) return;
+
+  req.db.raw(`UPDATE bin SET burnt=1 WHERE sidingID = ?`, [sidingID])
+      .then(response => {
+        res.status(200).send();
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+      });
+});
+
 module.exports = router;

@@ -18,6 +18,7 @@ import { useBins } from '../context/binContext';
 import {errorToast, issueAlert} from '../lib/alerts';
 import {getSidings} from "../api/siding.api";
 import {getBlocks, getFarms, getSubBlocks} from "../api/user.api";
+import {burnSiding} from "../api/bins.api";
 
 const initialFarmOptions = [
   { label: 'Green Valley Farm', value: 1 },
@@ -67,8 +68,8 @@ const initialPadOptions = [
 
 // Doesn't change with api, only two options
 const burntOptions = [
-  { label: 'Yes', value: 1 },
-  { label: 'No', value: 2 },
+  { label: 'Yes', id: 1 },
+  { label: 'No', id: 2 },
 ];
 
 const SetupPage = () => {
@@ -77,6 +78,7 @@ const SetupPage = () => {
   const [farms, setFarms] = useState();
   const [blocks, setBlocks] = useState();
   const [subBlocks, setSubOptions] = useState();
+  const [burnOption, setBurnOption] = useState(2);
 
   useEffect(() => {
     getSidings()
@@ -133,13 +135,31 @@ const SetupPage = () => {
         });
   };
 
+  const onBurnOptionSelected = (burn) => {
+    console.info(burn);
+    setBurnOption(burn);
+  };
+
   const onDonePressed = () => {
     if (getSelectedFarm() == null || getSelectedSiding() == null) {
       issueAlert('Select a siding and a farm to begin consigning.');
       return;
     }
-    onSetup();
-    router.navigate('/dashboard');
+    console.info(burnOption);
+    if (burnOption === 1) {
+      burnSiding(getSelectedSiding().sidingID)
+          .then(response => {
+            onSetup();
+            router.navigate('/dashboard');
+          })
+          .catch(err => {
+            console.error(err);
+            errorToast({message: 'Unable to burn siding, try again or set burn to No'});
+          });
+    } else {
+      onSetup();
+      router.navigate('/dashboard');
+    }
   };
 
   const onLogoutPressed = () => {
@@ -195,7 +215,9 @@ const SetupPage = () => {
         <SettingsItem
           type='select'
           label='Burnt'
+          startOption={2}
           options={burntOptions}
+          setSelectedItem={onBurnOptionSelected}
         />
         <Divider />
       </View>
