@@ -7,7 +7,15 @@ export function getAllLocos() {
         .then(response => {
             if (response.ok)
                 return response.json();
-            throw new Error();
+            else {
+                response.json()
+                .then(issue => {
+                    throw new Error(issue.message);
+                })
+            }
+        })
+        .catch(err => {
+            throw new Error(err);
         });
 }
 
@@ -16,8 +24,16 @@ export function getLoco(id) {
         .then(response => {
             if (response.ok)
                 return response.json();
-            throw new Error();
+                else {
+                    response.json()
+                .then(issue => {
+                    throw new Error(issue.message);
+                })
+            }
         })
+        .catch(err => {
+            throw new Error(err);
+        });
 }
 
 export function getCurrentLoad(id) {

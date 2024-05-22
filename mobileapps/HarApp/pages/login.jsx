@@ -41,7 +41,7 @@ const LogInPage = () => {
     );
   };
 
-  const { serverURL, signIn, mockMode } = useAuth();
+  const { serverURL, signIn} = useAuth();
 
   const handleResetCode = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -95,15 +95,11 @@ const LogInPage = () => {
       generalAlert('Please provide a valid email.');
       return;
     }
-    // Add further logic if desired for mock
+    // Add further logic if desired
     /*
     if (!resetPass.match(`^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8,}$`)){
       generalAlert("Please provide a stronger password (minimum 8 characters, 1 special character, 2 numerals, 3 lower case, 2 upper case).");
     }*/
-    if (mockMode) {
-      generalAlert('Password has been reset successfully');
-      return;
-    }
     try {
       const options = {
         method: 'POST',
@@ -147,10 +143,6 @@ const LogInPage = () => {
     }
     if (resetPass != resetPassConfirm) {
       generalAlert('Passwords do not match.');
-      return;
-    }
-    if (mockMode) {
-      router.navigate(setupPageRef);
       return;
     }
 

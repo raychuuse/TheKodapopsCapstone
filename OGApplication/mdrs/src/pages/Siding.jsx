@@ -68,7 +68,7 @@ const SidingDetails = ({id}) => {
                 <div className="row">
                     <div className="table-wrapper">
                         <div className="table-header-wrapper">
-                            <h1 className="bin-count-header">Bins:</h1>
+                            <h1 className="bin-count-header">Siding: {id ? id: "Select a Siding"}</h1>
                             {/*<h1 className="bin-count-number">{`${sidingData.data.full.length + sidingData.data.empty.length}`}</h1>*/}
                         </div>
                     </div>

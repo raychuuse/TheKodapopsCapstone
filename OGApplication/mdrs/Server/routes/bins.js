@@ -170,6 +170,61 @@ router.put('/bin-field-state/:binID', verifyAuthorization, (req, res) => {
         });
 });
 
+router.put('/bin-resolved/:binID', verifyAuthorization, (req, res) => {
+    if (!isValidId(req.params.binID, res)) return;
+
+    req.db.raw(`SELECT *
+                FROM bin
+                WHERE binID = ? AND (missing = 1 OR repair = 1)`, [req.params.binID])
+        .then(processQueryResult)
+        .then(response => {
+            const bin = response[0];
+            if (bin == null)
+                throw { status: 404, message: 'No bin found with id: ' + req.params.binID };
+            return bin;
+        })
+        .then(bin => {
+            let binUpdate = false;
+            let transactionUpdate = false;
+            req.db.transaction(trx => {
+                trx.raw(`UPDATE bin SET missing = 0, repair = 0 
+                         WHERE binID = ?`, [bin.binID])
+                    .then(response => {
+                        binUpdate = true;
+                        if (transactionUpdate) {
+                            trx.commit();
+                            return res.status(200).send();
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        trx.rollback();
+                        throw { status: 500, message: 'An unknown error occurred. Please try again.' };
+                    });
+
+                trx.raw(`INSERT INTO transactionlog (userID, binID, type)
+                         VALUES (?, ?, ?)`, [req.userID, bin.binID, "RESOLVED"])
+                    .then(response => {
+                        transactionUpdate = true;
+                        if (binUpdate) {
+                            trx.commit();
+                            return res.status(200).send();
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        trx.rollback();
+                        throw { status: 500, message: 'An unknown error occurred. Please try again.' };
+                    });
+            });
+        })
+        .catch(err => {
+            if (err.status != null && err.message != null)
+                return res.status(err.status).json({message: err.message});
+            console.error(err);
+        });
+})
+
 router.post('/consign', verifyAuthorization, (req, res) => {
     if (!isValidId(req.body.binID, res)) return;
 

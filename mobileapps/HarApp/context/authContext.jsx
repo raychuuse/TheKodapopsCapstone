@@ -5,15 +5,12 @@ import useWebSocket from 'react-use-websocket';
 import NetInfo from '@react-native-community/netinfo';
 
 export const AuthContext = createContext({
-  setMockMode: () => {},
 });
 
 const serverIP = process.env.EXPO_PUBLIC_SERVER_IP;
 const serverPort = process.env.EXPO_PUBLIC_SERVER_PORT;
 
 export const AuthProvider = ({ children }) => {
-  // Set this for testing
-  const [mockMode, setMockMode] = useState(true);
 
   const [isSignedIn, setIsSignedIn] = useState('false');
   const [isOnline, setIsOnline] = useState(false);
@@ -29,9 +26,6 @@ export const AuthProvider = ({ children }) => {
     share: true,
     token: getToken,
     shouldReconnect: (closeEvent) => {
-      if (mockMode) {
-        return false;
-      }
       if (isSignedIn) {
         return true;
       } else {
@@ -100,11 +94,9 @@ export const AuthProvider = ({ children }) => {
     isOnline,
     serverURL,
     wsURL,
-    mockMode,
     sendJsonMessage,
     lastJsonMessage,
     readyState,
-    setMockMode,
     getToken,
   };
 

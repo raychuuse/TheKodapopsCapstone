@@ -3,7 +3,10 @@ import {getConfig, handleFetch, postConfig, putConfig, serverUrl} from "./utils"
 const apiUrl = `${serverUrl}/user`;
 
 export function login(user) {
-    return handleFetch(fetch(`${apiUrl}/login`, postConfig(user)));
+    return handleFetch(fetch(`${apiUrl}/login`, postConfig(user)))
+    .catch(err => {
+        throw new Error("Invalid user ID/ password");
+    });
 }
 
 export function getAll() {
