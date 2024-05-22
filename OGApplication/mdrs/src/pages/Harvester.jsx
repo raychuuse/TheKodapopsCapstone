@@ -53,23 +53,7 @@ export default function Harvester() {
 }
 
 const HarvesterDetails = ({id}) => {
-    const [harvesterData, setHarvesterData] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    useEffect(() => {
-        getHarvester(id)
-            .then(data => {
-                setHarvesterData(data);
-                setError(null);
-                setLoading(false);
-            })
-            .catch(err => {
-                setError(err);
-                setHarvesterData(null);
-                setLoading(false);
-            })
-    });
 
     return (
         <>

@@ -17,6 +17,10 @@ router.get("/", (req, res) => {
       });
 });
 
+router.get('/:id', (req, res) => {
+  req.db.raw(`SELECT * FROM `)
+});
+
 // Returns the status of a siding, including how many, and which, bins are full and empty, as well as when the bin
 // was filled or dropped off, telling the user how long the bin has been sitting at the siding in its current state,
 // potentially pointing out data entry errors.
@@ -106,28 +110,24 @@ router.post('/', (req, res) => {
       });
 });
 
-router.put('/:id/name', (req, res) => {
+router.put('/:id/:name', (req, res) => {
   const id = req.params.id;
-  const name = req.body.name;
+  const name = req.params.name;
   if (!isValidId(id)) return;
-  req.db.raw(`select count(sidingName) AS count from siding WHERE sidingName = '${name}'`)
-  .then(processQueryResult)
-  .then(data => {
-    if (data[0].count > 0) {
-      res.status(510).json('Duplicate appeared.');
-    }
-    else {
-      req.db('siding').update({sidingName: req.body.name}).where({sidingID: id})
-      .then(result => {
-        res.status(204).send();
+  req.db.raw(`select count(sidingName) AS count from siding WHERE sidingName = ?`, [name])
+      .then(processQueryResult)
+      .then(data => {
+        if (data[0].count > 0)
+          return res.status(409).json({message: 'Another siding with that name already exists.'});
+        req.db('siding').update({sidingName: name}).where({sidingID: id})
+            .then(result => {
+              res.status(204).send();
+            })
+            .catch(error => {
+              console.error(error);
+              res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+            })
       })
-      .catch(error => {
-        console.error(error);
-        res.status(500).json(error);
-      })
-    }
-  })
-
 });
 
 router.delete('/:id', (req, res) => {

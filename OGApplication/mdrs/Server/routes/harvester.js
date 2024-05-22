@@ -48,21 +48,20 @@ router.post('/', (req, res) => {
         })
         .catch(error => {
             console.error(error);
-            res.status(500).json(error)
+            res.status(500).json({message: 'An unknown error occurred. Please try again.'});
         });
 });
 
-router.put('/:id/name', (req, res) => {
+router.put('/:id/:name', (req, res) => {
     const id = req.params.id;
-    const name = req.body.name;
+    const name = req.params.name;
     if (!isValidId(id)) return;
     
-    req.db.raw(`select count(harvesterName) AS count from harvester WHERE harvesterName = '${name}'`)
+    req.db.raw(`select count(harvesterName) AS count from harvester WHERE harvesterName = ?`, [name])
     .then(processQueryResult)
     .then(data => {
-      if (data[0].count > 0) {
-        res.status(510).json('Duplicate appeared.');
-      }
+      if (data[0].count > 0)
+        return res.status(409).json({message: 'A harvester with that name already exists.'});
       else {
         req.db('harvester').update({harvesterName: req.body.name}).where({harvesterID: id})
         .then(response => {
@@ -70,7 +69,7 @@ router.put('/:id/name', (req, res) => {
         })
         .catch(error => {
             console.error(error);
-            res.status(500).json(error);
+            res.status(500).json({message: 'An unknown error occurred. Please try again.'});
         })
       }
     })
@@ -87,7 +86,7 @@ router.delete('/:id', (req, res) => {
     })
     .catch(error => {
       console.error(error);
-      res.status(500).json(error);
+      res.status(500).json({message: 'An unknown error occurred. Please try again.'});
     });
 });
 
