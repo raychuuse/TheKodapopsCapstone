@@ -114,36 +114,9 @@ export function deleteBin(binID) {
 }
 
 export function getMaintenanceBreakdown() {
-    return fetch(`${apiUrl}/maintenance_breakdown`)
-        .then((body) => body.json())
-        .then((data) =>{
-            // Data formatting
-            return data.map((obj) => ({
-                id: obj.binID,
-                sidingName: obj.sidingName,
-                issue: getFlag(obj.missing, obj.repair),
-            }))
-        })
+    return handleFetch(fetch(`${apiUrl}/maintenance_breakdown/stop-being-annoying`), true);
 }
 
 export function resolveBin(id) {
-    return fetch(`${apiUrl}/bin-resolved/${id}`, putConfig({}))
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-    });
+    return handleFetch(fetch(`${apiUrl}/bin-resolved/${id}`, putConfig()), false);
 }
-
-
-
-const getFlag = (missing, repair) => {
-    if (missing) {
-        return "Missing";
-    }
-    if (repair)
-    {
-        return "Needs Repairs";
-    }
-}
-

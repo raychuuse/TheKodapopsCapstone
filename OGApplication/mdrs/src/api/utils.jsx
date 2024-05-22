@@ -1,3 +1,5 @@
+import Cookies from 'js-cookie';
+
 export const serverUrl = "http://localhost:8080";
 
 export function postConfig(data) {
@@ -5,7 +7,10 @@ export function postConfig(data) {
     return {
         method: 'POST',
         mode: 'cors',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken(),
+        },
         body: b
     }
 }
@@ -15,7 +20,10 @@ export function putConfig(data) {
     return {
         method: 'PUT',
         mode: 'cors',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken(),
+        },
         body: b
     }
 }
@@ -24,7 +32,10 @@ export function getConfig() {
     return {
         method: 'GET',
         mode: 'cors',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken(),
+        },
     }
 }
 
@@ -41,6 +52,10 @@ export function handleFetch(promise, hasJson=true) {
                     });
             }
         });
+}
+
+function getToken() {
+    return Cookies.get('token');
 }
 
 export const Status = {
