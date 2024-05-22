@@ -161,7 +161,7 @@ CREATE TABLE `runs` (
 
 LOCK TABLES `runs` WRITE;
 /*!40000 ALTER TABLE `runs` DISABLE KEYS */;
-INSERT INTO `runs` VALUES (1,'2024-05-06',1,1);
+INSERT INTO `runs` VALUES (1,'2024-05-22',1,1);
 /*!40000 ALTER TABLE `runs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -206,7 +206,7 @@ CREATE TABLE `transactionlog` (
   `sidingID` int DEFAULT NULL,
   `locoID` int DEFAULT NULL,
   `stopID` int DEFAULT NULL,
-  `type` enum('FILLED','EMPTIED','PICKED_UP','DROPPED_OFF','MISSING','REPAIR','BURNT') NOT NULL,
+  `type` enum('FILLED','EMPTIED','PICKED_UP','DROPPED_OFF','MISSING','REPAIR','BURNT', 'RESOLVED') NOT NULL,
   PRIMARY KEY (`transactionID`),
   UNIQUE KEY `transactionNumber` (`transactionID`),
   KEY `transactionlog_harvester_harvesterID_fk` (`harvesterID`),

@@ -25,6 +25,10 @@ export const RepairBinAlert = (message, func) => {
   );
 };
 
+export const generalAlert = (message) => {
+  Alert.alert(`See message below`, `\n${message}`, [{text: "OK"}]);
+};
+
 export const errorToast = (err) => {
   Toast.show({
     text1: err.message != null ? err.message : 'An unknown error occurred. Please try again.',
