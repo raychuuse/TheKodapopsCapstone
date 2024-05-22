@@ -15,9 +15,9 @@ import { Colours } from '../components/colours';
 // Import Contexts
 import { useAuth } from '../context/authContext';
 import { useBins } from '../context/binContext';
-import {errorToast, issueAlert} from '../lib/alerts';
-import {getSidings} from "../api/siding.api";
-import {getBlocks, getFarms, getSubBlocks} from "../api/user.api";
+import { errorToast, issueAlert } from '../lib/alerts';
+import { getSidings } from '../api/siding.api';
+import { getBlocks, getFarms, getSubBlocks } from '../api/user.api';
 
 const initialFarmOptions = [
   { label: 'Green Valley Farm', value: 1 },
@@ -72,7 +72,13 @@ const burntOptions = [
 ];
 
 const SetupPage = () => {
-  const {setSelectedSiding, setSelectedFarm, getSelectedSiding, getSelectedFarm, onSetup} = useBins();
+  const {
+    setSelectedSiding,
+    setSelectedFarm,
+    getSelectedSiding,
+    getSelectedFarm,
+    onSetup,
+  } = useBins();
   const [sidings, setSidings] = useState();
   const [farms, setFarms] = useState();
   const [blocks, setBlocks] = useState();
@@ -80,57 +86,56 @@ const SetupPage = () => {
 
   useEffect(() => {
     getSidings()
-        .then(response => {
-          setSidings(response);
-        })
-        .catch(err => {
-          console.error(err);
-          errorToast(err);
-        });
+      .then((response) => {
+        setSidings(response);
+      })
+      .catch((err) => {
+        console.error(err);
+        errorToast(err);
+      });
 
     getFarms()
-        .then(response => {
-          setFarms(response);
-        })
-        .catch(err => {
-          console.error(err);
-          errorToast(err);
-        })
+      .then((response) => {
+        setFarms(response);
+      })
+      .catch((err) => {
+        console.error(err);
+        errorToast(err);
+      });
   }, []);
 
   const onSidingSelected = (selectedSidingID) => {
-    if (selectedSidingID === 0)
-      return setSelectedSiding(null);
-    const siding = sidings.find(s => s.sidingID === selectedSidingID);
+    if (selectedSidingID === 0) return setSelectedSiding(null);
+    const siding = sidings.find((s) => s.sidingID === selectedSidingID);
     setSelectedSiding(siding);
   };
 
   const onFarmSelected = (selectedFarmID) => {
-    if (selectedFarmID === 0)
-      return setSelectedFarm(null);
-    const farm = farms.find(f => f.farmID === selectedFarmID);
+    if (selectedFarmID == 0) return setSelectedFarm(null);
+    selectedFarmID = Number.parseInt(selectedFarmID);
+    const farm = farms.find((f) => f.farmID === selectedFarmID);
     setSelectedFarm(farm);
     getBlocks(farm.farmID)
-        .then(response => {
-          setBlocks(response);
-        })
-        .catch(err => {
-          console.error(err);
-          errorToast(err);
-        });
+      .then((response) => {
+        setBlocks(response);
+      })
+      .catch((err) => {
+        console.error(err);
+        errorToast(err);
+      });
   };
 
   const onBlockSelected = (selectedBlockID) => {
     if (getSelectedFarm() == null) return;
 
     getSubBlocks(getSelectedFarm().farmID, selectedBlockID)
-        .then(response => {
-          setSubOptions(response);
-        })
-        .catch(err => {
-          console.error(err);
-          errorToast(err);
-        });
+      .then((response) => {
+        setSubOptions(response);
+      })
+      .catch((err) => {
+        console.error(err);
+        errorToast(err);
+      });
   };
 
   const onDonePressed = () => {
@@ -161,8 +166,8 @@ const SetupPage = () => {
           type='location'
           label='Siding'
           startOption={getSelectedSiding()?.sidingID}
-          options={sidings?.map(s => {
-            return {id: s.sidingID, label: s.sidingName};
+          options={sidings?.map((s) => {
+            return { id: s.sidingID, label: s.sidingName };
           })}
           setSelectedItem={onSidingSelected}
         />
@@ -171,26 +176,30 @@ const SetupPage = () => {
           type='select'
           label='Farm'
           startOption={getSelectedFarm()?.farmID}
-          options={farms?.map(s => {
-            return {id: s.farmID, label: s.farmName};
+          options={farms?.map((s) => {
+            return { id: s.farmID, label: s.farmName };
           })}
           setSelectedItem={onFarmSelected}
         />
-        {blocks != null && <SettingsItem
-          type='select'
-          label='Block'
-          options={blocks?.map(s => {
-            return {id: s.blockID, label: s.blockName};
-          })}
-          setSelectedItem={onBlockSelected}
-        />}
-        {subBlocks != null && <SettingsItem
-          type='select'
-          label='Sub'
-          options={subBlocks?.map(s => {
-            return {id: s.subBlockID, label: s.subBlockName};
-          })}
-        />}
+        {blocks != null && (
+          <SettingsItem
+            type='select'
+            label='Block'
+            options={blocks?.map((s) => {
+              return { id: s.blockID, label: s.blockName };
+            })}
+            setSelectedItem={onBlockSelected}
+          />
+        )}
+        {subBlocks != null && (
+          <SettingsItem
+            type='select'
+            label='Sub'
+            options={subBlocks?.map((s) => {
+              return { id: s.subBlockID, label: s.subBlockName };
+            })}
+          />
+        )}
         {/* <SettingsItem type="select" label="Pad" options={padOptions} /> */}
         <SettingsItem
           type='select'
