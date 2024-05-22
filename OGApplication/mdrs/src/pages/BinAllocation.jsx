@@ -28,11 +28,6 @@ export default function BinAllocation() {
     const navigate = useNavigate();
     const search = useLocation().search;
     const id = new URLSearchParams(search).get("id");
-    const [error, setError] = useState(null);
-    const [sidings, setSidings] = useState([]);
-    const [selectedSiding, setSelectedSiding] = useState();
-    const [bin, setBin] = useState();
-
 
     const [searchResult, setSearchResult] = useState([]);
 
@@ -41,7 +36,34 @@ export default function BinAllocation() {
         navigate(`?id=${bin.id}`);
     };
 
+    return (
+        <main>
+            <div className="container-fluid">
+                <div className="row">
+                    <div className="col-sm-3">
+                        <div className="container-fluid">
+                            <ItemList onItemSelected={changeState} itemName={'Bin'}
+                                      getAllItemApi={getAllBins} createItemApi={createBin} updateItemApi={editBin}
+                                      deleteItemApi={deleteBin}/>
+                        </div>
+                    </div>
+                    <div className="col-sm-9">
+                        {id != null ? <BinPage id={id} /> : null}
+                    </div>
+                </div>
+            </div>
+        </main>
+    );
+}
+
+const BinPage = ({id}) => {
+    const [error, setError] = useState(null);
+    const [sidings, setSidings] = useState([]);
+    const [selectedSiding, setSelectedSiding] = useState();
+    const [bin, setBin] = useState();
+
     useEffect(() => {
+        console.info('jjj');
         getBin(id)
             .then(response => {
                 setBin(response);
@@ -51,7 +73,7 @@ export default function BinAllocation() {
             .catch(err => {
                 setError(err);
             });
-    }, []);
+    }, [id]);
 
     const getSidings = () => {
         getAllSidings()
@@ -69,65 +91,51 @@ export default function BinAllocation() {
         setSelectedSiding(newSiding);
     };
 
+
     return (
-        <main>
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-sm-3">
-                        <div className="container-fluid">
-                            <ItemList onItemSelected={changeState} itemName={'Bin'}
-                                      getAllItemApi={getAllBins} createItemApi={createBin} updateItemApi={editBin}
-                                      deleteItemApi={deleteBin}/>
+        <div>
+            {error && <ErrorAlert message={error.message} />}
+            <section className="data-table">
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="table-wrapper">
+                            <div className="table-header-wrapper">
+                                <h1 className="table-header">Bin: {bin != null ? bin.code : "Select Bin"}</h1>
+                            </div>
                         </div>
                     </div>
-                    <div className="col-sm-9">
-                        {error && <ErrorAlert message={error.message}/>}
-                        {!error && (
-                            <section className="data-table">
-                                <div className="container-fluid">
-                                    <div className="row">
-                                        <div className="table-wrapper">
-                                            <div className="table-header-wrapper">
-                                                <h1 className="table-header">Bin: {bin != null ? bin.code : "Select Bin"}</h1>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr/>
-                                    <div className="row">
-                                        <div className="col">
-                                            <FormGroup>
-                                                <Label for="siding">Move bin to Siding</Label>
-                                                <Input
-                                                    type="select"
-                                                    id="siding"
-                                                    value={selectedSiding}
-                                                    onChange={(e) => onSidingChanged(e.target.value)}
-                                                >
-                                                    <option value="0">Not At Siding</option>
-                                                    {sidings.map(s => (
-                                                        <option key={s.sidingID} value={s.sidingID}>
-                                                            {s.sidingName}
-                                                        </option>
-                                                    ))}
-                                                </Input>
-                                            </FormGroup>
-                                        </div>
-                                    </div>
-                                    <div className="row">
-                                        <div className="col">
-                                            <div className="row">
-                                                <BinSidingBreakdown id={id}/>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <hr/>
-                                </div>
-                            </section>
-                        )}
+                    <hr />
+                    <div className="row">
+                        <div className="col">
+                            <FormGroup>
+                                <Label for="siding">Move bin to Siding</Label>
+                                <Input
+                                    type="select"
+                                    id="siding"
+                                    value={selectedSiding}
+                                    onChange={(e) => onSidingChanged(e.target.value)}
+                                >
+                                    <option value="0">Not At Siding</option>
+                                    {sidings.map(s => (
+                                        <option key={s.sidingID} value={s.sidingID}>
+                                            {s.sidingName}
+                                        </option>
+                                    ))}
+                                </Input>
+                            </FormGroup>
+                        </div>
                     </div>
+                    <div className="row">
+                        <div className="col">
+                            <div className="row">
+                                <BinSidingBreakdown id={id} />
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
                 </div>
-            </div>
-        </main>
+            </section>
+        </div>
     );
 }
 
@@ -142,9 +150,9 @@ const BinSidingBreakdown = ({id}) => {
               setError(null);
             })
             .catch(err => {
-                setError(err);
+              setError(err);
             });
-    });
+    }, [id]);
 
 
     const columns = [
@@ -154,6 +162,7 @@ const BinSidingBreakdown = ({id}) => {
 
     return (
         <div className="col">
+            {error && <ErrorAlert message={error.message}/>}
             <section className="metric">
                 <div className="hero__content">
                     <div className="table-wrapper">

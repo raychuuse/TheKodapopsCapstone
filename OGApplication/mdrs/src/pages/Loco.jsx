@@ -69,7 +69,7 @@ const LocoDetails = ({id}) => {
                 setLocoData(null);
                 setLoading(false);
             });
-    });
+    }, [id]);
 
     return (
         <>
@@ -131,7 +131,7 @@ const LocoCurrentLoad = ({id}) => {
             .catch(err => {
                 setError(err);
             });
-    }, []);
+    }, [id]);
 
 
     const columns = [
@@ -193,7 +193,7 @@ const LocoSidingBreakdown = ({id}) => {
             .catch(err => {
                 setError(err);
             });
-    });
+    }, [id]);
 
 
     const columns = [

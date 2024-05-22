@@ -369,7 +369,7 @@ router.post('/:code', (req, res) => {
     //Change to edit code?
     let code  = req.params.code;
     if (code == null || code.length > 4 || isNaN(code))
-      return res.status(400).json({message: 'Please provide a valid bin code of 4 characters.'});
+      return res.status(400).json({message: 'Please provide a valid bin code of 4 numbers.'});
 
     while (code.length < 4)
       code = '0' + code;
@@ -391,7 +391,7 @@ router.put('/:binID/:code', (req, res) => {
   if (!isValidId(id, res)) return;
   let code = req.params.code;
   if (code == null || code.length > 4 || isNaN(code))
-    return res.status(400).json({message: 'Please provide a valid bin code of 4 characters.'});
+    return res.status(400).json({message: 'Please provide a valid bin code of 4 numbers.'});
 
   while (code.length < 4)
     code = '0' + code;
