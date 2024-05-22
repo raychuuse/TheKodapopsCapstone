@@ -10,8 +10,9 @@ import {useNavigate} from 'react-router-dom';
 import {ErrorAlert} from "../components/Alerts";
 
 import {
-  getMaintenanceBreakdown
-} from "../api/bins";
+    getMaintenanceBreakdown, resolveBin,
+} from '../api/bins';
+import { Button } from 'reactstrap';
 
 
 
@@ -55,22 +56,77 @@ export default function Maintenance() {
 const MaintenanceBreakdown = () => {
     const [data, setData] = useState([]);
     const [error, setError] = useState(null);
+
+    /*
+    .then((body) => body.json())
+        .then((data) =>{
+            console.info(data);
+            // Data formatting
+            return data.map((obj) => ({
+                id: obj.binID,
+                sidingName: obj.sidingName,
+                issue: getFlag(obj.missing, obj.repair),
+            }))
+        })
+     */
     useEffect(() => {
         getMaintenanceBreakdown()
             .then((data) => {
-                setData(data);
+                setData(data.map(b => {
+                    return {
+                        id: b.binID,
+                        sidingName: b.sidingName,
+                        issue: getFlag(b.missing, b.repair),
+                    }
+                }));
                 setError(null);
             })
             .catch(err => {
                 setError(err);
             });
-    });
+    }, []);
 
+
+    const getFlag = (missing, repair) => {
+        if (missing) {
+            return "Missing";
+        }
+        if (repair)
+        {
+            return "Needs Repairs";
+        }
+    }
+
+    const onResolvePressed = (params) => {
+        console.info(params);
+        resolveBin(params.data.id)
+            .then(response => {
+                const index = data.findIndex(d => d.id === params.data.id);
+                if (index >= 0) {
+                    data.splice(index, 1);
+                    setData([...data]);
+                    setError(null);
+                    console.info('hello');
+                } else {
+                    setError({message: 'Failed to resolve issue. Please try again.'});
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                setError({message: 'Failed to resolve issue. Please try again.'});
+            });
+    };
 
     const columns = [
         {headerName: "Bin", field: "id"},
         {headerName: "Siding Location (Or Last Location)", field: "sidingName"},
-        {headerName: "Issue", field: "issue"}
+        {headerName: "Issue", field: "issue"},
+        {
+            headerName: 'Resolve',
+            cellRenderer: params => {
+               return <><Button color={'success'} style={{width: '100%'}} onClick={() => onResolvePressed(params)}>Resolve Issue</Button></>
+            }
+        }
     ];
 
     return (

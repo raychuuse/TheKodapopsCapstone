@@ -35,6 +35,10 @@ const Table = ({ columns, data, onRowClicked, onGridReadyCallback }) => {
         filterParams: { buttons: ['clear'], }
       };
     }, []);
+
+    const gridOptions = {
+        rowHeight: 40,
+    };
   
     return (
       <div className="table">
@@ -50,6 +54,7 @@ const Table = ({ columns, data, onRowClicked, onGridReadyCallback }) => {
                       columnDefs={columns}
                       defaultColDef={defaultColDef}
                       rowData={data}
+                      gridOptions={gridOptions}
                       cacheQuickFilter={true}
                       pagination={true}
                       paginationPageSize={20}

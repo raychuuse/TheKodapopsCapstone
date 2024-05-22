@@ -349,18 +349,19 @@ router.get("/:binID/siding_breakdown", (req, res) => {
       })
 });
 
-router.get("/maintenance_breakdown", (req, res) => {
+router.get("/maintenance_breakdown/stop-being-annoying", (req, res) => {
 
-  req.db.raw(`SELECT *, s.sidingName FROM bin b
+  req.db.raw(`SELECT b.*, s.sidingName 
+              FROM bin b
                 LEFT JOIN siding s ON b.sidingID = s.sidingID
-                WHERE missing IS TRUE OR repair IS TRUE`)
+              WHERE missing IS TRUE OR repair IS TRUE`)
       .then(processQueryResult)
       .then(data => {
         res.status(200).json(data);
       })
       .catch(err => {
         console.error(err);
-        res.status(500).json(err);
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
       })
 });
 
