@@ -6,15 +6,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import Table from "../components/Table";
-import { NoEditItemList } from "../components/ItemList";
+import ItemList  from "../components/ItemList";
 import {useLocation, useNavigate} from 'react-router-dom';
 import {ErrorAlert} from "../components/Alerts";
 
 import {
-  createBin,
-  deleteBin,
-  getAllBins,
-  getSidingBreakdown,
+    createBin,
+    deleteBin, editBin,
+    getAllBins,
+    getSidingBreakdown,
 } from "../api/bins";
 
 
@@ -40,8 +40,8 @@ export default function BinAllocation() {
                 <div className="row">
                     <div className="col-sm-3">
                         <div className="container-fluid">
-                            <NoEditItemList onItemSelected={changeState} itemName={'Bin'}
-                                      getAllItemApi={getAllBins} createItemApi={createBin}
+                            <ItemList onItemSelected={changeState} itemName={'Bin'}
+                                      getAllItemApi={getAllBins} createItemApi={createBin} updateItemApi={editBin}
                                       deleteItemApi={deleteBin}/>
                         </div>
                     </div>

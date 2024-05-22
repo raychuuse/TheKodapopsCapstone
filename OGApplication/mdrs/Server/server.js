@@ -67,6 +67,7 @@ app.get("/knex", function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
+  console.error('Not found', req.url);
   var err = new Error("Not Found");
   err.status = 404;
   next(err);

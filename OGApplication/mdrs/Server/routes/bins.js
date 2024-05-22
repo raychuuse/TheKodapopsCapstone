@@ -273,40 +273,52 @@ router.get("/maintenance_breakdown", (req, res) => {
 });
 
 
-router.post('/', (req, res) => {
+router.post('/:code', (req, res) => {
     //Change to edit code?
-    const id  = req.body.binID;
-    req.db.raw(`INSERT INTO bin (binID, code, status, sidingID) 
-    VALUES (${id}, "0000", "EMPTY", 1)`)
-        .then((response) => {
-            res.status(201).json({Message: "Success"});
-        })
-        .catch(error => {
-            console.error(error);
-            res.json({Error: true, Message: error.message})
-        });
-});
+    let code  = req.params.code;
+    if (code == null || code.length > 4 || isNaN(code))
+      return res.status(400).json({message: 'Please provide a valid bin code of 4 characters.'});
 
-router.put('/:binID', (req, res) => {
-    const id = req.params.id;
-    req.db.raw(`select count(binID) AS count from bin WHERE binID = '${id}'`)
-    .then(processQueryResult)
-    .then(data => {
-      if (data[0].count > 0) {
-        res.status(510).json('Duplicate appeared.');
-      }
-      else {
-        req.db('bin').update({binData: req.body.data}).where({binID: id})
-        .then(response => {
-          res.json({Error: false, Message: 'Success'});
+    while (code.length < 4)
+      code = '0' + code;
+
+    req.db.raw(`INSERT INTO bin (code) VALUES (?)`, [code])
+        .then((response) => {
+            res.status(201).json({Message: "Bin Successfully Created"});
         })
         .catch(error => {
           console.error(error);
-          res.json({Error: true, Message: error.message});
-        })
-      }
-    })
-    
+          if (error?.code === 'ER_DUP_ENTRY' && error?.sqlMessage.includes('bin.bin_code_uindex'))
+            return res.status(409).json({message: 'A bin with that code already exists.'});
+          res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+        });
+});
+
+router.put('/:binID/:code', (req, res) => {
+  const id = req.params.binID;
+  if (!isValidId(id, res)) return;
+  let code = req.params.code;
+  if (code == null || code.length > 4 || isNaN(code))
+    return res.status(400).json({message: 'Please provide a valid bin code of 4 characters.'});
+
+  while (code.length < 4)
+    code = '0' + code;
+
+  req.db.raw(`select count(code) AS count from bin WHERE code = ?`, [code])
+      .then(processQueryResult)
+      .then(data => {
+        if (data[0].count > 0)
+          return res.status(510).json('Another bin with that code already exists.');
+
+        req.db('bin').update({code: code}).where({binID: id})
+            .then(response => {
+              res.status(200).json({message: 'Bin Successfully Updated'});
+            })
+            .catch(error => {
+              console.error(error);
+              res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+            })
+      });
 });
 
 router.delete('/:binID', (req, res) => {

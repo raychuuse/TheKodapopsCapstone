@@ -15,8 +15,8 @@ function calculateDifference(a, b) {
 function standardiseData(data) {
     return data.map(obj => {
         return {
-            id: obj.harvesterID || obj.sidingID || obj.locoID || obj.id,
-            name: obj.harvesterName || obj.sidingName || obj.locoName || obj.name
+            id: obj.binID || obj.harvesterID || obj.sidingID || obj.locoID || obj.id,
+            name: obj.code || obj.harvesterName || obj.sidingName || obj.locoName || obj.name
         };
     })
 }

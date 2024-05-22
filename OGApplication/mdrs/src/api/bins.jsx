@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, ListInlineItem } from 'reactstrap';
-import {serverUrl, postConfig, putConfig, Status} from "./utils";
+import {serverUrl, postConfig, putConfig, Status, handleFetch} from "./utils";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const apiUrl = `${serverUrl}/bins`;
@@ -101,28 +101,17 @@ export function getBin(binID) {
         })
 }
 
-export function createBin(binID) {
-    if (!isNaN(binID) && !isNaN(parseFloat(binID))) {
-        return fetch(`${apiUrl}`, postConfig({binID: binID}))
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
-    }
-    else {
-        throw new Error("Must be a number");
-    }
-    
+export function createBin(code) {
+    return handleFetch(fetch(`${apiUrl}/${code}`, postConfig()), false);
+}
+
+export function editBin(binID,code) {
+    console.info(binID, code);
+    return handleFetch(fetch(`${apiUrl}/${binID}/${code}`, putConfig()), false);
 }
 
 export function deleteBin(binID) {
-    return fetch(`${apiUrl}/${binID}`, {method: 'DELETE'})
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/${binID}`, {method: 'DELETE'}), false);
 }
 
 export function getMaintenanceBreakdown() {
