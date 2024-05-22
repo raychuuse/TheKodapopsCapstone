@@ -178,7 +178,7 @@ const ItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi, updat
         </div>
         <div className="form-wrapper">
             <button style={{display: state === 'CREATE' ? 'none' : 'block'}}
-                    className={`w-100 btn-md btn btn-primary mt-1`} onClick={setStateCreate}>Create Siding
+                    className={`w-100 btn-md btn btn-primary mt-1`} onClick={setStateCreate}>Create {itemName}
             </button>
             <hr/>
             <h3>{formTitle}</h3>
