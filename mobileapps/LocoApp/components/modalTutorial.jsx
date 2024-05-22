@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     aspectRatio: '16/9',
     overflow: 'hidden',
     marginHorizontal: 'auto',
-    marginBottom: 16,
+    marginVertical: 'auto',
   },
   image: {
     resizeMode: 'contain',

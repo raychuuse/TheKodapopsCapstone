@@ -7,6 +7,7 @@ import UserGreeting from '../../components/userGreeting';
 import SelectedSiddingStats from '../../components/selectedSidingStats';
 import SidingCard from '../../components/sidingCard';
 import BottomBar from '../../components/bottomBar';
+import SidingListScrollBar from '../../components/sidingListScrollBar';
 
 // Modals
 import ModalSidingDetails from '../../components/modalSidingDetails';
@@ -18,16 +19,21 @@ import { NotificationsMockData } from '../../data/NotificationsMockData';
 // Import Providers
 import { useTheme } from '../../styles/themeContext';
 import { useRun } from '../../context/runContext';
-import SidingListScrollBar from '../../components/sidingListScrollBar';
+import { useModal } from '../../context/modalContext';
 
-import {getCurrentLoadById} from "../../api/loco.api";
-import AddBinCamera from "../../components/addBinCamera";
-import Toast, {ErrorToast, InfoToast, SuccessToast} from "react-native-toast-message";
+import { getCurrentLoadById } from '../../api/loco.api';
+import AddBinCamera from '../../components/addBinCamera';
+import Toast, {
+  ErrorToast,
+  InfoToast,
+  SuccessToast,
+} from 'react-native-toast-message';
 
 export default function Page() {
   // Providers
   const { getStops } = useRun();
   const { theme } = useTheme();
+  const { updateSelectedSidingID } = useModal();
 
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const [sidingCarouselWidth, setSidingCarouselWidth] = useState(0);
@@ -38,6 +44,10 @@ export default function Page() {
   // Run Data for the Whole App
   const [notifications, setNotifications] = useState(NotificationsMockData);
   const stops = getStops();
+  const firstStop = stops[0].stopID;
+
+  // defaults selects the first stop
+  updateSelectedSidingID(firstStop);
 
   return (
     <View
@@ -49,30 +59,30 @@ export default function Page() {
       }}
     >
       {/* Add Bin Modal */}
-      <AddBinCamera stop={null}/>
-      <ModalSidingDetails >
+      <AddBinCamera stop={null} />
+      <ModalSidingDetails>
         <Toast
-            position={'bottom'}
-            config={{
-              success: (props) => (
-                  <SuccessToast
-                      {...props}
-                      text1Style={{fontSize: 18}}
-                  />
-              ),
-              error: (props) => (
-                  <ErrorToast
-                      {...props}
-                      text1Style={{fontSize: 18}}
-                  />
-              ),
-              info: (props) => (
-                  <InfoToast
-                      {...props}
-                      text1Style={{fontSize: 18}}
-                  />
-              ),
-            }}
+          position={'bottom'}
+          config={{
+            success: (props) => (
+              <SuccessToast
+                {...props}
+                text1Style={{ fontSize: 18 }}
+              />
+            ),
+            error: (props) => (
+              <ErrorToast
+                {...props}
+                text1Style={{ fontSize: 18 }}
+              />
+            ),
+            info: (props) => (
+              <InfoToast
+                {...props}
+                text1Style={{ fontSize: 18 }}
+              />
+            ),
+          }}
         />
       </ModalSidingDetails>
       <ModalSelectSiding />
@@ -127,14 +137,15 @@ export default function Page() {
               keyExtractor={(item) => item.stopID}
               data={stops}
               renderItem={({ item, index }) => {
-                  return (
-                <SidingCard
-                  stopID={item.stopID}
-                  index={index}
-                  scrollX={scrollX}
-                  containerWidth={sidingCarouselWidth}
-                />
-              );}}
+                return (
+                  <SidingCard
+                    stopID={item.stopID}
+                    index={index}
+                    scrollX={scrollX}
+                    containerWidth={sidingCarouselWidth}
+                  />
+                );
+              }}
             />
           </View>
           <SidingListScrollBar
@@ -153,25 +164,25 @@ export default function Page() {
         position={'bottom'}
         config={{
           success: (props) => (
-              <SuccessToast
-                  {...props}
-                  text1Style={{fontSize: 18}}
-              />
+            <SuccessToast
+              {...props}
+              text1Style={{ fontSize: 18 }}
+            />
           ),
           error: (props) => (
-              <ErrorToast
-                  {...props}
-                  text1Style={{fontSize: 18}}
-              />
+            <ErrorToast
+              {...props}
+              text1Style={{ fontSize: 18 }}
+            />
           ),
           info: (props) => (
-              <InfoToast
-                  {...props}
-                  text1Style={{fontSize: 18}}
-              />
+            <InfoToast
+              {...props}
+              text1Style={{ fontSize: 18 }}
+            />
           ),
         }}
-        />
+      />
     </View>
   );
 }
