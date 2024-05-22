@@ -33,7 +33,7 @@ const SetupPage = () => {
   }, []);
 
   const onLocoSelected = (locoID) => {
-    setLocoID(locoID);
+    setLocoID(Number.parseInt(locoID));
   };
 
   const onStartPressed = () => {
