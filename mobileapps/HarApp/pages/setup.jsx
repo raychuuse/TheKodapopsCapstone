@@ -108,6 +108,7 @@ const SetupPage = () => {
 
   const onSidingSelected = (selectedSidingID) => {
     if (selectedSidingID === 0) return setSelectedSiding(null);
+    selectedSidingID = Number.parseInt(selectedSidingID);
     const siding = sidings.find((s) => s.sidingID === selectedSidingID);
     setSelectedSiding(siding);
   };
