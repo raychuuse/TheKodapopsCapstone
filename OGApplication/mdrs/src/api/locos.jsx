@@ -1,4 +1,4 @@
-import {fullConverter, postConfig, putConfig, serverUrl} from "./utils";
+import {fullConverter, handleFetch, postConfig, putConfig, serverUrl} from "./utils";
 
 const apiUrl = `${serverUrl}/locos`;
 
@@ -7,7 +7,15 @@ export function getAllLocos() {
         .then(response => {
             if (response.ok)
                 return response.json();
-            throw new Error();
+            else {
+                response.json()
+                .then(issue => {
+                    throw new Error(issue.message);
+                })
+            }
+        })
+        .catch(err => {
+            throw new Error(err);
         });
 }
 
@@ -16,20 +24,20 @@ export function getLoco(id) {
         .then(response => {
             if (response.ok)
                 return response.json();
-            throw new Error();
+                else {
+                    response.json()
+                .then(issue => {
+                    throw new Error(issue.message);
+                })
+            }
         })
+        .catch(err => {
+            throw new Error(err);
+        });
 }
 
 export function getCurrentLoad(id) {
-    return fetch(`${apiUrl}/${id}/current-load`)
-        .then((body) => body.json())
-        .then((data) =>{
-            // Data formatting
-            return data.map((obj) => ({
-                binID: obj.binID,
-                status: obj.status !== null ? obj.status : "NOT LISTED",
-            }))
-        })
+    return handleFetch(fetch(`${apiUrl}/${id}/load`), true);
 }
 
 export function getSidingBreakdown(id) {
@@ -46,28 +54,13 @@ export function getSidingBreakdown(id) {
 }
 
 export function createLoco(name) {
-    return fetch(`${apiUrl}`, postConfig({name: name}))
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}`, postConfig({name: name})), false);
 }
 
 export function updateLoco(id, name) {
-    return fetch(`${apiUrl}/${id}/name`, putConfig({name: name}))
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/${id}/${name}`, putConfig()), false);
 }
 
 export function deleteLoco(id) {
-    return fetch(`${apiUrl}/${id}`, {method: 'DELETE'})
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/${id}`, {method: 'DELETE'}), false);
 }

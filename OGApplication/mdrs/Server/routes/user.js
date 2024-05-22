@@ -436,8 +436,7 @@ router.post("/", createValidationRules, (req, res) => {
   }
 
   const { password, firstName, lastName, email, role } = req.body;
-  const selectedHarvester =
-    role === "Harvester" ? req.body.selectedHarvester : null;
+  const selectedHarvester = role === "Harvester" ? req.body.selectedHarvester : null;
   if (role === "Harvester" && selectedHarvester == undefined) {
     console.error("Need selected harvester");
     return res.status(400).json({
@@ -468,9 +467,9 @@ router.post("/", createValidationRules, (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        res
-          .status(500)
-          .json({ message: "An unknown error occurred, please try again." });
+        if (err?.code === 'ER_DUP_ENTRY' && err?.sqlMessage.includes('users.email'))
+          return res.status(409).json({message: 'Account already exists with that email.'});
+        res.status(500).json({ message: "An unknown error occurred, please try again." });
       });
   });
 });
@@ -775,7 +774,7 @@ router.get("/", (req, res) => {
     .raw(
       `SELECT u.*, h.harvesterName
                 FROM users u
-                LEFT JOIN harvester h ON h.harvesterID = u.userID`
+                LEFT JOIN harvester h ON h.harvesterID = u.harvesterID`
     )
     .then(processQueryResult)
     .then((result) => {
@@ -805,7 +804,7 @@ router.put("/", updateValidationRules, (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { userID, firstName, lastName, role } = req.body;
+  const { userID, firstName, lastName, role, email } = req.body;
   const selectedHarvester =
     role === "Harvester" ? req.body.selectedHarvester : null;
   if (role === "Harvester" && selectedHarvester == undefined) {
@@ -821,9 +820,10 @@ router.put("/", updateValidationRules, (req, res) => {
                 SET firstName=?,
                     lastName=?,
                     userRole=?,
-                    harvesterID=?
+                    harvesterID=?,
+                    email=?
                 WHERE userID = ?`,
-      [firstName, lastName, role, selectedHarvester, userID]
+      [firstName, lastName, role, selectedHarvester, email, userID]
     )
     .then(processQueryResult)
     .then((result) => {

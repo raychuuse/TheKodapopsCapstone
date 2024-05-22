@@ -4,6 +4,23 @@ const router = express.Router();
 const {processQueryResult, isValidId} = require("../utils");
 const { verifyAuthorization } = require('../middleware/authorization');
 
+router.get('/:binID', (req, res) => {
+  const binID = req.params.binID;
+  if (!isValidId(binID, res)) return;
+
+  req.db.raw(`SELECT * FROM bin WHERE binID = ?`, [binID])
+      .then(processQueryResult)
+      .then(response => {
+        if (response.length === 0)
+          return res.status(404).json({message: 'No bin found with the id: ' + binID});
+        res.status(200).json(response[0]);
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+      });
+});
+
 router.get("/", (req, res) => {
   req.db.raw(`SELECT *, s.sidingName, l.locoName FROM bin b
              LEFT JOIN siding s ON b.sidingID = s.sidingID
@@ -14,6 +31,26 @@ router.get("/", (req, res) => {
       })
       .catch((err) => {
         res.status(500).json(err);
+      });
+});
+
+router.post('/:binID/move-bin/:sidingID', (req, res) => {
+  const binID = req.params.binID;
+  if (!isValidId(binID, res))
+    return;
+  const sidingID = req.params.sidingID;
+  if (!isValidId(sidingID, res))
+    return;
+
+  req.db.raw(`UPDATE bin SET ${sidingID !== '0' ? 'sidingID=?' : 'sidingID=null'}, locoID=null WHERE binID=?`, sidingID !== '0' ? [sidingID, binID] : [binID])
+      .then(response => {
+        res.status(204).send();
+      })
+      .catch(err => {
+        console.error(err);
+        if (err?.code === 'ER_NO_REFERENCED_ROW_2' && err?.sqlMessage.includes('bin_siding_sidingID_fk'))
+          return res.status(400).json({message: 'No siding found with id: ' + sidingID});
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
       });
 });
 
@@ -132,6 +169,61 @@ router.put('/bin-field-state/:binID', verifyAuthorization, (req, res) => {
             console.error(err);
         });
 });
+
+router.put('/bin-resolved/:binID', verifyAuthorization, (req, res) => {
+    if (!isValidId(req.params.binID, res)) return;
+
+    req.db.raw(`SELECT *
+                FROM bin
+                WHERE binID = ? AND (missing = 1 OR repair = 1)`, [req.params.binID])
+        .then(processQueryResult)
+        .then(response => {
+            const bin = response[0];
+            if (bin == null)
+                throw { status: 404, message: 'No bin found with id: ' + req.params.binID };
+            return bin;
+        })
+        .then(bin => {
+            let binUpdate = false;
+            let transactionUpdate = false;
+            req.db.transaction(trx => {
+                trx.raw(`UPDATE bin SET missing = 0, repair = 0 
+                         WHERE binID = ?`, [bin.binID])
+                    .then(response => {
+                        binUpdate = true;
+                        if (transactionUpdate) {
+                            trx.commit();
+                            return res.status(200).send();
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        trx.rollback();
+                        throw { status: 500, message: 'An unknown error occurred. Please try again.' };
+                    });
+
+                trx.raw(`INSERT INTO transactionlog (userID, binID, type)
+                         VALUES (?, ?, ?)`, [req.userID, bin.binID, "RESOLVED"])
+                    .then(response => {
+                        transactionUpdate = true;
+                        if (binUpdate) {
+                            trx.commit();
+                            return res.status(200).send();
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        trx.rollback();
+                        throw { status: 500, message: 'An unknown error occurred. Please try again.' };
+                    });
+            });
+        })
+        .catch(err => {
+            if (err.status != null && err.message != null)
+                return res.status(err.status).json({message: err.message});
+            console.error(err);
+        });
+})
 
 router.post('/consign', verifyAuthorization, (req, res) => {
     if (!isValidId(req.body.binID, res)) return;
@@ -257,56 +349,69 @@ router.get("/:binID/siding_breakdown", (req, res) => {
       })
 });
 
-router.get("/maintenance_breakdown", (req, res) => {
+router.get("/maintenance_breakdown/stop-being-annoying", (req, res) => {
 
-  req.db.raw(`SELECT *, s.sidingName FROM bin b
+  req.db.raw(`SELECT b.*, s.sidingName 
+              FROM bin b
                 LEFT JOIN siding s ON b.sidingID = s.sidingID
-                WHERE missing IS TRUE OR repair IS TRUE`)
+              WHERE missing IS TRUE OR repair IS TRUE`)
       .then(processQueryResult)
       .then(data => {
         res.status(200).json(data);
       })
       .catch(err => {
         console.error(err);
-        res.status(500).json(err);
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
       })
 });
 
 
-router.post('/', (req, res) => {
+router.post('/:code', (req, res) => {
     //Change to edit code?
-    const id  = req.body.binID;
-    req.db.raw(`INSERT INTO bin (binID, code, status, sidingID) 
-    VALUES (${id}, "0000", "EMPTY", 1)`)
-        .then((response) => {
-            res.status(201).json({Message: "Success"});
-        })
-        .catch(error => {
-            console.error(error);
-            res.json({Error: true, Message: error.message})
-        });
-});
+    let code  = req.params.code;
+    if (code == null || code.length > 4 || isNaN(code))
+      return res.status(400).json({message: 'Please provide a valid bin code of 4 numbers.'});
 
-router.put('/:binID', (req, res) => {
-    const id = req.params.id;
-    req.db.raw(`select count(binID) AS count from bin WHERE binID = '${id}'`)
-    .then(processQueryResult)
-    .then(data => {
-      if (data[0].count > 0) {
-        res.status(510).json('Duplicate appeared.');
-      }
-      else {
-        req.db('bin').update({binData: req.body.data}).where({binID: id})
-        .then(response => {
-          res.json({Error: false, Message: 'Success'});
+    while (code.length < 4)
+      code = '0' + code;
+
+    req.db.raw(`INSERT INTO bin (code) VALUES (?)`, [code])
+        .then((response) => {
+            res.status(201).json({Message: "Bin Successfully Created"});
         })
         .catch(error => {
           console.error(error);
-          res.json({Error: true, Message: error.message});
-        })
-      }
-    })
-    
+          if (error?.code === 'ER_DUP_ENTRY' && error?.sqlMessage.includes('bin.bin_code_uindex'))
+            return res.status(409).json({message: 'A bin with that code already exists.'});
+          res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+        });
+});
+
+router.put('/:binID/:code', (req, res) => {
+  const id = req.params.binID;
+  if (!isValidId(id, res)) return;
+  let code = req.params.code;
+  if (code == null || code.length > 4 || isNaN(code))
+    return res.status(400).json({message: 'Please provide a valid bin code of 4 numbers.'});
+
+  while (code.length < 4)
+    code = '0' + code;
+
+  req.db.raw(`select count(code) AS count from bin WHERE code = ?`, [code])
+      .then(processQueryResult)
+      .then(data => {
+        if (data[0].count > 0)
+          return res.status(510).json('Another bin with that code already exists.');
+
+        req.db('bin').update({code: code}).where({binID: id})
+            .then(response => {
+              res.status(200).json({message: 'Bin Successfully Updated'});
+            })
+            .catch(error => {
+              console.error(error);
+              res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+            })
+      });
 });
 
 router.delete('/:binID', (req, res) => {
@@ -338,5 +443,19 @@ router.post('/missing/:id'), (req, res) => {
         res.json({Error: true, Message: error.message});
       })
 }
+
+router.post('/burn-siding/:sidingID', (req, res) => {
+  const sidingID = req.params.sidingID;
+  if (!isValidId(sidingID, res)) return;
+
+  req.db.raw(`UPDATE bin SET burnt=1 WHERE sidingID = ?`, [sidingID])
+      .then(response => {
+        res.status(200).send();
+      })
+      .catch(err => {
+        console.error(err);
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+      });
+});
 
 module.exports = router;

@@ -56,23 +56,9 @@ export default function Siding() {
 
 //Displays data of a single siding
 const SidingDetails = ({id}) => {
-    const [sidingData, setSidingData] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        setLoading(true);
-        getSiding(id)
-            .then(data => {
-                setSidingData(data);
-                setError(null);
-                setLoading(false);
-            })
-            .catch(err => {
-                setError(err);
-                setSidingData(null);
-                setLoading(false);
-            })
     }, [id]);
 
     return (<>
@@ -82,7 +68,7 @@ const SidingDetails = ({id}) => {
                 <div className="row">
                     <div className="table-wrapper">
                         <div className="table-header-wrapper">
-                            <h1 className="bin-count-header">Bins:</h1>
+                            <h1 className="bin-count-header">Siding: {id ? id: "Select a Siding"}</h1>
                             {/*<h1 className="bin-count-number">{`${sidingData.data.full.length + sidingData.data.empty.length}`}</h1>*/}
                         </div>
                     </div>

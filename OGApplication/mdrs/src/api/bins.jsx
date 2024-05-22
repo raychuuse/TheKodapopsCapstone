@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, ListInlineItem } from 'reactstrap';
-import {serverUrl, postConfig, putConfig, Status} from "./utils";
+import {serverUrl, postConfig, putConfig, Status, handleFetch} from "./utils";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const apiUrl = `${serverUrl}/bins`;
@@ -71,6 +71,10 @@ export function getAllBins(){
         });
 }
 
+export function moveBin(binID, sidingID) {
+    return handleFetch(fetch(`${apiUrl}/${binID}/move-bin/${sidingID}`, postConfig()), false);
+}
+
 export function getDashBins(){
     return fetch(`${apiUrl}/dash`)
         .then(response => {
@@ -93,57 +97,26 @@ export function getSidingBreakdown(id) {
 }
 
 export function getBin(binID) {
-    return fetch(`${apiUrl}/${binID}`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        })
+    return handleFetch(fetch(`${apiUrl}/${binID}`), true);
 }
 
-export function createBin(binID) {
-    if (!isNaN(binID) && !isNaN(parseFloat(binID))) {
-        return fetch(`${apiUrl}`, postConfig({binID: binID}))
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
-    }
-    else {
-        throw new Error("Must be a number");
-    }
-    
+export function createBin(code) {
+    return handleFetch(fetch(`${apiUrl}/${code}`, postConfig()), false);
+}
+
+export function editBin(binID,code) {
+    console.info(binID, code);
+    return handleFetch(fetch(`${apiUrl}/${binID}/${code}`, putConfig()), false);
 }
 
 export function deleteBin(binID) {
-    return fetch(`${apiUrl}/${binID}`, {method: 'DELETE'})
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/${binID}`, {method: 'DELETE'}), false);
 }
 
 export function getMaintenanceBreakdown() {
-    return fetch(`${apiUrl}/maintenance_breakdown`)
-        .then((body) => body.json())
-        .then((data) =>{
-            // Data formatting
-            return data.map((obj) => ({
-                id: obj.binID,
-                sidingName: obj.sidingName,
-                issue: getFlag(obj.missing, obj.repair),
-            }))
-        })
+    return handleFetch(fetch(`${apiUrl}/maintenance_breakdown/stop-being-annoying`), true);
 }
 
-const getFlag = (missing, repair) => {
-    if (missing) {
-        return "Missing";
-    }
-    if (repair)
-    {
-        return "Needs Repairs";
-    }
+export function resolveBin(id) {
+    return handleFetch(fetch(`${apiUrl}/bin-resolved/${id}`, putConfig()), false);
 }

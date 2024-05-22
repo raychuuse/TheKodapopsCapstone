@@ -5,7 +5,7 @@ const {isValidId, processQueryResult} = require("../utils");
 
 // Get all locomotives
 router.get("/", (req, res) => {
-  req.db.raw("SELECT * FROM locomotive")
+  req.db.raw("SELECT * FROM locomotive ORDER BY locoName")
       .then(processQueryResult)
       .then((locos) => {
         res.status(200).json(locos);
@@ -52,6 +52,8 @@ router.get('/:locoId/load', (req, res) => {
   req.db.raw(withoutStopId, [id])
       .then(processQueryResult)
       .then(data => {
+        if (data.length === 0)
+          return res.status(404).json({message: 'No loco found with the id: ' + id});
         const loco = {
             locoID: data[0].locoID,
             locoName: data[0].locoName,
@@ -86,30 +88,30 @@ router.post('/', (req, res) => {
         })
         .catch(error => {
             console.error(error);
+            if (error?.code === 'ER_DUP_ENTRY' && error?.sqlMessage.includes('locomotive_locoName_uindex'))
+              return res.status(409).json({message: 'A loco with that name already exists.'});
             res.status(500).json(error)
         });
 });
 
-router.put('/:id/name', (req, res) => {
+router.put('/:id/:name', (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
-    // Multiple locos existing?
-    req.db.raw(`select count(locoName) AS count from locomotive WHERE locoName = '${req.body.name}'`)
+    const name = req.params.name;
+      // Multiple locos existing?
+    req.db.raw(`select count(locoName) AS count from locomotive WHERE locoName = ?`, [name])
     .then(processQueryResult)
     .then(data => {
-      if (data[0].count > 0) {
-        res.status(510).json('Duplicate appeared.');
-      }
-      else {
-        req.db('locomotive').update({locoName: req.body.name}).where({locoID: id})
-        .then(result => {
-            res.status(204).send();
-        })
-        .catch(error => {
-            console.error(error);
-            res.status(500).json(error);
-        })
-      }
+      if (data[0].count > 0)
+        return res.status(409).json('A loco with that name already exists.');
+      req.db('locomotive').update({locoName: name}).where({locoID: id})
+      .then(result => {
+          res.status(204).send();
+      })
+      .catch(error => {
+          console.error(error);
+          res.status(500).json(error);
+      })
     })
 });
 

@@ -69,7 +69,7 @@ const LocoDetails = ({id}) => {
                 setLocoData(null);
                 setLoading(false);
             });
-    });
+    }, [id]);
 
     return (
         <>
@@ -125,22 +125,33 @@ const LocoCurrentLoad = ({id}) => {
     useEffect(() => {
         getCurrentLoad(id)
             .then(data => {
-                setData(data);
+                setData(data.bins);
                 setError(null);
             })
             .catch(err => {
                 setError(err);
-                setData(null);
             });
-    });
+    }, [id]);
 
 
     const columns = [
-        {headerName: "Bin", field: "binID"},
-        {headerName: "Status", field: "status"}
+        {headerName: "Bin", field: "code"},
+        {headerName: 'Full', valueGetter: params => params.data.full ? 'Yes' : 'No'},
+        {headerName: 'Burnt', valueGetter: params => params.data.burnt ? 'Yes' : 'No'},
+        {headerName: 'Maintenance', valueGetter: params => {
+            if (params.data.repair && params.data.missing)
+                return 'Needs Repair, Missing';
+            else if (params.data.repair)
+                return 'Needs Repair';
+            else if (params.data.missing)
+                return 'Missing';
+            return 'None';
+        }},
     ];
 
-    return (<div className="col">
+    return (
+        <div className="col">
+        {error && <ErrorAlert message={error.message}/>}
         <section className="metric">
             <div className="hero__content">
                 <div className="table-wrapper">
@@ -148,7 +159,7 @@ const LocoCurrentLoad = ({id}) => {
                         <h4 className="table-header">Current Load</h4>
                     </div>
                     <div className="row">
-                        {data ? <Table columns={columns} data={data}/> : null}
+                        {<Table columns={columns} data={data}/>}
                     </div>
                 </div>
             </div>
@@ -181,9 +192,8 @@ const LocoSidingBreakdown = ({id}) => {
             })
             .catch(err => {
                 setError(err);
-                setData(null);
             });
-    });
+    }, [id]);
 
 
     const columns = [
@@ -203,6 +213,7 @@ const LocoSidingBreakdown = ({id}) => {
     ];
 
     return (<div className="col">
+        {error && <ErrorAlert message={error.message}/>}
         <section className="metric">
             <div className="hero__content">
                 <div className="table-wrapper">
@@ -210,7 +221,7 @@ const LocoSidingBreakdown = ({id}) => {
                         <h4 className="table-header">Siding Breakdown</h4>
                     </div>
                     <div className="row">
-                        {data ? <Table columns={columns} data={data}/> : null}
+                        {<Table columns={columns} data={data}/>}
                     </div>
                 </div>
             </div>

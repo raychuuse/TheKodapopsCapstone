@@ -1,4 +1,4 @@
-import {serverUrl, postConfig, putConfig, fullConverter} from "./utils";
+import {serverUrl, postConfig, putConfig, fullConverter, handleFetch} from "./utils";
 
 const apiUrl = `${serverUrl}/sidings`;
 
@@ -52,28 +52,13 @@ export function getLocoBreakdown(id) {
 }
 
 export function createSiding(sidingName) {
-    return fetch(`${apiUrl}`, postConfig({name: sidingName}))
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}`, postConfig({name: sidingName})), false);
 }
 
 export function updateSiding(id, sidingName) {
-    return fetch(`${apiUrl}/${id}/name`, putConfig({name: sidingName}))
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/${id}/${sidingName}`, putConfig()), false);
 }
 
 export function deleteSiding(id) {
-    return fetch(`${apiUrl}/${id}`, {method: 'DELETE'})
-        .then(response => {
-            if (response.ok)
-                return response;
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/${id}`, {method: 'DELETE'}), false);
 }
