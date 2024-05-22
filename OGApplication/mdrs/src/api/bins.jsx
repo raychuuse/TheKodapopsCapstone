@@ -126,6 +126,17 @@ export function getMaintenanceBreakdown() {
         })
 }
 
+export function resolveBin(id) {
+    return fetch(`${apiUrl}/bin-resolved/${id}`, putConfig({}))
+        .then(response => {
+            if (response.ok)
+                return response;
+            throw new Error();
+    });
+}
+
+
+
 const getFlag = (missing, repair) => {
     if (missing) {
         return "Missing";
@@ -135,3 +146,4 @@ const getFlag = (missing, repair) => {
         return "Needs Repairs";
     }
 }
+
