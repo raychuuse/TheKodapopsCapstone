@@ -116,6 +116,12 @@ const ItemList = ({onItemSelected, itemName, getAllItemApi, createItemApi, updat
         setError(null);
 
         if (state === 'CREATE') {
+            if (itemName === 'Bin') {
+                if (!formInput.match(/^\d+$/)) {
+                    setError({message: "Please enter a numeric bin name."});
+                    return;
+                }
+            }
             createItemApi(formInput).then(response => {
                 fetchItems();
                 setSuccess({message: itemName + ' Successfully Created'});
