@@ -15,10 +15,6 @@ export const AuthProvider = ({ children }) => {
   const [isSignedIn, setIsSignedIn] = useState('false');
   const [isOnline, setIsOnline] = useState(false);
 
-  const [isReady, setIsReady] = useState(false);
-  const [val, setVal] = useState(null);
-  const [jToken, setToken] = useState('');
-
   const serverURL = `http://${serverIP}:${serverPort}`;
   const wsURL = `ws://${serverIP}:${serverPort}`;
 

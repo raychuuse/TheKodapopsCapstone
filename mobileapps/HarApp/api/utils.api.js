@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverIP = process.env.EXPO_PUBLIC_SERVER_IP;
 const serverPort = process.env.EXPO_PUBLIC_SERVER_PORT;
@@ -42,13 +43,20 @@ export function getConfig() {
   };
 }
 
-function getToken() {
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzE1MDUxMTcwMzU0LCJpYXQiOjE3MTQ5NjQ3NzB9.7mRDeb8rlYAV3Q37aWUJ9KlBx-yMcDea2fZSChUrQB8';
+async function getToken() {
+  return await AsyncStorage.getItem("token");
+  //return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzE1MDUxMTcwMzU0LCJpYXQiOjE3MTQ5NjQ3NzB9.7mRDeb8rlYAV3Q37aWUJ9KlBx-yMcDea2fZSChUrQB8';
 }
 
-function logout() {
+export async function logout() {
+  AsyncStorage.removeItem
   Cookies.remove('token');
   Cookies.remove('user');
+  await AsyncStorage.removeItem('isSignedIn');
+  await AsyncStorage.removeItem('userID');
+  await AsyncStorage.removeItem('email');
+  await AsyncStorage.removeItem('token');
+  await AsyncStorage.removeItem('fullname');
 }
 
 export function handleFetch(promise, hasJson = true) {

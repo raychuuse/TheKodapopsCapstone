@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
+import { logOut } from '../api/utils.api';
 
 // Import Components
 import AltButton from '../components/altButton';
@@ -13,12 +14,13 @@ import { Footnote, LargeTitle, Strong, Title1 } from '../components/typography';
 import { Colours } from '../components/colours';
 
 // Import Contexts
-import { useAuth } from '../context/authContext';
 import { useBins } from '../context/binContext';
-import { errorToast, issueAlert } from '../lib/alerts';
-import { getSidings } from '../api/siding.api';
-import { getBlocks, getFarms, getSubBlocks } from '../api/user.api';
-import { burnSiding } from '../api/bins.api';
+
+import {errorToast, issueAlert} from '../lib/alerts';
+import {getSidings} from "../api/siding.api";
+import {getBlocks, getFarms, getSubBlocks} from "../api/user.api";
+import {burnSiding} from "../api/bins.api";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const initialFarmOptions = [
   { label: 'Green Valley Farm', value: 1 },
@@ -85,8 +87,24 @@ const SetupPage = () => {
   const [blocks, setBlocks] = useState();
   const [subBlocks, setSubOptions] = useState();
   const [burnOption, setBurnOption] = useState(2);
+  const [fullname, setName] = useState("");
 
   useEffect(() => {
+    async function getName() {
+      await AsyncStorage.getItem('fullname')
+      .then(name => {
+        if (name !== null && name) {
+          setName(name);
+        }
+      })
+      .catch(err => {
+        setName("Awaiting Cache");
+        errorToast(err);
+      })
+    }
+
+    getName();
+
     getSidings()
       .then((response) => {
         setSidings(response);
@@ -169,8 +187,19 @@ const SetupPage = () => {
     }
   };
 
-  const onLogoutPressed = () => {
-    router.navigate('/');
+  
+
+  const onLogoutPressed = async () => {
+    // only comment, handling failed cache?
+    try {
+      logOut();
+    }
+    catch (err) {
+      errorToast(err);
+    }
+    finally {
+      router.navigate('/');
+    }
   };
 
   return (
@@ -180,7 +209,7 @@ const SetupPage = () => {
         <LargeTitle>
           <GreetingMessage />
         </LargeTitle>
-        <Title1>John Smith</Title1>
+        <Title1>{fullname}</Title1>
       </View>
       {/* Page Content */}
       <View style={styles.content}>

@@ -23,6 +23,24 @@ import { useBins } from '../context/binContext';
 const MainPage = () => {
   const { getSelectedSiding, setOnMainPage } = useBins();
   const [addBinVisable, setAddBinVisable] = useState(false);
+  const [fullname, setName] = useState("");
+
+  useEffect(() => {
+    async function getName() {
+      await AsyncStorage.getItem('fullname')
+      .then(name => {
+        if (name !== null && name) {
+          setName(name);
+        }
+      })
+      .catch(err => {
+        setName("Awaiting Cache");
+        errorToast(err);
+      })
+    }
+
+    getName();
+  }, []);
 
   const handleDone = () => {
     FinishedAlert(() => setOnMainPage(false));
@@ -55,7 +73,7 @@ const MainPage = () => {
             <GreetingMessage />
           </LargeTitle>
         </View>
-        <Title1>John Smith</Title1>
+        <Title1>{fullname}</Title1>
       </View>
       {/* Page Content */}
       <View style={styles.content}>

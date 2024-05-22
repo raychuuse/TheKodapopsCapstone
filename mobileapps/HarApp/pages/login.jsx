@@ -19,7 +19,7 @@ import { errorAlert, issueAlert, generalAlert } from '../lib/alerts';
 import { Title1, Body, Subhead } from '../components/typography';
 
 // Import Context
-import { useAuth } from '../context/authContext';
+import { serverUrl} from '../api/utils.api';
 
 const LogInPage = () => {
   const [email, setEmail] = useState('');
@@ -32,8 +32,10 @@ const LogInPage = () => {
   const [resetCode, setResetCode] = useState('');
   const [modalForgotVisible, setModalForgotVisible] = useState(false);
   const [modalResetVisible, setModalResetVisible] = useState(false);
-  const [loading, setLoading] = useState(false);
+  
   const setupPageRef = 'dashboard/setup';
+
+  const serverURL = serverUrl;
 
   const emailChecker = (mail) => {
     return mail.match(
@@ -41,20 +43,14 @@ const LogInPage = () => {
     );
   };
 
-  const { serverURL, signIn} = useAuth();
-
   const handleResetCode = async () => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     if (!codeEmail) {
-      generalAlert('Please provide email.');
+      generalAlert('Please provide an email.');
       return;
     }
     if (!emailChecker(codeEmail)) {
       generalAlert('Please provide a valid email.');
-      return;
-    }
-    if (mockMode) {
-      generalAlert('Code has been sent successfully');
       return;
     }
     try {
@@ -72,11 +68,15 @@ const LogInPage = () => {
       if (res.ok) {
         generalAlert('Code has been sent successfully.');
       } else {
-        issueAlert(res.status);
-        //setLoading(false);
+        generalAlert("Please enter a registered harvester email.");
       }
     } catch (err) {
-      issueAlert(err.message);
+      if (err.message) {
+        issueAlert(err.message);
+      }
+      else {
+        issueAlert("Server connection issues are occuring");
+      }
       console.log(err.message);
     }
   };
@@ -119,9 +119,13 @@ const LogInPage = () => {
             generalAlert('Password has been reset successfully.');
           } else {
             res.json().then((issue) => {
-              issueAlert(issue.message);
+              if (issue.message) {
+                issueAlert(issue.message);
+              }
+              else {
+                issueAlert("Invalid login details.")
+              }
             });
-            //setLoading(false);
           }
         })
         .catch((err) => {
@@ -129,7 +133,6 @@ const LogInPage = () => {
           console.log(err.message);
         });
     } catch (err) {
-      // or err.message
       issueAlert('Server issues occured.');
       console.log(err.message);
     }
@@ -159,7 +162,6 @@ const LogInPage = () => {
           password: password,
         }),
       };
-
       const res = await fetch(`${serverURL}/user/har/login`, options);
       if (res.ok) {
         const data = await res.json();
@@ -167,7 +169,8 @@ const LogInPage = () => {
         AsyncStorage.setItem('userID', toString(data.user.userID));
         AsyncStorage.setItem('email', email);
         AsyncStorage.setItem('token', data.token);
-        signIn();
+        fullname = data.user.firstName + " " + data.user.lastName;
+        AsyncStorage.setItem('fullname', fullname);
         router.navigate(setupPageRef);
       } else {
         const issue = await res.json();
