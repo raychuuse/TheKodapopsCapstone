@@ -6,7 +6,6 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import { Link } from 'expo-router';
 
 // Import Components
 import CustomModal from '../components/modal';
@@ -14,11 +13,16 @@ import CustomModal from '../components/modal';
 // Import Style Compontes
 import { Title1, Subhead, H1 } from '../styles/typography';
 import { useTheme } from '../styles/themeContext';
+import { errorToast, generalAlert, showToast } from '../lib/alerts';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 const LogInPage = () => {
   const { theme, toggleTheme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const setupPageRef = "/setup"
 
   // Modal component hooks
   const [codeEmail, setCodeEmail] = useState('');
@@ -29,13 +33,10 @@ const LogInPage = () => {
   const [modalForgotVisible, setModalForgotVisible] = useState(false);
   const [modalResetVisible, setModalResetVisible] = useState(false);
 
-  //const {serverURL, signIn, mockMode} = useAuth();
   const serverIP = process.env.EXPO_PUBLIC_SERVER_IP;
   const serverPort = process.env.EXPO_PUBLIC_SERVER_PORT;
 
   const serverURL = `http://${serverIP}:${serverPort}`;
-  const signIn = () => {};
-  const mockMode = false;
 
   const emailChecker = (mail) => {
     return mail.match(
@@ -44,17 +45,12 @@ const LogInPage = () => {
   };
 
   const handleResetCode = async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     if (!codeEmail) {
-      generalAlert('Please provide email.');
+      generalAlert('Please provide an email.');
       return;
     }
     if (!emailChecker(codeEmail)) {
       generalAlert('Please provide a valid email.');
-      return;
-    }
-    if (mockMode) {
-      generalAlert('Code has been sent successfully');
       return;
     }
     try {
@@ -72,17 +68,20 @@ const LogInPage = () => {
       if (res.ok) {
         generalAlert('Code has been sent successfully.');
       } else {
-        issueAlert(res.status);
-        //setLoading(false);
+        generalAlert("Please enter a registered locomotive email.");
       }
     } catch (err) {
-      issueAlert(err.message);
+      if (err.message) {
+        generalAlert(err.message);
+      }
+      else {
+        generalAlert("Server connection issues are occuring");
+      }
       console.log(err.message);
     }
   };
 
   const handleReset = async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     if (!resetPass || !resetCode || !resetPassConfirm || !resetEmail) {
       generalAlert('Please provide details required.');
       return;
@@ -95,15 +94,11 @@ const LogInPage = () => {
       generalAlert('Please provide a valid email.');
       return;
     }
-    // Add further logic if desired for mock
+    // Add further logic if desired for
     /*
     if (!resetPass.match(`^(?=.*[A-Z].*[A-Z])(?=.*[!@#$&*])(?=.*[0-9].*[0-9])(?=.*[a-z].*[a-z].*[a-z]).{8,}$`)){
       generalAlert("Please provide a stronger password (minimum 8 characters, 1 special character, 2 numerals, 3 lower case, 2 upper case).");
     }*/
-    if (mockMode) {
-      generalAlert('Password has been reset successfully');
-      return;
-    }
     try {
       const options = {
         method: 'POST',
@@ -122,25 +117,26 @@ const LogInPage = () => {
           if (res.ok) {
             generalAlert('Password has been reset successfully.');
           } else {
-            res.json().then((issue) => {
-              issueAlert(issue.message);
-            });
-            //setLoading(false);
+            generalAlert("Invalid token/ email");
           }
         })
         .catch((err) => {
-          issueAlert('Server issues occured.');
+          generalAlert('Server issues occured.');
           console.log(err.message);
         });
     } catch (err) {
-      // or err.message
-      issueAlert('Server issues occured.');
+      if (err.message) {
+        generalAlert(err.message);
+      }
+      else {
+        issueAlert("Server connection issues are occuring");
+      }
+
       console.log(err.message);
     }
   };
 
   const handleSubmit = async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     if (!email || !password) {
       generalAlert('Please provide details required.');
       return;
@@ -148,9 +144,6 @@ const LogInPage = () => {
     if (resetPass != resetPassConfirm) {
       generalAlert('Passwords do not match.');
       return;
-    }
-    if (mockMode) {
-      router.navigate(setupPageRef);
     }
 
     try {
@@ -173,26 +166,32 @@ const LogInPage = () => {
           const data = await res.json();
           const parsedData = JSON.parse(data);
           // Awaiting async vs cookies! needed for in loco func with zac merge
-          /*
+          
           await AsyncStorage.setItem('isSignedIn', 'true');
           await AsyncStorage.setItem('userID', toString(parsedData.user.userID));
           await AsyncStorage.setItem('email', email);
-          await AsyncStorage.setItem('token', parsedData.token);*/
-          signIn();
+          await AsyncStorage.setItem('token', parsedData.token);
+          fullname = parsedData.user.firstName + " " + parsedData.user.lastName;
+          await AsyncStorage.setItem('fullname', fullname);
         } catch (err) {
-          issueAlert('Failed to login.');
+          generalAlert('Failed to login. Please enter an existing user.');
           console.log(err);
           return;
         }
         router.navigate(setupPageRef);
-      } else {
+      } 
+      else {
         res.json().then((issue) => {
-          issueAlert(issue.message);
+          if (issue.message) {
+            generalAlert(issue.message);
+          }
+          else {
+            generalAlert("Failed to login. Please enter an existing user.");
+          }
         });
-        //setLoading(false);
       }
     } catch (err) {
-      issueAlert('Failed to login.');
+      generalAlert('Failed to login.');
       console.log(err.message);
     }
   };
@@ -326,24 +325,19 @@ const LogInPage = () => {
           onChange={(e) => setPassword(e.nativeEvent.text)}
         />
         <View style={styles.button_container}>
-          <Link
-            href='/setup/'
-            asChild
+          <TouchableOpacity
+            style={{
+              backgroundColor: theme.bgButton,
+              borderRadius: 10,
+              padding: 15,
+              alignItems: 'center',
+            }}
+            onPress={handleSubmit}
           >
-            <TouchableOpacity
-              style={{
-                backgroundColor: theme.bgButton,
-                borderRadius: 10,
-                padding: 15,
-                alignItems: 'center',
-              }}
-              onPress={handleSubmit}
-            >
-              <Text style={[styles.button_text, { color: theme.textButton }]}>
-                Sign in
-              </Text>
-            </TouchableOpacity>
-          </Link>
+            <Text style={[styles.button_text, { color: theme.textButton }]}>
+              Sign in
+            </Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.link}
             onPress={() => setModalForgotVisible(true)}

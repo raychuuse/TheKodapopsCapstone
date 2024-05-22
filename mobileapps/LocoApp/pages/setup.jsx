@@ -15,13 +15,31 @@ import { useTheme } from '../styles/themeContext';
 import { getAllLocos } from '../api/loco.api';
 import { useRun } from '../context/runContext';
 import { errorToast } from '../lib/alerts';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const SetupPage = () => {
   const [locos, setLocos] = useState();
   const { getLocoID, setLocoID, onRunStarted } = useRun();
   const { theme } = useTheme();
+  const [fullname, setName] = useState("");
+
 
   useEffect(() => {
+    async function getName() {
+      await AsyncStorage.getItem('fullname')
+      .then(name => {
+        if (name !== null && name) {
+          setName(name);
+        }
+      })
+      .catch(err => {
+        setName("Awaiting Cache");
+        errorToast(err);
+      })
+    }
+
+    getName();
     getAllLocos()
       .then((response) => {
         setLocos(response);
@@ -42,6 +60,25 @@ const SetupPage = () => {
     onRunStarted();
   };
 
+
+  const onLogOutPressed = async () => {
+    // only comment, handling failed cache?
+    try {
+      await AsyncStorage.removeItem('isSignedIn');
+      await AsyncStorage.removeItem('userID');
+      await AsyncStorage.removeItem('email');
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('fullname');
+    }
+    catch (err) {
+      errorToast(err);
+    }
+    finally {
+      router.navigate('/');
+    }
+  };
+
+
   return (
     <View style={[styles.page, { backgroundColor: theme.appBG }]}>
       <View style={[styles.body, { backgroundColor: theme.bgModal }]}>
@@ -50,7 +87,7 @@ const SetupPage = () => {
           <LargeTitle>
             <GreetingMessage />
           </LargeTitle>
-          <Title1>John Smith</Title1>
+          <Title1>{fullname}</Title1>
         </View>
         {/* Page Content */}
         <View style={styles.content}>
@@ -75,6 +112,7 @@ const SetupPage = () => {
               title='Log Out'
               textColor={theme.textLevel2}
               backgroundColor='transparent'
+              onPress={onLogOutPressed}
               border
             />
           </Link>
