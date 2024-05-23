@@ -160,7 +160,6 @@ const SetupPage = () => {
   };
 
   const onBurnOptionSelected = (burn) => {
-    console.info(burn);
     setBurnOption(burn);
   };
 
@@ -169,9 +168,8 @@ const SetupPage = () => {
       issueAlert('Select a siding and a farm to begin consigning.');
       return;
     }
-    console.info(burnOption);
     if (burnOption === 1) {
-      burnSiding(getSelectedSiding().sidingID)
+      burnSiding(getSelectedSiding().sidingID, burnOption)
         .then((response) => {
           onSetup();
           router.navigate('/dashboard');
@@ -179,10 +177,24 @@ const SetupPage = () => {
         .catch((err) => {
           console.error(err);
           errorToast({
-            message: 'Unable to burn siding, try again or set burn to No',
+            message: 'Unable to burn siding, try again or set burn to Yes',
           });
         });
-    } else {
+    }
+    else if (burnOption === 2) {
+      burnSiding(getSelectedSiding().sidingID, 0)
+        .then((response) => {
+          onSetup();
+          router.navigate('/dashboard');
+        })
+        .catch((err) => {
+          console.error(err);
+          errorToast({
+            message: 'Unable to se siding bins to green, try again or set burn to No',
+          });
+        });
+    }
+    else {
       onSetup();
       router.navigate('/dashboard');
     }

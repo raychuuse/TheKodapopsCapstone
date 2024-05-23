@@ -14,6 +14,6 @@ export function findBin(code, sidingID) {
     return handleFetch(fetch(`${apiUrl}/find-bin/${code}?sidingID=${sidingID}`, postConfig()), true);
 }
 
-export function burnSiding(sidingID) {
-    return handleFetch(fetch(`${apiUrl}/burn-siding/${sidingID}`, postConfig()), false);
+export function burnSiding(sidingID, toBurn) {
+    return handleFetch(fetch(`${apiUrl}/burn-siding/${sidingID}/${toBurn}`, postConfig()), false);
 }

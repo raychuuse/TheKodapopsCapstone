@@ -444,11 +444,12 @@ router.post('/missing/:id'), (req, res) => {
       })
 }
 
-router.post('/burn-siding/:sidingID', (req, res) => {
+router.post('/burn-siding/:sidingID/:toBurn', (req, res) => {
   const sidingID = req.params.sidingID;
+  const toBurn = req.params.toBurn;
   if (!isValidId(sidingID, res)) return;
 
-  req.db.raw(`UPDATE bin SET burnt=1 WHERE sidingID = ?`, [sidingID])
+  req.db.raw(`UPDATE bin SET burnt= ? WHERE sidingID = ?`, [toBurn, sidingID])
       .then(response => {
         res.status(200).send();
       })
