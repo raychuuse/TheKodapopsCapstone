@@ -316,6 +316,22 @@ INSERT INTO `transactionlog` VALUES (956,'2024-05-21 21:58:02',9,5,NULL,7,1,2,'D
 UNLOCK TABLES;
 
 --
+-- Table structure for table `userTokens`
+--
+
+DROP TABLE IF EXISTS `usertokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `userTokens` (
+  `email` varchar(255) NOT NULL,
+  `userRole` varchar(255) NOT NULL,
+  `resetToken` varchar(255) NOT NULL,
+  PRIMARY KEY (`email`, `userRole`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table for user reset tokens';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
 -- Table structure for table `users`
 --
 
@@ -345,7 +361,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'$2a$08$wkJZiX0D.FPOVbsCuDmiBe14L6UFWAKkaYfALcHlv9saXPztybcvm',',mill@email.com','Geoff','Kent','Mill',1,NULL),(2,'$2a$08$HgTEhro2.iteq26ORrQ6fekeD56OsqAbjYHPUj37TgHDHcX1vkLta','example2@gmail.com','Matthew','Satler','Locomotive',1,NULL),(3,'$2a$08$vuM7du751UzTRsJYY3ri2uH2LqdhCx24dG4s3dsD4mtB/tfXOjnwa','example3@gmail.com','Brad','Young','Harvester',1,NULL),(4,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','example4@gmail.com','Jarrod','Stout','Harvester',1,6),(5,'root','example5@gmail.com','Anthony','Pitt','Harvester',1,9),(6,'root','example6@gmail.com','Harry','Brown','Locomotive',1,NULL),(7,'root','example7@gmail.com','Jack','Smith','Locomotive',0,NULL),(8,'root','example8@gmail.com','Ron','Falcon','Locomotive',0,NULL),(9,'$2a$08$tHBAB7gxIY82RA0NUQ.WW.6JnDvU9JtY.afrchogUHVaHoucLAhNq','example9@gmail.com','James','Gill','Harvester',0,NULL),(10,'$2a$08$G/yln3BQYKKG0NrNZHbsVuXuQSRPON3fD2Jtc8oskM37sCivKm0Dy','example17@gmail.com','Trent','Lazerick','Locomotive',1,NULL),(11,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','example18@gmail.com','Thomas','Meek','Harvester',1,1),(12,'$2a$08$KgvtBPBDCiSAlrPIcBijMeeFLQH0lagvTLKyZSPnUh4VyuCv8Lp/a','example12@gmail.comasdf','Avery','Flynn','Mill',1,NULL), (13,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','harvester@email.com','Geoff','Kent','Harvester',1,5),(14,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','loco@email.com','Geoff','Kent','Locomotive',1,NULL);
+INSERT INTO `users` VALUES (1,'$2a$08$wkJZiX0D.FPOVbsCuDmiBe14L6UFWAKkaYfALcHlv9saXPztybcvm','mill@email.com','Geoff','Kent','Mill',1,NULL),(2,'$2a$08$HgTEhro2.iteq26ORrQ6fekeD56OsqAbjYHPUj37TgHDHcX1vkLta','example2@gmail.com','Matthew','Satler','Locomotive',1,NULL),(3,'$2a$08$vuM7du751UzTRsJYY3ri2uH2LqdhCx24dG4s3dsD4mtB/tfXOjnwa','example3@gmail.com','Brad','Young','Harvester',1,NULL),(4,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','example4@gmail.com','Jarrod','Stout','Harvester',1,6),(5,'root','example5@gmail.com','Anthony','Pitt','Harvester',1,9),(6,'root','example6@gmail.com','Harry','Brown','Locomotive',1,NULL),(7,'root','example7@gmail.com','Jack','Smith','Locomotive',0,NULL),(8,'root','example8@gmail.com','Ron','Falcon','Locomotive',0,NULL),(9,'$2a$08$tHBAB7gxIY82RA0NUQ.WW.6JnDvU9JtY.afrchogUHVaHoucLAhNq','example9@gmail.com','James','Gill','Harvester',0,NULL),(10,'$2a$08$G/yln3BQYKKG0NrNZHbsVuXuQSRPON3fD2Jtc8oskM37sCivKm0Dy','example17@gmail.com','Trent','Lazerick','Locomotive',1,NULL),(11,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','example18@gmail.com','Thomas','Meek','Harvester',1,1),(12,'$2a$08$KgvtBPBDCiSAlrPIcBijMeeFLQH0lagvTLKyZSPnUh4VyuCv8Lp/a','example12@gmail.comasdf','Avery','Flynn','Mill',1,NULL), (13,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','harvester@email.com','Geoff','Kent','Harvester',1,5),(14,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','loco@email.com','Geoff','Kent','Locomotive',1,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
