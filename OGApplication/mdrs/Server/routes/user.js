@@ -35,11 +35,7 @@ function GenerateUniqueID() {
 }
 
 const { validateUserBody } = require("../middleware/validateUser");
-const {
-  processQueryResult,
-  validationErrorToError,
-  htmlResetCode
-} = require("../utils");
+const { processQueryResult, validationErrorToError, htmlResetCode } = require("../utils");
 const { isNumeric } = require("validator");
 const e = require("express");
 const { verifyAuthorization } = require("../middleware/authorization");
@@ -72,7 +68,7 @@ const sendCode = async (userEmail, resetCode, app) => {
   } catch (err) {
     console.log(err);
   }
-}
+};
 
 router.post("/login", loginValidationRulesID, (req, res) => {
   const errors = validationResult(req);
@@ -86,29 +82,23 @@ router.post("/login", loginValidationRulesID, (req, res) => {
     .raw(
       `SELECT *
                 FROM users u
-                WHERE userID = ? AND userRole = "${millRole}`,
+                WHERE userID = ? AND userRole = "${millRole}"`,
       [id]
     )
     .then(processQueryResult)
     .then((response) => {
       if (response.length === 0) {
-        return res
-          .status(401)
-          .json({ message: "No matching user ID and password" });
+        return res.status(401).json({ message: "No matching user ID and password" });
       }
 
       bcrypt.compare(password, response[0].password, (err, result) => {
         if (err) {
           console.error(err);
-          return res
-            .status(500)
-            .json({ message: "An unknown error occurred. Please try again." });
+          return res.status(500).json({ message: "An unknown error occurred. Please try again." });
         }
 
         if (!result) {
-          return res
-            .status(401)
-            .json({ message: "No matching user ID and password" });
+          return res.status(401).json({ message: "No matching user ID and password" });
         }
 
         const user = response[0];
@@ -151,14 +141,10 @@ router.post("/har/login", (req, res) => {
       bcrypt.compare(password, response[0].password, (err, result) => {
         if (err) {
           console.error(err);
-          return res
-            .status(500)
-            .json({ message: "An unknown error occurred. Please try again." });
+          return res.status(500).json({ message: "An unknown error occurred. Please try again." });
         }
         if (!result) {
-          return res
-            .status(401)
-            .json({ message: "No matching user ID and password" });
+          return res.status(401).json({ message: "No matching user ID and password" });
         }
 
         const user = response[0];
@@ -202,14 +188,10 @@ router.post("/loco/login", (req, res) => {
       bcrypt.compare(password, response[0].password, (err, result) => {
         if (err) {
           console.error(err);
-          return res
-            .status(500)
-            .json({ message: "An unknown error occurred. Please try again." });
+          return res.status(500).json({ message: "An unknown error occurred. Please try again." });
         }
         if (!result) {
-          return res
-            .status(401)
-            .json({ message: "No matching user ID and password" });
+          return res.status(401).json({ message: "No matching user ID and password" });
         }
 
         const user = response[0];
@@ -223,9 +205,7 @@ router.post("/loco/login", (req, res) => {
         const expires_in = 60 * 60 * 24;
         const exp = Date.now() + expires_in * 1000;
         const token = jwt.sign({ email, exp }, secretKey);
-        return res
-          .status(200)
-          .json(JSON.stringify({ token: token, user: user }));
+        return res.status(200).json(JSON.stringify({ token: token, user: user }));
       });
     })
     .catch((err) => {
@@ -249,15 +229,11 @@ router.get("/:id", (req, res) => {
     .then(processQueryResult)
     .then((rows) => {
       if (rows == null || rows.length !== 1)
-        return res
-          .status(404)
-          .json({ message: "No user found with userID " + req.params.id });
+        return res.status(404).json({ message: "No user found with userID " + req.params.id });
       res.status(200).json(rows[0]);
     })
     .catch((err) => {
-      res
-        .status(500)
-        .json({ message: "An unknown error occurred. Please try again." });
+      res.status(500).json({ message: "An unknown error occurred. Please try again." });
     });
 });
 
@@ -269,28 +245,19 @@ router.post("/set-active/:id/:active", (req, res) => {
     !isNumeric(req.params.active) ||
     (req.params.active !== "0" && req.params.active !== "1")
   )
-    return res
-      .status(400)
-      .json({ message: "Please provide a valid active status." });
+    return res.status(400).json({ message: "Please provide a valid active status." });
 
   req.db
-    .raw(`UPDATE users SET active=? WHERE userID = ?`, [
-      req.params.active,
-      req.params.id,
-    ])
+    .raw(`UPDATE users SET active=? WHERE userID = ?`, [req.params.active, req.params.id])
     .then(processQueryResult)
     .then((result) => {
       if (result == null || result.affectedRows !== 1)
-        return res
-          .status(404)
-          .json({ message: "No user found with userID " + req.params.id });
+        return res.status(404).json({ message: "No user found with userID " + req.params.id });
       res.sendStatus(204);
     })
     .catch((err) => {
       console.error(err);
-      res
-        .status(500)
-        .json({ message: "An unknown error occurred. Please try again." });
+      res.status(500).json({ message: "An unknown error occurred. Please try again." });
     });
 });
 
@@ -320,9 +287,7 @@ router.post("/", createValidationRules, (req, res) => {
   bcrypt.hash(password, hashKey, (err, hashPassword) => {
     if (err) {
       console.error(err);
-      return res
-        .status(500)
-        .json({ message: "An unknown error occurred, please try again." });
+      return res.status(500).json({ message: "An unknown error occurred, please try again." });
     }
 
     req
@@ -340,8 +305,8 @@ router.post("/", createValidationRules, (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        if (err?.code === 'ER_DUP_ENTRY' && err?.sqlMessage.includes('users.email'))
-          return res.status(409).json({message: 'Account already exists with that email.'});
+        if (err?.code === "ER_DUP_ENTRY" && err?.sqlMessage.includes("users.email"))
+          return res.status(409).json({ message: "Account already exists with that email." });
         res.status(500).json({ message: "An unknown error occurred, please try again." });
       });
   });
@@ -352,19 +317,13 @@ router.post("/reset-password", (req, res) => {
   const email = req.body.email;
   const code = req.body.code;
   const password = req.body.password;
-  const queryUsers = req.db
-    .from("usertokens")
-    .select("*")
-    .where("email", "=", email)
-    .where("userRole", "=", millRole);
+  const queryUsers = req.db.from("usertokens").select("*").where("email", "=", email).where("userRole", "=", millRole);
   //checking db for matching users with emails
   queryUsers
     .then((users) => {
       //checking if any matching user emails are found
       if (users.length == 0) {
-        res
-          .status(400)
-          .json({ Error: true, Message: "No email token has been sent" });
+        res.status(400).json({ Error: true, Message: "No email token has been sent" });
         console.log("No email token has been sent");
         return;
       }
@@ -387,20 +346,14 @@ router.post("/reset-password", (req, res) => {
               )
               .then((result) => {
                 if (result == 0) {
-                  res
-                    .status(500)
-                    .json({ Error: true, Message: "Unknown error occured." });
+                  res.status(500).json({ Error: true, Message: "Unknown error occured." });
                 }
 
-                res
-                  .status(200)
-                  .json({ message: "Password updated successfully" });
+                res.status(200).json({ message: "Password updated successfully" });
 
                 // Delete token from saved database
                 try {
-                  req.db.raw(
-                    `DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${millRole}'`
-                  );
+                  req.db.raw(`DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${millRole}'`);
                 } catch (err) {
                   console.error(err);
                 }
@@ -438,9 +391,7 @@ router.post("/har/reset-password", (req, res) => {
     .then((users) => {
       //checking if any matching user emails are found
       if (users.length == 0) {
-        res
-          .status(400)
-          .json({ Error: true, Message: "No email token has been sent" });
+        res.status(400).json({ Error: true, Message: "No email token has been sent" });
         console.log("No email token has been sent");
         return;
       }
@@ -463,20 +414,14 @@ router.post("/har/reset-password", (req, res) => {
               )
               .then((result) => {
                 if (result == 0) {
-                  res
-                    .status(500)
-                    .json({ Error: true, Message: "Unknown error occured." });
+                  res.status(500).json({ Error: true, Message: "Unknown error occured." });
                 }
 
-                res
-                  .status(200)
-                  .json({ message: "Password updated successfully" });
+                res.status(200).json({ message: "Password updated successfully" });
 
                 // Delete token from saved database
                 try {
-                  req.db.raw(
-                    `DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${harvesterRole}'`
-                  );
+                  req.db.raw(`DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${harvesterRole}'`);
                 } catch (err) {
                   console.error(err);
                 }
@@ -503,11 +448,7 @@ router.post("/har/reset-password", (req, res) => {
 router.post("/reset-code", async (req, res) => {
   //Using email!
   const email = req.body.email;
-  const queryUsers = req.db
-    .from("users")
-    .select("*")
-    .where("email", "=", email)
-    .where("userRole", "=", millRole);
+  const queryUsers = req.db.from("users").select("*").where("email", "=", email).where("userRole", "=", millRole);
   //checking db for matching users with emails
   queryUsers
     .then((users) => {
@@ -528,21 +469,16 @@ router.post("/reset-code", async (req, res) => {
         )
         .then((result) => {
           if (result == 0) {
-            res
-              .status(500)
-              .json({ Error: true, Message: "Unknown error occured." });
+            res.status(500).json({ Error: true, Message: "Unknown error occured." });
           }
           sendCode(email, code, millRole);
           res.status(200).json({
-            Message:
-              "A link to reset password to the user's email has been sent.",
+            Message: "A link to reset password to the user's email has been sent.",
           });
         })
         .catch((err) => {
           console.error(err);
-          res
-            .status(500)
-            .json({ message: "Failed to register token on server." });
+          res.status(500).json({ message: "Failed to register token on server." });
           return;
         });
     })
@@ -554,11 +490,7 @@ router.post("/reset-code", async (req, res) => {
 
 router.post("/har/reset-code", async (req, res) => {
   const email = req.body.email;
-  const queryUsers = req.db
-    .from("users")
-    .select("*")
-    .where("email", "=", email)
-    .where("userRole", "=", harvesterRole);
+  const queryUsers = req.db.from("users").select("*").where("email", "=", email).where("userRole", "=", harvesterRole);
   //checking db for matching users with emails
   queryUsers
     .then((users) => {
@@ -579,21 +511,16 @@ router.post("/har/reset-code", async (req, res) => {
         )
         .then((result) => {
           if (result == 0) {
-            res
-              .status(500)
-              .json({ Error: true, Message: "Unknown error occured." });
+            res.status(500).json({ Error: true, Message: "Unknown error occured." });
           }
           sendCode(email, code, harvesterRole);
           res.status(200).json({
-            Message:
-              "A link to reset password to the user's email has been sent.",
+            Message: "A link to reset password to the user's email has been sent.",
           });
         })
         .catch((err) => {
           console.error(err);
-          res
-            .status(500)
-            .json({ message: "Failed to register token on server." });
+          res.status(500).json({ message: "Failed to register token on server." });
           return;
         });
     })
@@ -607,19 +534,13 @@ router.post("/loco/reset-password", (req, res) => {
   const email = req.body.email;
   const code = req.body.code;
   const password = req.body.password;
-  const queryUsers = req.db
-    .from("usertokens")
-    .select("*")
-    .where("email", "=", email)
-    .where("userRole", "=", locoRole);
+  const queryUsers = req.db.from("usertokens").select("*").where("email", "=", email).where("userRole", "=", locoRole);
   //checking db for matching users with emails
   queryUsers
     .then((users) => {
       //checking if any matching user emails are found
       if (users.length == 0) {
-        res
-          .status(400)
-          .json({ Error: true, Message: "No email token has been sent" });
+        res.status(400).json({ Error: true, Message: "No email token has been sent" });
         console.log("No email token has been sent");
         return;
       }
@@ -642,20 +563,14 @@ router.post("/loco/reset-password", (req, res) => {
               )
               .then((result) => {
                 if (result == 0) {
-                  res
-                    .status(500)
-                    .json({ Error: true, Message: "Unknown error occured." });
+                  res.status(500).json({ Error: true, Message: "Unknown error occured." });
                 }
 
-                res
-                  .status(200)
-                  .json({ message: "Password updated successfully" });
+                res.status(200).json({ message: "Password updated successfully" });
 
                 // Delete token from saved database
                 try {
-                  req.db.raw(
-                    `DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${locoRole}'`
-                  );
+                  req.db.raw(`DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${locoRole}'`);
                 } catch (err) {
                   console.error(err);
                 }
@@ -681,11 +596,7 @@ router.post("/loco/reset-password", (req, res) => {
 
 router.post("/loco/reset-code", async (req, res) => {
   const email = req.body.email;
-  const queryUsers = req.db
-    .from("users")
-    .select("*")
-    .where("email", "=", email)
-    .where("userRole", "=", locoRole);
+  const queryUsers = req.db.from("users").select("*").where("email", "=", email).where("userRole", "=", locoRole);
   //checking db for matching users with emails
   queryUsers
     .then((users) => {
@@ -706,21 +617,16 @@ router.post("/loco/reset-code", async (req, res) => {
         )
         .then((result) => {
           if (result == 0) {
-            res
-              .status(500)
-              .json({ Error: true, Message: "Unknown error occured." });
+            res.status(500).json({ Error: true, Message: "Unknown error occured." });
           }
           sendCode(email, code, locoRole);
           res.status(200).json({
-            Message:
-              "A link to reset password to the user's email has been sent.",
+            Message: "A link to reset password to the user's email has been sent.",
           });
         })
         .catch((err) => {
           console.error(err);
-          res
-            .status(500)
-            .json({ message: "Failed to register token on server." });
+          res.status(500).json({ message: "Failed to register token on server." });
           return;
         });
     })
@@ -743,17 +649,12 @@ router.get("/", (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res
-        .status(500)
-        .json({ message: "An unknown error occurred. Please try again." });
+      res.status(500).json({ message: "An unknown error occurred. Please try again." });
     });
 });
 
 const updateValidationRules = [
-  body("userID")
-    .notEmpty()
-    .isNumeric()
-    .withMessage("Please provide your userID"),
+  body("userID").notEmpty().isNumeric().withMessage("Please provide your userID"),
   body("firstName").notEmpty().withMessage("Please provide your first name"),
   body("lastName").notEmpty().withMessage("Please provide your last name"),
   body("role").notEmpty().withMessage("Please provide a role"),
@@ -766,8 +667,7 @@ router.put("/", updateValidationRules, (req, res) => {
   }
 
   const { userID, firstName, lastName, role, email } = req.body;
-  const selectedHarvester =
-    role === "Harvester" ? req.body.selectedHarvester : null;
+  const selectedHarvester = role === "Harvester" ? req.body.selectedHarvester : null;
   if (role === "Harvester" && selectedHarvester == undefined) {
     console.error("Need selected harvester");
     return res.status(400).json({
