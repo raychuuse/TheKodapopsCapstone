@@ -146,6 +146,7 @@ export const BinProvider = ({ children }) => {
       if (selectedSiding == null) return;
       getBinsFromSiding(selectedSiding.sidingID)
           .then(response => {
+              sortBins(response);
               setBins(response);
           })
           .catch(err => {
@@ -162,6 +163,20 @@ export const BinProvider = ({ children }) => {
         connected = state.isConnected;
       }
   });
+
+  const sortBins = (bins) => {
+      bins.sort((a, b) => {
+          if (a.full !== b.full)
+              return a.full ? -1 : 1;
+          if (a.burnt !== b.burnt)
+              return a.burnt ? 1 : -1;
+          if (a.code < b.code)
+              return -1;
+          if (a.code > b.code)
+              return 1;
+          return 0;
+      });
+  };
 
   const onReconnected = () => {
       if (!connected || selectedSiding == null) return;
@@ -237,6 +252,7 @@ export const BinProvider = ({ children }) => {
               persistOfflineData();
               handleSuccessfulConsignBin(bin);
           }
+          sortBins(bins);
           setBins([...bins]);
           return;
       }
@@ -265,6 +281,7 @@ export const BinProvider = ({ children }) => {
                   }
                   handleSuccessfulConsignBin(bin);
               }
+              sortBins(bins);
               setBins([...bins]);
           })
           .catch(err => {
@@ -277,14 +294,18 @@ export const BinProvider = ({ children }) => {
     if (!connected) {
         offlineConsignActions.push({binID: bin.binID, full: !bin.full});
         persistOfflineData();
-        if (handleSuccessfulConsignBin(bin))
+        if (handleSuccessfulConsignBin(bin)) {
+            sortBins(bins);
             setBins([...bins]);
+        }
         return;
     }
     consignBin(bin.binID, !bin.full)
         .then(response => {
-            if (handleSuccessfulConsignBin(bin))
+            if (handleSuccessfulConsignBin(bin)) {
+                sortBins(bins);
                 setBins([...bins]);
+            }
         })
         .catch(err => {
           console.error(err);
@@ -330,6 +351,7 @@ export const BinProvider = ({ children }) => {
           if (field === 'MISSING') bins.splice(index, 1);
           else bins[index] = bin;
 
+          sortBins(bins);
           setBins([...bins]);
       } else {
           // rip
