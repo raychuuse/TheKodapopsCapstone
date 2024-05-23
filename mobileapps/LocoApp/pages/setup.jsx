@@ -12,9 +12,9 @@ import { LargeTitle, Title1 } from '../styles/typography';
 import { useTheme } from '../styles/themeContext';
 
 // Import Mock Data
-import { getAllLocos } from '../api/loco.api';
+import { getAllLocos, getLocosWithRunToday } from '../api/loco.api';
 import { useRun } from '../context/runContext';
-import { errorToast } from '../lib/alerts';
+import { errorToast, showToast } from '../lib/alerts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -40,9 +40,15 @@ const SetupPage = () => {
     }
 
     getName();
-    getAllLocos()
+
+    getLocosWithRunToday()
       .then((response) => {
-        setLocos(response);
+        if (response == null || response?.length === 0) {
+          showToast('There are no runs today. Please check with your traffic officer.', 'info');
+          setLocos([]);
+        } else {
+          setLocos(response);
+        }
       })
       .catch((err) => {
         console.error(err);
