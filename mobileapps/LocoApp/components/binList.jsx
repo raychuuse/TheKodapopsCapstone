@@ -178,7 +178,7 @@ const BinList = ({ stopID, type }) => {
             },
             backgroundColor,
           ]}
-          onPress={() => onCompletePressed(stopID, type)}
+          onPress={() => onCompletePressed(stop, type)}
         >
           <Feather
             size={24}

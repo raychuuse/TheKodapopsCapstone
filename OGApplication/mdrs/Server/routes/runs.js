@@ -233,7 +233,7 @@ router.post('/:locoID/stop-action/:stopID/:binID', (req, res) => {
                                            SET collectComplete = ?,
                                                dropOffComplete = ?
                                            WHERE stopID = ?`,
-                            [collectTest || stop.collectComplete ? 1 : 0, dropOffTest || stop.dropOffComplete ? 1 : 0, stop.stopID]);
+                            [collectTest ? 1 : 0, dropOffTest ? 1 : 0, stop.stopID]);
                     } else {
                         return Promise.resolve();
                     }
@@ -267,19 +267,23 @@ router.post('/:locoID/stop-action/:stopID/:binID', (req, res) => {
         })
 });
 
-router.post('/:stopID/complete-stop/:type', verifyAuthorization, (req, res) => {
+router.post('/:stopID/complete-stop/:type/:complete', verifyAuthorization, (req, res) => {
     const stopID = req.params.stopID;
     if (!isValidId(stopID, res)) return;
     const type = req.params.type;
     if (type !== 'COLLECT' && type !== 'DROP_OFF')
         return res.status(400).json({message: 'Type must be either COLLECT or DROP_OFF'});
+    const complete = req.params.complete;
+    if (complete !== '0' && complete !== '1')
+        return res.status(400).json({message: 'Complete must be either 1 or 0'});
 
+    const update = (type === 'COLLECT' ? 'collectComplete = ' + complete : 'dropOffComplete = ' + complete);
     req.db.raw(`SELECT * FROM run_stops WHERE stopID = ?`, [stopID])
         .then(processQueryResult)
         .then(response => {
             if (response.length === 0)
                 throw {status: 404, message: 'No stop found with id: ' + stopID};
-            return req.db.raw(`UPDATE run_stops SET ` + (type === 'COLLECT' ? 'collectComplete = 1' : 'dropOffComplete = 1') + ` WHERE stopID = ?`, [stopID]);
+            return req.db.raw(`UPDATE run_stops SET ` + update + ` WHERE stopID = ?`, [stopID]);
         })
         .then(response => {
             return res.status(204).send();
