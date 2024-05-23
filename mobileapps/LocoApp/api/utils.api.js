@@ -1,3 +1,6 @@
+import {router} from 'expo-router';
+import { generalAlert } from '../lib/alerts';
+
 const serverIP = process.env.EXPO_PUBLIC_SERVER_IP;
 const serverPort = process.env.EXPO_PUBLIC_SERVER_PORT;
 
@@ -46,6 +49,12 @@ export function setToken(t) {
   token = t;
 }
 
+export function logout() {
+  token = null;
+  generalAlert('Your authentication has expired, you have been logged out.');
+  router.navigate('/');
+}
+
 export function handleFetch(promise, hasJson = true) {
   return promise.then((response) => {
     if (response.ok) {
@@ -53,7 +62,7 @@ export function handleFetch(promise, hasJson = true) {
     } else {
       return response.json().then((err) => {
         console.error(err);
-        if (response.status === 403) logout(); // TODO
+        if (response.status === 403) logout();
         throw { status: response.status, message: err.message };
       });
     }
