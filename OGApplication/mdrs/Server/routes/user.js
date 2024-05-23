@@ -141,10 +141,14 @@ router.post("/har/login", (req, res) => {
       bcrypt.compare(password, response[0].password, (err, result) => {
         if (err) {
           console.error(err);
-          return res.status(500).json({ message: "An unknown error occurred. Please try again." });
+          return res
+            .status(500)
+            .json({ message: "An unknown error occurred. Please try again." });
         }
         if (!result) {
-          return res.status(401).json({ message: "No matching user ID and password" });
+          return res
+            .status(401)
+            .json({ message: "No matching user ID and password" });
         }
 
         const user = response[0];
@@ -355,7 +359,7 @@ router.post("/reset-password", (req, res) => {
 
                 // Delete token from saved database
                 try {
-                  req.db.raw(`DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${millRole}'`);
+                  req.db.raw(`DELETE FROM usertokens WHERE email = '${email}' AND userRole = '${millRole}'`);
                 } catch (err) {
                   console.error(err);
                 }
@@ -423,7 +427,7 @@ router.post("/har/reset-password", (req, res) => {
 
                 // Delete token from saved database
                 try {
-                  req.db.raw(`DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${harvesterRole}'`);
+                  req.db.raw(`DELETE FROM usertokens WHERE email = '${email}' AND userRole = '${harvesterRole}'`);
                 } catch (err) {
                   console.error(err);
                 }
@@ -572,7 +576,7 @@ router.post("/loco/reset-password", (req, res) => {
 
                 // Delete token from saved database
                 try {
-                  req.db.raw(`DELETE FROM userTokens WHERE email = '${email}' AND userRole = '${locoRole}'`);
+                  req.db.raw(`DELETE FROM usertokens WHERE email = '${email}' AND userRole = '${locoRole}'`);
                 } catch (err) {
                   console.error(err);
                 }
@@ -733,11 +737,11 @@ router.get("/:id/sidings", verifyAuthorization, (req, res) => {
 router.get("/:id/farms", verifyAuthorization, (req, res) => {
   req.db
     .raw(
-      `SELECT *
-                FROM farms`
+      `SELECT * FROM farms`
     )
     .then(processQueryResult)
     .then((farms) => {
+      console.log(farms);
       res.status(200).json(farms);
     })
     .catch((err) => {
