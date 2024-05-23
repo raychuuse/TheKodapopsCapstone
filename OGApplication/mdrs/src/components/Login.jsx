@@ -165,6 +165,13 @@ export function LoginForm() {
         }
     };
 
+    const styles = {
+        resetbuttons: {
+          fontSize: "17px",
+          color: "#5eb4ec",
+        }
+      }
+
     return (
         <main>
             <div className="login-wrapper">
@@ -189,52 +196,68 @@ export function LoginForm() {
 
                     <Button type="submit" disabled={loading}>{loading ?
                         <LoadingSpinner/> : 'Submit'}</Button> {/* shows loading spinner if loading state is true */}
-                    
+                </Form>
+                {/* Spacing between, just using essentially divs*/}
+                <Form> 
+                    <FormGroup>
+                    </FormGroup>
+                    {''}
+                    <FormGroup>
+                    </FormGroup>
                 </Form>
                 <div className="reset-wrapper">
-                    <Label>Reset Settings:</Label>
-                    <div className="Reset-Buttons">
-                    <Button onClick={resetCodeSwitch} disabled={loading}>{'Send Reset Code to Email'}</Button> {/* Shouldn't reset during loading either */}
-                    <Button onClick={resetPassSwitch} disabled={loading}>{'Reset Password with Code'}</Button> {/* Shouldn't reset during loading either */}
+                    <div className="Reset-Button">
+                        <span onClick={resetCodeSwitch} disabled={loading} style = {styles.resetbuttons}>Forgot Your Password?</span>
                     </div>    
                     {inResetCode && (
                         <Form onSubmit={handleResetCode}>
                             <FormGroup>
                             <Label for="codeEmail" hidden>Email</Label>
-                            <Input id="codeEmail" name="codeEmail" placeholder="Enter Email to send reset token." type="email"
+                            <Input id="codeEmail" name="codeEmail" placeholder="Enter Email to send code." type="email"
                                 onChange={e => {setCodeEmail(e.target.value)}}
                             />
+                            {' '}
                             </FormGroup>
                             <Button type="submit" disabled={loading}>{loading ?
                                 <LoadingSpinner/> : 'Submit'}</Button> {/* If any load, stall any server requests */}
                         </Form> 
                         )}  
+                    <div>
+                    <Form name="myform">
+                        <a></a>
+                        <span onClick={resetPassSwitch} disabled={loading} style = {styles.resetbuttons}>Reset Password with Code</span> 
+                    </Form>
+                    </div>
                     {inResetPassword && (
                         <Form onSubmit={handleReset}>
                             <FormGroup>
                             <Label for="resetEmail" hidden>Email</Label>
-                            <Input id="resetEmail" name="resetEmail" placeholder="Enter Email for mill account" type="email"
+                            <Input id="resetEmail" name="resetEmail" placeholder="Enter Email" type="email"
                                 onChange={e => {setResetEmail(e.target.value)}}
                             />
                             </FormGroup>
+                            {' '}
                             <FormGroup>
                             <Label for="resetCode" hidden>Reset Token</Label>
                             <Input id="resetCode" name="resetCode" placeholder="Reset Token" type="code"
                                 onChange={e => {setResetCode(e.target.value)}}
                             />
                             </FormGroup>
+                            {' '}
                             <FormGroup>
                             <Label for="resetPass" hidden>Reset Password</Label>
                             <Input id="resetPass" name="resetPass" placeholder="Reset Password" type="password"
                                 onChange={e => {setResetPass(e.target.value)}}
                             />
                             </FormGroup>
+                            {' '}
                             <FormGroup>
                             <Label for="resetPassConfirm" hidden>Confirm Password</Label>
                             <Input id="resetPassConfirm" name="resetPassConfirm" placeholder="Confirm Password" type="password"
                                 onChange={e => {setResetPassConfirm(e.target.value)}}
                             />
                             </FormGroup>
+                            {' '}
                             <Button type="submit" disabled={loading}>{loading ?
                                 <LoadingSpinner/> : 'Submit'}</Button> {/* If any load, stall any server requests */}
                         </Form>
