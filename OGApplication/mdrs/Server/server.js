@@ -3,15 +3,10 @@ const http = require("http");
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const router = express.Router();
-const WebSocket = require("ws");
-const { uuid } = require("uuidv4");
 
 const port = 8080;
 
 const server = http.createServer(app);
-const ws = new WebSocket.Server({ server });
-const clients = {};
 
 // Websocket integration
 // i.e.
@@ -89,43 +84,5 @@ process.on("unhandledRejection", (error, p) => {
   console.log("=== UNHANDLED REJECTION ===", p);
   console.dir(error.stack);
 });
-
-ws.on("connection", (ws, req) => {
-  const userId = uuid();
-
-  // May want to use req to specificy client difference more
-  // i.e. specific users, or roles for different notifications
-  console.log(`New Connection established.`);
-
-  clients[userId] = ws;
-  console.log(`${userId} connected.`);
-
-  // Was shifted elsewhere
-  // Don't need to multiply by 1000, already done in jwt token creation
-  /*
-  if (req[0].exp < Date.now()) {
-      //removed
-  }
-  */
-});
-
-function handleDC(userId) {
-  console.log(`${userId} disconnected.`);
-  delete clients[userId];
-}
-
-ws.on("close", () => handleDC(userId));
-
-// Functionality for global notifs, may want to seperate user
-// by app, then send specific messags to each role...
-function broadcastMessage(data) {
-  //const data = JSON.stringify(json);
-  for (let userId in clients) {
-    let client = clients[userId];
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(data);
-    }
-  }
-}
 
 server.listen(port, () => console.log(`API runs on http:localhost:${port}`));

@@ -4,7 +4,6 @@ import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/styles/ag-theme-balham.css'; // Optional theme CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import LoadingSpinner from "../components/LoadingSpinner";
 import Table from "../components/Table";
 import ItemList  from "../components/ItemList";
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -17,7 +16,6 @@ import {
     getSidingBreakdown, moveBin,
 } from "../api/bins";
 import {FormGroup, Input, Label} from "reactstrap";
-import {getById} from "../api/users";
 import {getAllSidings} from "../api/sidings";
 
 
