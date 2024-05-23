@@ -66,7 +66,7 @@ const ModalSelectSiding = () => {
         />
         {/* Siding Name */}
         <Title2 style={{ color: TextColor, marginRight: 'auto' }}>
-          {stop.name}
+          {stop.sidingName}
         </Title2>
 
         {/* Bin Details */}
