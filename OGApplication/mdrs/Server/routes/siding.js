@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const {processQueryResult, isValidId} = require("../utils");
+const { verifyAuthorization } = require('../middleware/authorization');
 
 //path for getting all current Sidings in db
-router.get("/", (req, res) => {
+router.get("/", verifyAuthorization, (req, res) => {
   req.db.raw(`SELECT *
               FROM siding`)
       .then(processQueryResult)

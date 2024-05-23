@@ -11,6 +11,6 @@ export function performStopAction(binID, locoID, stopID, type) {
     return handleFetch(fetch(`${apiUrl}/${locoID}/stop-action/${stopID}/${binID}?type=${type}`, postConfig(null)), false);
 }
 
-export function completeStop(stopID, type) {
-    return handleFetch(fetch(`${apiUrl}/${stopID}/complete-stop/${type}`, postConfig(null)), false);
+export function completeStop(stopID, type, complete) {
+    return handleFetch(fetch(`${apiUrl}/${stopID}/complete-stop/${type}/${complete ? '1' : '0'}`, postConfig(null)), false);
 }

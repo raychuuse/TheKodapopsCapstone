@@ -144,7 +144,7 @@ router.put('/bin-field-state/:binID', verifyAuthorization, (req, res) => {
                     .catch(err => {
                         console.error(err);
                         trx.rollback();
-                        throw { status: 500, message: 'An unknown error occurred. Please try again.' };
+                        return res.status(500).json({message: 'An unknown error occurred. Please try again.' });
                     });
 
                 trx.raw(`INSERT INTO transactionlog (userID, binID, type)
@@ -159,7 +159,7 @@ router.put('/bin-field-state/:binID', verifyAuthorization, (req, res) => {
                     .catch(err => {
                         console.error(err);
                         trx.rollback();
-                        throw { status: 500, message: 'An unknown error occurred. Please try again.' };
+                        return res.status(500).json({message: 'An unknown error occurred. Please try again.' });
                     });
             });
         })

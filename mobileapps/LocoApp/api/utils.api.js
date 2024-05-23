@@ -1,9 +1,12 @@
-import Cookies from 'js-cookie';
+import {router} from 'expo-router';
+import { generalAlert } from '../lib/alerts';
 
 const serverIP = process.env.EXPO_PUBLIC_SERVER_IP;
 const serverPort = process.env.EXPO_PUBLIC_SERVER_PORT;
 
 export const serverUrl = `http://${serverIP}:${serverPort}`;
+
+let token;
 
 export function postConfig(data) {
   const b = data != null ? JSON.stringify(data) : '';
@@ -12,7 +15,7 @@ export function postConfig(data) {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
     body: b,
   };
@@ -25,7 +28,7 @@ export function putConfig(data) {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
     body: b,
   };
@@ -37,18 +40,19 @@ export function getConfig() {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
   };
 }
 
-function getToken() {
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzE1MzI0NTkyNzc0LCJpYXQiOjE3MTUyMzgxOTJ9.GmoH-dJpJVbrFPrwVFrBmRCsx5r_s9pPDPALZRBd-o4';
+export function setToken(t) {
+  token = t;
 }
 
-function logout() {
-  Cookies.remove('token');
-  Cookies.remove('user');
+export function logout() {
+  token = null;
+  generalAlert('Your authentication has expired, you have been logged out.');
+  router.navigate('/');
 }
 
 export function handleFetch(promise, hasJson = true) {

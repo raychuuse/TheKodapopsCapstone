@@ -6,7 +6,7 @@ const ModalContext = createContext();
 // Context provider component
 const ModalProvider = ({ children }) => {
   // State for modals visibility
-  const [modalAddBinVisible, setModalAddBinVisible] = useState(true);
+  const [modalAddBinVisible, setModalAddBinVisible] = useState(false);
   const [modalSidingVisible, setModalSidingVisible] = useState(false);
   const [modalSelectSidingVisible, setModalSelectSidingVisible] =
     useState(false);

@@ -53,7 +53,7 @@ const SwipeableBinItem = ({
       >
         <TouchableOpacity
           onPress={() => {
-            RepairBinAlert(bin.binID, onBinRepair);
+            RepairBinAlert(bin.code, bin, onBinRepair);
             Haptics.selectionAsync();
           }}
           style={[styles.actionButton, { backgroundColor: '#FFA000' }]}
@@ -68,7 +68,7 @@ const SwipeableBinItem = ({
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: '#D32F2F' }]}
           onPress={() => {
-            RemoveBinAlert(bin.binID, onBinMissing);
+            RemoveBinAlert(bin.code, onBinMissing);
             Haptics.selectionAsync();
           }}
         >
@@ -251,9 +251,17 @@ const SwipeableBinItem = ({
                 : null,
             ]}
           >
-            Bin #{bin.binID}
+            Bin {bin.code}
           </Headline>
         </TouchableOpacity>
+          {bin.repair ? (
+              // Show repair icon if bin needs repair
+              <Feather
+                  name='tool'
+                  size={24}
+                  color='#fff'
+              />
+          ) : null}
         {/* Edit Btn / Full Indicator */}
         <Headline
           style={[

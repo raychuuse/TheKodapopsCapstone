@@ -12,7 +12,7 @@ const verifyAuthorization = (req, res, next) => {
                 if (err) {
                     return res.status(403).json({message: 'Unauthorized'});
                 } else {
-                    req.userID = auth.id;
+                    req.userID = auth.userID;
                     return next();
                 }
             });

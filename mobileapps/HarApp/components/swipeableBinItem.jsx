@@ -63,7 +63,7 @@ const SwipeableBinItem = ({
           onPress={() => {
             // Trigger haptic feedback and show repair alert
             Haptics.selectionAsync();
-            RepairBinAlert(`Bin #${bin.binID}`, bin, onBinRepair)}
+            RepairBinAlert(`Bin ${bin.code}`, bin, onBinRepair)}
           }
           style={[styles.actionButton, { backgroundColor: '#FFA000' }]}
         >
@@ -80,7 +80,7 @@ const SwipeableBinItem = ({
           onPress={() => {
             // Trigger haptic feedback and show remove alert
             Haptics.selectionAsync();
-            RemoveBinAlert(`Bin #${bin.binID}`, bin, onBinMissing)}}
+            RemoveBinAlert(`Bin #${bin.code}`, bin, onBinMissing)}}
         >
           <Feather
             name='help-circle'
@@ -203,7 +203,7 @@ const SwipeableBinItem = ({
                 : null,
             ]}
           >
-            Bin #{bin.binID}
+            Bin {bin.code}
           </Headline>
         </TouchableOpacity>
         {bin.repair ? (

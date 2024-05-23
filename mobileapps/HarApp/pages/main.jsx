@@ -10,15 +10,16 @@ import AddBinCamera from '../components/addBinCamera';
 import NetworkIndicator from '../components/networkIndicator';
 
 //Import Functions
-import { FinishedAlert } from '../lib/alerts';
+import { errorToast, FinishedAlert } from '../lib/alerts';
 
 // Import Styling Components
 import { LargeTitle, Title1 } from '../components/typography';
 import { Colours } from '../components/colours';
 import BinList from '../components/binList';
 import { useBins } from '../context/binContext';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Import Contexts
 
 const MainPage = () => {
   const { getSelectedSiding, setOnMainPage } = useBins();

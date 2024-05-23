@@ -138,6 +138,29 @@ export const RunProvider = ({children}) => {
             onReconnected();
     };
 
+    const sortBins = (bins, type) => {
+        bins.sort((a, b) => {
+
+            if (type === 'SIDING') {
+                if (a.droppedOffInRun !== b.droppedOffInRun)
+                    return a.droppedOffInRun ? 1 : -1;
+            } else {
+                if (a.pickedUpInRun !== b.pickedUpInRun)
+                    return a.pickedUpInRun ? 1 : -1;
+            }
+
+            if (a.full !== b.full)
+                return a.full ? -1 : 1;
+            if (a.burnt !== b.burnt)
+                return a.burnt ? 1 : -1;
+            if (a.code < b.code)
+                return -1;
+            if (a.code > b.code)
+                return 1;
+            return 0;
+        });
+    };
+
     const loadData = (navigate) => {
         let tempRun;
         return getCurrentLoadById(locoID)
@@ -173,13 +196,12 @@ export const RunProvider = ({children}) => {
             });
     };
 
-    const onCompletePressed = (stopID, type) => {
-        completeStop(stopID, type === 'SIDING' ? 'COLLECT' : 'DROP_OFF')
+    const onCompletePressed = (stop, type) => {
+        const complete = type === 'SIDING' ? !stop.collectComplete : !stop.dropOffComplete;
+        completeStop(stop.stopID, type === 'SIDING' ? 'COLLECT' : 'DROP_OFF', complete)
             .then(response => {
-                const stop = run.stops.find(s => s.stopID === stopID);
-                if (stop == null) return;
-                if (type === 'SIDING') stop.collectComplete = true;
-                else stop.dropOffComplete = true;
+                if (type === 'SIDING') stop.collectComplete = complete;
+                else stop.dropOffComplete = complete;
                 updateRun();
             })
             .catch(err => {
@@ -215,8 +237,8 @@ export const RunProvider = ({children}) => {
             }
         }
 
-        stop.dropOffComplete = stop.dropOffCount >= stop.dropOffQuantity || stop.dropOffComplete;
-        stop.collectComplete = stop.collectCount >= stop.collectQuantity || stop.collectComplete;
+        stop.dropOffComplete = stop.dropOffCount >= stop.dropOffQuantity;
+        stop.collectComplete = stop.collectCount >= stop.collectQuantity;
     }
 
     const handleSuccessfulStopAction = (binID, stop, type, operatingOverRange) => {
@@ -293,6 +315,8 @@ export const RunProvider = ({children}) => {
     }
 
     const updateRun = () => {
+        for (const stop of run.stops)
+            sortBins(stop.bins, 'SIDING');
         setRun({
             ...run,
             stops: run.stops,
@@ -300,6 +324,7 @@ export const RunProvider = ({children}) => {
     };
 
     const updateLoco = () => {
+        sortBins(loco.bins, 'LOCO');
         setLoco({
             ...loco,
             bins: loco.bins,
@@ -411,7 +436,10 @@ export const RunProvider = ({children}) => {
     };
 
     const handleFindBin = (code, stop) => {
-        if (!connected) return;
+        if (!connected) {
+            errorToast({message: 'Cannot find bin while offline'});
+            return;
+        }
 
         findBin(code, stop != null ? stop.sidingID : null, stop == null ? locoID : null)
             .then(bin => {

@@ -6,6 +6,10 @@ export function getAllLocos() {
     return handleFetch(fetch(`${apiUrl}`, getConfig()), true);
 }
 
+export function getLocosWithRunToday() {
+    return handleFetch(fetch(`${apiUrl}/locos-with-run`, getConfig()), true);
+}
+
 export function getLocoById(id) {
     return handleFetch(fetch(`${apiUrl}/${id}`, getConfig()), true);
 }

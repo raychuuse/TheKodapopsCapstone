@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const {isValidId, processQueryResult} = require("../utils");
+const { verifyAuthorization } = require('../middleware/authorization');
 
 // Get all locomotives
 router.get("/", (req, res) => {
@@ -13,6 +14,20 @@ router.get("/", (req, res) => {
       .catch((err) => {
         res.status(500).json(err);
       });
+});
+
+router.get(`/locos-with-run`, verifyAuthorization, (req, res) => {
+    req.db.raw(`SELECT l.* 
+                FROM locomotive l
+                INNER JOIN runs r ON l.locoID = r.locoID AND r.date = CURDATE()`)
+        .then(processQueryResult)
+        .then(response => {
+            res.status(200).json(response);
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+        });
 });
 
 // Returns the sidings the loco has visited in the last period, and how many bins have been picked up and dropped
