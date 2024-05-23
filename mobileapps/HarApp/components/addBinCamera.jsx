@@ -95,8 +95,7 @@ const AddBinCamera = ({ modalCloser }) => {
     if (/^\d+$/.test(num)) {
       return true;
     } else {
-      issueAlert('An invalid number has been entered.');
-      return true;
+      return false;
     }
   }
 
