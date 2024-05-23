@@ -18,6 +18,22 @@ router.get("/", verifyAuthorization, (req, res) => {
       });
 });
 
+
+//path for getting all current Sidings in db for mill
+router.get("/all", (req, res) => {
+  req.db.raw(`SELECT *
+              FROM siding`)
+      .then(processQueryResult)
+      .then((sidings) => {
+        res.status(200).json(sidings);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json(err);
+      });
+});
+
+
 router.get('/:id', (req, res) => {
   req.db.raw(`SELECT * FROM `)
 });

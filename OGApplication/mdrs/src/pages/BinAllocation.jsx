@@ -61,7 +61,6 @@ const BinPage = ({id}) => {
     const [bin, setBin] = useState();
 
     useEffect(() => {
-        console.info('jjj');
         getBin(id)
             .then(response => {
                 setBin(response);
@@ -92,7 +91,7 @@ const BinPage = ({id}) => {
 
     return (
         <div>
-            {error && <ErrorAlert message={error.message} />}
+            {error && error.message !== "" && <ErrorAlert message={error.message} />}
             <section className="data-table">
                 <div className="container-fluid">
                     <div className="row">
@@ -160,7 +159,7 @@ const BinSidingBreakdown = ({id}) => {
 
     return (
         <div className="col">
-            {error && <ErrorAlert message={error.message}/>}
+            {error && error.message !== "" && <ErrorAlert message={error.message}/>}
             <section className="metric">
                 <div className="hero__content">
                     <div className="table-wrapper">

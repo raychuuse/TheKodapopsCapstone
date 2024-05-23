@@ -3,7 +3,7 @@ import {serverUrl, postConfig, putConfig, fullConverter, handleFetch} from "./ut
 const apiUrl = `${serverUrl}/sidings`;
 
 export function getAllSidings() {
-    return fetch(`${apiUrl}`)
+    return fetch(`${apiUrl}/all`)
         .then(response => {
             if (response.ok)
                 return response.json();
