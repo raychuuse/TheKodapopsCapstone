@@ -16,7 +16,6 @@ const ModalProvider = ({ children }) => {
   const [sidingToViewID, setSidingToViewID] = useState();
   const [addBinModelStop, setAddBinModelStop] = useState();
 
-
   // Function to open siding modal and update the ID to view
   const openSidingModal = (id) => {
     setSidingToViewID(id); // Update the ID of the siding to view
@@ -25,22 +24,22 @@ const ModalProvider = ({ children }) => {
   const closeSidingModal = () => setModalSidingVisible(false);
 
   // Function to open and close the Select Siding Modal
-  const openSelectSidingModal = () => setModalSelectSidingVisible(false);
+  const openSelectSidingModal = () => setModalSelectSidingVisible(true);
   const closeSelectSidingModal = () => setModalSelectSidingVisible(false);
 
   // Function to open and close the Add Bin Modal
   const openAddBinModal = (stop) => {
     setAddBinModelStop(stop);
     setModalAddBinVisible(true);
-  }
+  };
   const closeAddBinModal = () => {
     setAddBinModelStop(null);
     setModalAddBinVisible(false);
-  }
+  };
 
   const getAddBinModelStop = () => {
     return addBinModelStop;
-  }
+  };
 
   // Function to update the selected siding ID
   const updateSelectedSidingID = (id) => setSelectedSidingID(id);
