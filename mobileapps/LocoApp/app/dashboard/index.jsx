@@ -44,10 +44,6 @@ export default function Page() {
   // Run Data for the Whole App
   const [notifications, setNotifications] = useState(NotificationsMockData);
   const stops = getStops();
-  const firstStop = stops[0].stopID;
-
-  // defaults selects the first stop
-  updateSelectedSidingID(firstStop);
 
   return (
     <View
