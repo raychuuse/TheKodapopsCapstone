@@ -19,7 +19,7 @@ import { errorAlert, issueAlert, generalAlert } from '../lib/alerts';
 import { Title1, Body, Subhead } from '../components/typography';
 
 // Import Context
-import { serverUrl} from '../api/utils.api';
+import { serverUrl, setToken } from '../api/utils.api';
 
 const LogInPage = () => {
   const [email, setEmail] = useState('');
@@ -165,12 +165,12 @@ const LogInPage = () => {
       const res = await fetch(`${serverURL}/user/har/login`, options);
       if (res.ok) {
         const data = await res.json();
-        AsyncStorage.setItem('isSignedIn', 'true');
-        AsyncStorage.setItem('userID', toString(data.user.userID));
-        AsyncStorage.setItem('email', email);
-        AsyncStorage.setItem('token', data.token);
-        fullname = data.user.firstName + " " + data.user.lastName;
-        AsyncStorage.setItem('fullname', fullname);
+        await AsyncStorage.setItem('isSignedIn', 'true');
+        await AsyncStorage.setItem('userID', toString(data.user.userID));
+        await AsyncStorage.setItem('email', email);
+        setToken(data.token);
+        const fullname = data.user.firstName + " " + data.user.lastName;
+        await AsyncStorage.setItem('fullname', fullname);
         router.navigate(setupPageRef);
       } else {
         const issue = await res.json();

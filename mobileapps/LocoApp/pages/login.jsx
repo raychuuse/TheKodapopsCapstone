@@ -14,6 +14,7 @@ import CustomModal from '../components/modal';
 import { Title1, Subhead, H1 } from '../styles/typography';
 import { useTheme } from '../styles/themeContext';
 import { errorToast, generalAlert, showToast } from '../lib/alerts';
+import { setToken } from '../api/utils.api';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
@@ -159,23 +160,23 @@ const LogInPage = () => {
           password: password,
         }),
       };
-
       const res = await fetch(`${serverURL}/user/loco/login`, options);
       if (res.ok) {
         try {
           const data = await res.json();
           const parsedData = JSON.parse(data);
+          console.info(parsedData);
           // Awaiting async vs cookies! needed for in loco func with zac merge
           
           await AsyncStorage.setItem('isSignedIn', 'true');
           await AsyncStorage.setItem('userID', toString(parsedData.user.userID));
           await AsyncStorage.setItem('email', email);
-          await AsyncStorage.setItem('token', parsedData.token);
-          fullname = parsedData.user.firstName + " " + parsedData.user.lastName;
+          setToken(parsedData.token);
+          const fullname = parsedData.user.firstName + " " + parsedData.user.lastName;
           await AsyncStorage.setItem('fullname', fullname);
         } catch (err) {
           generalAlert('Failed to login. Please enter an existing user.');
-          console.log(err);
+          console.error(err);
           return;
         }
         router.navigate(setupPageRef);
@@ -192,7 +193,7 @@ const LogInPage = () => {
       }
     } catch (err) {
       generalAlert('Failed to login.');
-      console.log(err.message);
+      console.error(err);
     }
   };
 

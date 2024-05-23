@@ -1,10 +1,10 @@
-import Cookies from 'js-cookie';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverIP = process.env.EXPO_PUBLIC_SERVER_IP;
 const serverPort = process.env.EXPO_PUBLIC_SERVER_PORT;
 
 export const serverUrl = `http://${serverIP}:${serverPort}`;
+
+let token;
 
 export function postConfig(data) {
   const b = data != null ? JSON.stringify(data) : '';
@@ -13,7 +13,7 @@ export function postConfig(data) {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
     body: b,
   };
@@ -26,7 +26,7 @@ export function putConfig(data) {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
     body: b,
   };
@@ -38,25 +38,16 @@ export function getConfig() {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
   };
 }
 
-async function getToken() {
-  return await AsyncStorage.getItem("token");
-  //return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzE1MDUxMTcwMzU0LCJpYXQiOjE3MTQ5NjQ3NzB9.7mRDeb8rlYAV3Q37aWUJ9KlBx-yMcDea2fZSChUrQB8';
+export function setToken(t) {
+  token = t;
 }
 
-export async function logout() {
-  AsyncStorage.removeItem
-  Cookies.remove('token');
-  Cookies.remove('user');
-  await AsyncStorage.removeItem('isSignedIn');
-  await AsyncStorage.removeItem('userID');
-  await AsyncStorage.removeItem('email');
-  await AsyncStorage.removeItem('token');
-  await AsyncStorage.removeItem('fullname');
+export function logout() {
 }
 
 export function handleFetch(promise, hasJson = true) {
@@ -66,7 +57,7 @@ export function handleFetch(promise, hasJson = true) {
     } else {
       return response.json().then((err) => {
         console.error(err);
-        if (response.status === 403) logout();
+        if (response.status === 403) logout(); // TODO
         throw { status: response.status, message: err.message };
       });
     }

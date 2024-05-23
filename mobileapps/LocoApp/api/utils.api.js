@@ -1,9 +1,9 @@
-import Cookies from 'js-cookie';
-
 const serverIP = process.env.EXPO_PUBLIC_SERVER_IP;
 const serverPort = process.env.EXPO_PUBLIC_SERVER_PORT;
 
 export const serverUrl = `http://${serverIP}:${serverPort}`;
+
+let token;
 
 export function postConfig(data) {
   const b = data != null ? JSON.stringify(data) : '';
@@ -12,7 +12,7 @@ export function postConfig(data) {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
     body: b,
   };
@@ -25,7 +25,7 @@ export function putConfig(data) {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
     body: b,
   };
@@ -37,18 +37,13 @@ export function getConfig() {
     mode: 'cors',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + getToken(),
+      Authorization: 'Bearer ' + token,
     },
   };
 }
 
-function getToken() {
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZXhwIjoxNzE1MzI0NTkyNzc0LCJpYXQiOjE3MTUyMzgxOTJ9.GmoH-dJpJVbrFPrwVFrBmRCsx5r_s9pPDPALZRBd-o4';
-}
-
-function logout() {
-  Cookies.remove('token');
-  Cookies.remove('user');
+export function setToken(t) {
+  token = t;
 }
 
 export function handleFetch(promise, hasJson = true) {
@@ -58,7 +53,7 @@ export function handleFetch(promise, hasJson = true) {
     } else {
       return response.json().then((err) => {
         console.error(err);
-        if (response.status === 403) logout();
+        if (response.status === 403) logout(); // TODO
         throw { status: response.status, message: err.message };
       });
     }

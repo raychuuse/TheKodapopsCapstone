@@ -143,7 +143,6 @@ export const BinProvider = ({ children }) => {
   };
 
   const loadData = () => {
-      console.info('tent', selectedSiding);
       if (selectedSiding == null) return;
       getBinsFromSiding(selectedSiding.sidingID)
           .then(response => {
