@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 
 // Import Components
@@ -18,7 +18,7 @@ import { Colours } from '../components/colours';
 import BinList from '../components/binList';
 import { useBins } from '../context/binContext';
 
-// Import Contexts
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MainPage = () => {
   const { getSelectedSiding, setOnMainPage } = useBins();
