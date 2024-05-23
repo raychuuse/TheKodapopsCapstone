@@ -63,7 +63,7 @@ router.put('/:id/:name', (req, res) => {
       if (data[0].count > 0)
         return res.status(409).json({message: 'A harvester with that name already exists.'});
       else {
-        req.db('harvester').update({harvesterName: req.body.name}).where({harvesterID: id})
+        req.db('harvester').update({harvesterName: name}).where({harvesterID: id})
         .then(response => {
             res.status(200).send();
         })
