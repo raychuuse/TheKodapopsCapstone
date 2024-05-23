@@ -10,13 +10,34 @@ import CustomModal from './modal';
 import Button from './button';
 import { useTheme } from '../styles/themeContext';
 import { lightTheme } from '../styles/themes';
-import {useRun} from "../context/runContext";
+import { useRun } from '../context/runContext';
+import { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import Colours
 
 const ModalSettings = ({ isVisible, onClose }) => {
   const { theme, toggleTheme } = useTheme();
   const { refreshRunData, onReconnected } = useRun();
+
+  const [fullname, setName] = useState('');
+
+  useEffect(() => {
+    async function getName() {
+      await AsyncStorage.getItem('fullname')
+        .then((name) => {
+          if (name !== null && name) {
+            setName(name);
+          }
+        })
+        .catch((err) => {
+          setName('Awaiting Cache');
+          errorToast(err);
+        });
+    }
+
+    getName();
+  }, []);
   return (
     <CustomModal
       isVisible={isVisible}
@@ -55,66 +76,66 @@ const ModalSettings = ({ isVisible, onClose }) => {
       </View>
       {/* Page Content */}
       <View style={styles.content}>
-          {/* Refresh Data */}
-          <View
-              style={{
-                  flexDirection: 'row',
-                  width: '100%',
-                  gap: 22,
-                  paddingHorizontal: 16,
-                  paddingVertical: 4,
-                  alignItems: 'center',
-              }}
+        {/* Refresh Data */}
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            gap: 22,
+            paddingHorizontal: 16,
+            paddingVertical: 4,
+            alignItems: 'center',
+          }}
+        >
+          <Title3
+            style={{ flex: 1, textTransform: 'capitalize' }}
+            numberOfLines={1}
           >
-              <Title3
-                  style={{ flex: 1, textTransform: 'capitalize' }}
-                  numberOfLines={1}
-              >
-                  Refresh Run Data
-              </Title3>
-              <Button
-                  title='Refresh'
-                  iconName={'refresh'}
-                  iconColor={theme.textLevel3}
-                  textColor={theme.textLevel3}
-                  backgroundColor={theme.bgLevel3}
-                  border
-                  borderWidth={1}
-                  iconSize={28}
-                  style={{ paddingVertical: 4 }}
-                  onPress={() => refreshRunData()}
-              />
-          </View>
-          {/* Refresh Data */}
-          <View
-              style={{
-                  flexDirection: 'row',
-                  width: '100%',
-                  gap: 22,
-                  paddingHorizontal: 16,
-                  paddingVertical: 4,
-                  alignItems: 'center',
-              }}
+            Refresh Run Data
+          </Title3>
+          <Button
+            title='Refresh'
+            iconName={'refresh'}
+            iconColor={theme.textLevel3}
+            textColor={theme.textLevel3}
+            backgroundColor={theme.bgLevel3}
+            border
+            borderWidth={1}
+            iconSize={28}
+            style={{ paddingVertical: 4 }}
+            onPress={() => refreshRunData()}
+          />
+        </View>
+        {/* Refresh Data */}
+        <View
+          style={{
+            flexDirection: 'row',
+            width: '100%',
+            gap: 22,
+            paddingHorizontal: 16,
+            paddingVertical: 4,
+            alignItems: 'center',
+          }}
+        >
+          <Title3
+            style={{ flex: 1, textTransform: 'capitalize' }}
+            numberOfLines={1}
           >
-              <Title3
-                  style={{ flex: 1, textTransform: 'capitalize' }}
-                  numberOfLines={1}
-              >
-                  Send Offline Data
-              </Title3>
-              <Button
-                  title='Send'
-                  iconName={'swap-vert'}
-                  iconColor={theme.textLevel3}
-                  textColor={theme.textLevel3}
-                  backgroundColor={theme.bgLevel3}
-                  border
-                  borderWidth={1}
-                  iconSize={28}
-                  style={{ paddingVertical: 4 }}
-                  onPress={() => onReconnected()}
-              />
-          </View>
+            Send Offline Data
+          </Title3>
+          <Button
+            title='Send'
+            iconName={'swap-vert'}
+            iconColor={theme.textLevel3}
+            textColor={theme.textLevel3}
+            backgroundColor={theme.bgLevel3}
+            border
+            borderWidth={1}
+            iconSize={28}
+            style={{ paddingVertical: 4 }}
+            onPress={() => onReconnected()}
+          />
+        </View>
         {/* Log Out */}
         <View
           style={{
@@ -130,7 +151,7 @@ const ModalSettings = ({ isVisible, onClose }) => {
             style={{ flex: 1, textTransform: 'capitalize' }}
             numberOfLines={1}
           >
-            John Smith
+            {fullname}
           </Title3>
           <Button
             title='Log Out'
