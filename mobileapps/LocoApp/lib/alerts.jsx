@@ -17,11 +17,11 @@ export const RemoveBinAlert = (message, func) => {
   );
 };
 
-export const RepairBinAlert = (message, func) => {
+export const RepairBinAlert = (message, bin, func) => {
   Alert.alert(
-      'Switch Bin Repair Status?',
-      `\nAre you sure you want to request/ cancel a repair for #${message}?`,
-      [{ text: "No, It's Fine!"}, { text: 'Yes, Request', onPress: func}]
+      bin.repair ? 'Cancel Repair' : 'Request Repair',
+      `\nAre you sure you want to ${bin.repair ? 'cancel' : 'request'} repair for #${message}?`,
+      [{ text: "No, It's Fine!"}, { text: 'Yes, ' + (bin.repair ? 'Cancel' : 'Request'), onPress: func}]
   );
 };
 
