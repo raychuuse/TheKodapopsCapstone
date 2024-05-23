@@ -138,6 +138,29 @@ export const RunProvider = ({children}) => {
             onReconnected();
     };
 
+    const sortBins = (bins, type) => {
+        bins.sort((a, b) => {
+
+            if (type === 'SIDING') {
+                if (a.droppedOffInRun !== b.droppedOffInRun)
+                    return a.droppedOffInRun ? 1 : -1;
+            } else {
+                if (a.pickedUpInRun !== b.pickedUpInRun)
+                    return a.pickedUpInRun ? 1 : -1;
+            }
+
+            if (a.full !== b.full)
+                return a.full ? -1 : 1;
+            if (a.burnt !== b.burnt)
+                return a.burnt ? 1 : -1;
+            if (a.code < b.code)
+                return -1;
+            if (a.code > b.code)
+                return 1;
+            return 0;
+        });
+    };
+
     const loadData = (navigate) => {
         let tempRun;
         return getCurrentLoadById(locoID)
@@ -292,6 +315,8 @@ export const RunProvider = ({children}) => {
     }
 
     const updateRun = () => {
+        for (const stop of run.stops)
+            sortBins(stop.bins, 'SIDING');
         setRun({
             ...run,
             stops: run.stops,
@@ -299,6 +324,7 @@ export const RunProvider = ({children}) => {
     };
 
     const updateLoco = () => {
+        sortBins(loco.bins, 'LOCO');
         setLoco({
             ...loco,
             bins: loco.bins,
