@@ -146,9 +146,7 @@ router.post("/har/login", (req, res) => {
             .json({ message: "An unknown error occurred. Please try again." });
         }
         if (!result) {
-          return res
-            .status(401)
-            .json({ message: "No matching user ID and password" });
+          return res.status(401).json({ message: "No matching user ID and password" });
         }
 
         const user = response[0];
@@ -317,7 +315,6 @@ router.post("/", createValidationRules, (req, res) => {
 });
 
 router.post("/reset-password", (req, res) => {
-  // force email for resetting password.
   const email = req.body.email;
   const code = req.body.code;
   const password = req.body.password;
@@ -356,11 +353,10 @@ router.post("/reset-password", (req, res) => {
                 res.status(200).json({ message: "Password updated successfully" });
 
                 // Delete token from saved database
-                try {
-                  req.db.raw(`DELETE FROM usertokens WHERE email = '${email}' AND userRole = '${millRole}'`);
-                } catch (err) {
+                req.db.raw(`DELETE FROM usertokens WHERE (email = '${email}' AND userRole = '${millRole}')`)
+                .catch (err => {
                   console.error(err);
-                }
+                });
               })
               .catch((err) => {
                 console.error(err);
@@ -424,11 +420,10 @@ router.post("/har/reset-password", (req, res) => {
                 res.status(200).json({ message: "Password updated successfully" });
 
                 // Delete token from saved database
-                try {
-                  req.db.raw(`DELETE FROM usertokens WHERE email = '${email}' AND userRole = '${harvesterRole}'`);
-                } catch (err) {
+                req.db.raw(`DELETE FROM usertokens WHERE (email = '${email}' AND userRole = '${harvesterRole}')`)
+                .catch (err => {
                   console.error(err);
-                }
+                });
               })
               .catch((err) => {
                 console.error(err);
@@ -573,11 +568,10 @@ router.post("/loco/reset-password", (req, res) => {
                 res.status(200).json({ message: "Password updated successfully" });
 
                 // Delete token from saved database
-                try {
-                  req.db.raw(`DELETE FROM usertokens WHERE email = '${email}' AND userRole = '${locoRole}'`);
-                } catch (err) {
+                req.db.raw(`DELETE FROM usertokens WHERE (email = '${email}' AND userRole = '${locoRole}')`)
+                .catch (err => {
                   console.error(err);
-                }
+                });
               })
               .catch((err) => {
                 console.error(err);

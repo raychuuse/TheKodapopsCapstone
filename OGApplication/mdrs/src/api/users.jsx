@@ -4,8 +4,22 @@ const apiUrl = `${serverUrl}/user`;
 
 export function login(user) {
     return handleFetch(fetch(`${apiUrl}/login`, postConfig(user)))
-    .catch(err => {
+    .catch(() => {
         throw new Error("Invalid user ID/ password");
+    });
+}
+
+export function resetToken(user) {
+    return handleFetch(fetch(`${apiUrl}/reset-code`, postConfig(user)))
+    .catch(() => {
+        throw new Error("Invalid email for reset (doesn't exist).");
+    });
+}
+
+export function resetPassword(user) {
+    return handleFetch(fetch(`${apiUrl}/reset-password`, postConfig(user)))
+    .catch(() => {
+        throw new Error("Invalid token/ email.");
     });
 }
 
