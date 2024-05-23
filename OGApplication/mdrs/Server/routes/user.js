@@ -148,6 +148,7 @@ router.post("/har/login", (req, res) => {
         }
 
         const user = response[0];
+        const userID = user.userID;
 
         // Remove inappropriate info from user object so that it is not sent to client.
         delete user.password;
@@ -156,7 +157,7 @@ router.post("/har/login", (req, res) => {
 
         const expires_in = 60 * 60 * 24;
         const exp = Date.now() + expires_in * 1000;
-        const token = jwt.sign({ email, exp }, secretKey);
+        const token = jwt.sign({ userID, email, exp }, secretKey);
         return res.status(200).json({ token, user });
       });
     })
@@ -195,6 +196,7 @@ router.post("/loco/login", (req, res) => {
         }
 
         const user = response[0];
+        const userID = user.userID;
 
         // Remove inappropriate info from user object so that it is not sent to client.
         delete user.password;
@@ -204,7 +206,7 @@ router.post("/loco/login", (req, res) => {
         // Getting a day's worth of seconds once multiplied from milliseconds
         const expires_in = 60 * 60 * 24;
         const exp = Date.now() + expires_in * 1000;
-        const token = jwt.sign({ email, exp }, secretKey);
+        const token = jwt.sign({ userID, email, exp }, secretKey);
         return res.status(200).json(JSON.stringify({ token: token, user: user }));
       });
     })
