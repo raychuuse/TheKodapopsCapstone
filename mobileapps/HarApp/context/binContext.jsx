@@ -360,11 +360,16 @@ export const BinProvider = ({ children }) => {
   };
 
   const handleFindBin = (code) => {
-      if (!connected) return;
+      if (!connected) {
+          errorToast({message: 'Cannot find bin while offline'});
+          return;
+      }
 
-      findBin(code, 1)
+      findBin(code, selectedSiding.sidingID)
           .then(bin => {
               bins.push(bin);
+              sortBins(bins);
+              setBins([...bins]);
           })
           .catch(err => {
               console.error(err);

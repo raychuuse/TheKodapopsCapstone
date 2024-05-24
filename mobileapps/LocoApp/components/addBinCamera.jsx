@@ -54,12 +54,28 @@ const AddBinCamera = ({ stop }) => {
     }
   };
 
-  const addBinHandeler = () => {
-    handleFindBin(binNumber, getAddBinModelStop())
-    setBinNumber('');
-    closeAddBinModal();
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  };
+  function VerifyBinNumber(num) {
+      // Regex from stack overflow, \d for digits
+      return /^\d+$/.test(num) && num.length === 4;
+  }
+
+  /**
+   * Handle the submission of the bin number.
+   */
+  function addBinHandeler() {
+      if (VerifyBinNumber(binNumber)) {
+          try {
+              handleFindBin(binNumber, getAddBinModelStop());
+              setBinNumber('');
+              Alert.alert('Bin Creation Successful.');
+              return;
+          } catch (err) {
+              console.log(err);
+          }
+      }
+      Alert.alert('Bin Creation Failed, please enter a valid bin number');
+  }
+
 
   function toggleCameraType() {
     setType((current) =>
