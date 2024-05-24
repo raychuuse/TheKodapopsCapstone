@@ -102,13 +102,14 @@ router.post("/login", loginValidationRulesID, (req, res) => {
         }
 
         const user = response[0];
+        const userID = user.userID;
 
         // Remove password from user object so that it is not sent to client.
         delete user.password;
 
         const expires_in = 60 * 60 * 24;
         const exp = Date.now() + expires_in * 1000;
-        const token = jwt.sign({ id, exp }, secretKey);
+        const token = jwt.sign({ userID, exp }, secretKey);
         res.status(200).json({ token: token, user: user });
       });
     })
