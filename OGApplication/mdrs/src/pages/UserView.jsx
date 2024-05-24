@@ -27,7 +27,8 @@ const UserView = () => {
     const [formErrors, setFormErrors] = useState({});
     const [error, setError] = useState();
     const [success, setSuccess] = useState();
-
+    
+    // useEffect to update live data with every render and change in DOM
     useEffect(() => {
         const segment = match.params.segment;
         if (isNumeric(segment)) {
