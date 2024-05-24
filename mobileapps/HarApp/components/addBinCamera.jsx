@@ -92,11 +92,7 @@ const AddBinCamera = ({ modalCloser }) => {
    */
   function VerifyBinNumber(num) {
     // Regex from stack overflow, \d for digits
-    if (/^\d+$/.test(num)) {
-      return true;
-    } else {
-      return false;
-    }
+    return /^\d+$/.test(num) && num.length === 4;
   }
 
   /**
@@ -112,7 +108,7 @@ const AddBinCamera = ({ modalCloser }) => {
         console.log(err);
       }
     }
-    Alert.alert('Bin Creation Failed, please enter a valid bin number.');
+    Alert.alert('Bin Creation Failed, please enter a valid bin number');
   }
 
   if (!permission) requestPermission(); // Request camera permission if not granted

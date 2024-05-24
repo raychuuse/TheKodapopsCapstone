@@ -84,7 +84,7 @@ router.post('/find-bin/:code', verifyAuthorization, (req, res) => {
                     })
                     .catch(err => {
                         console.error(err);
-                        throw {};
+                        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
                     });
             } else {
                 req.db.raw(`UPDATE bin SET sidingID = ${sidingID != null ? '?' : 'null'}, locoID = ${locoID != null ? '?' : 'null'} WHERE binID = ?`, [sidingID != null ? sidingID : locoID, bin.binID])
@@ -97,7 +97,7 @@ router.post('/find-bin/:code', verifyAuthorization, (req, res) => {
                     })
                     .catch(err => {
                         console.error(err);
-                        throw {};
+                        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
                     })
             }
         })
@@ -167,10 +167,12 @@ router.put('/bin-field-state/:binID', verifyAuthorization, (req, res) => {
             if (err.status != null && err.message != null)
                 return res.status(err.status).json({message: err.message});
             console.error(err);
+            res.status(500).json({message: 'An unknown error occurred. Please try again.'});
         });
 });
 
 router.put('/bin-resolved/:binID', verifyAuthorization, (req, res) => {
+    console.info('hello');
     if (!isValidId(req.params.binID, res)) return;
 
     req.db.raw(`SELECT *
@@ -199,7 +201,7 @@ router.put('/bin-resolved/:binID', verifyAuthorization, (req, res) => {
                     .catch(err => {
                         console.error(err);
                         trx.rollback();
-                        throw { status: 500, message: 'An unknown error occurred. Please try again.' };
+                        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
                     });
 
                 trx.raw(`INSERT INTO transactionlog (userID, binID, type)
@@ -214,7 +216,7 @@ router.put('/bin-resolved/:binID', verifyAuthorization, (req, res) => {
                     .catch(err => {
                         console.error(err);
                         trx.rollback();
-                        throw { status: 500, message: 'An unknown error occurred. Please try again.' };
+                        return res.status(500).json({message: 'An unknown error occurred. Please try again.'});
                     });
             });
         })
@@ -300,6 +302,7 @@ router.post('/consign', verifyAuthorization, (req, res) => {
                         .catch(err => {
                             console.error(err);
                             trx.rollback();
+                            res.status(500).json({message: 'An unknown error occurred. Please try again.'});
                         });
                 }
             });
