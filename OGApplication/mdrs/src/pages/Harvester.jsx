@@ -4,6 +4,7 @@ import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/styles/ag-theme-balham.css'; // Optional theme CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+// Import apis for http requests and data loading
 import {
     createHarvester,
     deleteHarvester,
