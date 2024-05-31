@@ -38,11 +38,11 @@
 }
 
 /* ALEX'S STYLING */
-.hero{
+.hero {
   padding: auto;
   padding: 30px 30px;
 }
-.hero h1{
+.hero h1 {
   text-align: left;
 }
 
@@ -52,7 +52,6 @@ section.metric {
 
 section.search {
   text-align: left;
-
 }
 
 .search-result {
@@ -63,23 +62,23 @@ section.data-table {
   text-align: left;
 }
 
-.table-header-wrapper{
+.table-header-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
 
-.table-header{
+.table-header {
   align-items: start;
 }
 
-.table-bin-count-wrapper{
+.table-bin-count-wrapper {
   align-items: end;
   text-align: end;
   display: flex;
 }
 
-.table-bin-count-wrapper h1{
+.table-bin-count-wrapper h1 {
   padding-left: 10px;
 }
 
@@ -96,4 +95,21 @@ section.data-table {
 
 .list-group-item .btn {
   display: none;
+}
+
+/* Popover Styles */
+[popover] {
+  padding-block: 1rem;
+  padding-inline: 2rem;
+
+  max-width: 40rem;
+
+  > form {
+    margin-top: 3rem;
+  }
+
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(20px);
+  }
 }
