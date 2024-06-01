@@ -1,0 +1,7 @@
+{ 
+    "password": "root", 
+    "firstName": "Bob", 
+    "lastName": "Tester", 
+    "email": "newemail.com", 
+    "role": "Harvester"
+}

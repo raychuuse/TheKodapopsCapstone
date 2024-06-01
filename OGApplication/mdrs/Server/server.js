@@ -2,11 +2,10 @@ const createError = require("http-errors");
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
-const app = express();
-
 const port = 8080;
 
-const server = http.createServer(app);
+
+
 
 // Websocket integration
 // i.e.
@@ -30,59 +29,69 @@ const runsRouter = require("./routes/runs");
 const options = require("./knex.js");
 const knex = require("knex")(options);
 
-app.use(cors());
-// for parsing application/json
-app.use(express.json());
 
-app.use((req, res, next) => {
-  req.db = knex;
-  next();
-});
+function createServer() {
+  const app = express();
+  app.use(cors());
+  // for parsing application/json
+  app.use(express.json());
 
-//Routers
-app.use("/bins?", binRouter);
-app.use("/log", transactionRouter);
-app.use("/locos?", locoRouter);
-app.use("/sidings?", sidingRouter);
-app.use("/harvesters?", harvesterRouter);
-app.use("/dashboard", dashboardRouter);
-app.use("/runs", runsRouter);
-app.use("/user", userRouter);
+  app.use((req, res, next) => {
+    req.db = knex;
+    next();
+  });
 
-//test db connection
-app.get("/knex", function (req, res, next) {
-  req.db
-    .raw("SELECT VERSION()")
-    .then((version) => console.log(version[0][0]))
-    .catch((err) => {
-      console.log(err);
-      throw err;
-    });
-  res.send("Version Logged successfully");
-});
+  //Routers
+  app.use("/bins?", binRouter);
+  app.use("/log", transactionRouter);
+  app.use("/locos?", locoRouter);
+  app.use("/sidings?", sidingRouter);
+  app.use("/harvesters?", harvesterRouter);
+  app.use("/dashboard", dashboardRouter);
+  app.use("/runs", runsRouter);
+  app.use("/user", userRouter);
 
-app.use(function (req, res, next) {
-  console.error('Not found', req.url);
-  var err = new Error("Not Found");
-  err.status = 404;
-  next(err);
-});
+  //test db connection
+  app.get("/knex", function (req, res, next) {
+    req.db
+      .raw("SELECT VERSION()")
+      .then((version) => console.log(version[0][0]))
+      .catch((err) => {
+        console.log(err);
+        throw err;
+      });
+    res.send("Version Logged successfully");
+  });
 
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+  app.use(function (req, res, next) {
+    console.error('Not found', req.url);
+    var err = new Error("Not Found");
+    err.status = 404;
+    next(err);
+  });
 
-  console.log(err);
+  // error handler
+  app.use(function (err, req, res, next) {
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // render the error page
-  // res.status(err.status || 500);
-});
+    console.log(err); 
 
-process.on("unhandledRejection", (error, p) => {
-  console.log("=== UNHANDLED REJECTION ===", p);
-  console.dir(error.stack);
-});
+    // render the error page
+    // res.status(err.status || 500);
+  });
+
+  process.on("unhandledRejection", (error, p) => {
+    console.log("=== UNHANDLED REJECTION ===", p);
+    console.dir(error.stack);
+  });
+  return app
+}
+
+const app = createServer();
+const server = http.createServer(app);
 
 server.listen(port, () => console.log(`API runs on http:localhost:${port}`));
+
+module.exports = createServer
