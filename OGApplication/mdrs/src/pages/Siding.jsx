@@ -10,7 +10,6 @@ import {
     getAllSidings,
     getHarvesterBreakdown,
     getLocoBreakdown,
-    getSiding,
     getSidingBreakdown,
     updateSiding
 } from "../api/sidings";

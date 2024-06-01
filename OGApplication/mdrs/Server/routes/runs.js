@@ -60,7 +60,6 @@ router.get('/:id', (req, res) => {
                 .then(processQueryResult)
                 .then(stopsResult => {
                     run.stops = stopsResult;
-                    console.info(run);
                     return res.status(200).json(run);
                 })
                 .catch(err => {
@@ -212,13 +211,10 @@ router.post('/:locoID/stop-action/:stopID/:binID', (req, res) => {
                     `, [stop.stopID])
                         .then(processQueryResult)
                         .then(rows => {
-                            console.info('hello', rows);
                             if (rows.length === 0)
                                 return Promise.resolve();
-                            console.info('the good one')
                             collectCount = rows[0].collectCount;
                             dropOffCount = rows[0].dropOffCount;
-                            console.info(collectCount, dropOffCount);
                             return Promise.resolve();
                         });
                 };
@@ -226,7 +222,6 @@ router.post('/:locoID/stop-action/:stopID/:binID', (req, res) => {
                 const updateStopCompleteState = () => {
                     const collectTest = collectCount >= stop.collectQuantity;
                     const dropOffTest = dropOffCount >= stop.dropOffQuantity;
-                    console.info('here', collectTest, dropOffTest);
 
                     if (collectTest || dropOffTest) {
                         return req.db.raw(`UPDATE run_stops

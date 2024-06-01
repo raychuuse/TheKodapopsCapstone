@@ -23,6 +23,10 @@ function checkIfExpired(date) {
   return true;
 }
 
+function generateRandomString() {
+  return (Math.random() + 1).toString(36).substring(7);
+}
+
 function htmlResetCode(app, resetCode) {
   return `<!DOCTYPE html>
   <html lang="en">
@@ -136,4 +140,5 @@ module.exports = {
   validationErrorToError,
   checkIfExpired,
   htmlResetCode,
+  generateRandomString
 };

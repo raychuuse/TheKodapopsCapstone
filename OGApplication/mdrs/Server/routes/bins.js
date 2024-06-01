@@ -239,9 +239,6 @@ router.post('/consign', verifyAuthorization, (req, res) => {
             user = response[0];
             if (user == null)
                 throw {status: 404, message: 'No user found with the id: ' + req.userID};
-
-            if ((user.harvesterID == null || user.userRole !== 'Harvester') && user.userRole !== 'Locomotive')
-                throw {status: 403, message: 'Only harvester and locomotive users can consign bins'};
             return req.db.raw(`SELECT * FROM bin WHERE binID = ?`, [req.body.binID]);
         })
         .then(processQueryResult)

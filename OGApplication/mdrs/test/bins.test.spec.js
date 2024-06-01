@@ -1,9 +1,9 @@
-import createServer from "./Server/server";
-import request from 'supertest';
-import { expect } from 'chai';
+const createServer = require("../Server/server")
+const request = require('supertest');
+const chai = require('chai');
 
 // Hardcoded auth data for testing
-import authdata from '../testdata/authdata.json';
+const authdata = require('../testdata/authdata.json');
 
 // See user test for general comments
 
@@ -15,15 +15,14 @@ describe('Bins API tests', () => {
 
     it(`Consign a bin`, (done) => {
 		// Body : BinID, full, userID
-        let body = [1, 1, 1];
-
 		request(app)
-			.post(`${apiRoute}/${param[0]}/complete-stop/${param[1]}/${param[2]}`)
-            .send({binID: body[0], full: body[1], userID: body[2], Authorization: authdata.Authorization})
+			.post(`${apiRoute}/consign`)
+            .send({binID: 1, full: false})
 			.set('Accept', 'application/json')
 			.set('Content-Type', 'application/json')
+			.set('Authorization', authdata.Authorization)
 			.end(function (err, res) {
-				expect(res.statusCode).to.be.equal(200);
+				chai.expect(res.statusCode).to.be.equal(200);
                 done();
 			});
 	});

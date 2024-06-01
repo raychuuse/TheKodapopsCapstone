@@ -12,6 +12,7 @@ router.get("/", (req, res) => {
         res.status(200).json(locos);
       })
       .catch((err) => {
+        console.error(err);
         res.status(500).json(err);
       });
 });
@@ -132,15 +133,15 @@ router.put('/:id/:name', (req, res) => {
 
 router.delete('/:id', (req, res) => {
     const id = req.params.id;
-    if (!isValidId(id)) return;
+    if (!isValidId(id, res)) return;
 
     req.db.raw(`DELETE FROM locomotive 
-              WHERE locoID = '${id}'`)
+              WHERE locoID = ?`, [id])
         .then(result => {
             res.status(204).send();
         })
         .catch(error => {
-            console.error(error);
+            console.error('errrrrrrr', error);
             res.status(500).json(error);
         });
 });

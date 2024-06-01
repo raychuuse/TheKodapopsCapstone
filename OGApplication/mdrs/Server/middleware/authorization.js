@@ -8,7 +8,6 @@ const verifyAuthorization = (req, res, next) => {
         if (bearer.length > 1) {
             const token = bearer[1];
             jwt.verify(token, 'secret key', (err, auth) => {
-                console.info(err, auth);
                 if (err) {
                     return res.status(403).json({message: 'Unauthorized'});
                 } else {

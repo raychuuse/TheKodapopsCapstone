@@ -77,7 +77,7 @@ router.put('/:id/:name', (req, res) => {
 
 router.delete('/:id', (req, res) => {
     const id = req.params.id;
-    if (!isValidId(id)) return;
+    if (!isValidId(id, res)) return;
 
     req.db.raw(`DELETE FROM harvester 
                 WHERE harvesterID = '${id}'`)

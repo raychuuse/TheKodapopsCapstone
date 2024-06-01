@@ -51,6 +51,10 @@ In the terminal running the express back end press
 Ctrl + c
 Which will stop the server running 
 
+### Running Unit Tests
+From within the MDRS directory, run the following command to run the backend's suite of integration tests.
+\Cane-Consignment-Application\mdrs>
+### `npm test`
 
 
 

@@ -35,7 +35,7 @@ function GenerateUniqueID() {
 }
 
 const { validateUserBody } = require("../middleware/validateUser");
-const { processQueryResult, validationErrorToError, htmlResetCode } = require("../utils");
+const { processQueryResult, validationErrorToError, htmlResetCode, isValidId } = require("../utils");
 const { isNumeric } = require("validator");
 const e = require("express");
 const { verifyAuthorization } = require("../middleware/authorization");
@@ -668,8 +668,10 @@ router.put("/", updateValidationRules, (req, res) => {
   }
 
   const { userID, firstName, lastName, role, email } = req.body;
+  if (!isValidId(userID, res)) return;
+
   const selectedHarvester = role === "Harvester" ? req.body.selectedHarvester : null;
-  if (role === "Harvester" && selectedHarvester == undefined) {
+  if (role === "Harvester" && selectedHarvester == null) {
     console.error("Need selected harvester");
     return res.status(400).json({
       message: "Please select the harvesting company this user works for",
