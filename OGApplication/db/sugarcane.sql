@@ -294,7 +294,7 @@ CREATE TABLE `transactionlog` (
   KEY `transactionlog_siding_sidingID_fk` (`sidingID`),
   KEY `transactionlog_users_userID_fk` (`userID`),
   KEY `transactionlog_run_stops_stopID_fk` (`stopID`),
-  CONSTRAINT `transactionlog_bin_binID_fk` FOREIGN KEY (`binID`) REFERENCES `bin` (`binID`) ON DELETE CASCADE,
+  CONSTRAINT `transactionlog_bin_binID_fk` FOREIGN KEY (`binID`) REFERENCES `bin` (`binID`),
   CONSTRAINT `transactionlog_harvester_harvesterID_fk` FOREIGN KEY (`harvesterID`) REFERENCES `harvester` (`harvesterID`) ON DELETE CASCADE,
   CONSTRAINT `transactionlog_locomotive_locoID_fk` FOREIGN KEY (`locoID`) REFERENCES `locomotive` (`locoID`) ON DELETE CASCADE,
   CONSTRAINT `transactionlog_run_stops_stopID_fk` FOREIGN KEY (`stopID`) REFERENCES `run_stops` (`stopID`) ON DELETE CASCADE,

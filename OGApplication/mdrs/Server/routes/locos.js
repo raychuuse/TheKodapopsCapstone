@@ -119,14 +119,16 @@ router.put('/:id/:name', verifyAuthorization, (req, res) => {
     .then(data => {
       if (data[0].count > 0)
         return res.status(409).json('A loco with that name already exists.');
-      req.db('locomotive').update({locoName: name}).where({locoID: id})
-      .then(result => {
-          res.status(204).send();
-      })
-      .catch(error => {
-          console.error(error);
-          res.status(500).json(error);
-      })
+      else {
+        req.db('locomotive').update({locoName: name}).where({locoID: id})
+        .then(result => {
+            res.status(204).send();
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
+        })
+      }
     })
 });
 
@@ -141,6 +143,8 @@ router.delete('/:id', verifyAuthorization, (req, res) => {
         })
         .catch(error => {
             console.error('errrrrrrr', error);
+            if (error?.code === 'ER_ROW_IS_REFERENCED_2' && error?.sqlMessage.includes('bin_locomotive_locoID_fk'))
+              return res.status(409).json({message: 'That locomotive is used and cannot be deleted.'});
             res.status(500).json(error);
         });
 });
