@@ -398,20 +398,21 @@ router.put('/:binID/:code', (req, res) => {
     code = '0' + code;
 
   req.db.raw(`select count(code) AS count from bin WHERE code = ?`, [code])
-      .then(processQueryResult)
-      .then(data => {
-        if (data[0].count > 0)
-          return res.status(510).json('Another bin with that code already exists.');
-
+  .then(processQueryResult)
+  .then(data => {
+    if (data[0].count > 0)
+        return res.status(510).json('Another bin with that code already exists.');
+    else {
         req.db('bin').update({code: code}).where({binID: id})
-            .then(response => {
-              res.status(200).json({message: 'Bin Successfully Updated'});
-            })
-            .catch(error => {
-              console.error(error);
-              res.status(500).json({message: 'An unknown error occurred. Please try again.'});
-            })
-      });
+        .then(response => {
+            res.status(200).json({message: 'Bin Successfully Updated'});
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+        })
+    }
+  })
 });
 
 router.delete('/:binID', (req, res) => {
@@ -425,6 +426,8 @@ router.delete('/:binID', (req, res) => {
         })
         .catch(error => {
             console.error(error);
+            if (error?.code === 'ER_ROW_IS_REFERENCED_2' && error?.sqlMessage.includes('transactionlog_bin_binID_fk'))
+              return res.status(409).json({message: 'That bin is used and cannot be deleted.'});
             res.status(500).json(error);
         });
 });

@@ -87,6 +87,8 @@ router.delete('/:id', verifyAuthorization, (req, res) => {
     })
     .catch(error => {
       console.error(error);
+      if (error?.code === 'ER_ROW_IS_REFERENCED_2' && error?.sqlMessage.includes('users_harvester_harvesterID_fk'))
+              return res.status(409).json({message: 'That harvester is used and cannot be deleted.'});
       res.status(500).json({message: 'An unknown error occurred. Please try again.'});
     });
 });

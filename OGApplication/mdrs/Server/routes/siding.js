@@ -112,19 +112,21 @@ router.put('/:id/:name', verifyAuthorization, (req, res) => {
   const name = req.params.name;
   if (!isValidId(id, res)) return;
   req.db.raw(`select count(sidingName) AS count from siding WHERE sidingName = ?`, [name])
-      .then(processQueryResult)
-      .then(data => {
-        if (data[0].count > 0)
-          return res.status(409).json({message: 'Another siding with that name already exists.'});
-        req.db('siding').update({sidingName: name}).where({sidingID: id})
-            .then(result => {
-              res.status(204).send();
-            })
-            .catch(error => {
-              console.error(error);
-              res.status(500).json({message: 'An unknown error occurred. Please try again.'});
-            })
+  .then(processQueryResult)
+  .then(data => {
+    if (data[0].count > 0)
+        return res.status(409).json({message: 'Another siding with that name already exists.'});
+    else { 
+      req.db('siding').update({sidingName: name}).where({sidingID: id})
+      .then(result => {
+          res.status(204).send();
       })
+      .catch(error => {
+        console.error(error);
+        res.status(500).json({message: 'An unknown error occurred. Please try again.'});
+      })
+    }
+  })
 });
 
 router.delete('/:id', verifyAuthorization, (req, res) => {
@@ -138,6 +140,8 @@ router.delete('/:id', verifyAuthorization, (req, res) => {
         })
         .catch(error => {
             console.error(error);
+            if (error?.code === 'ER_ROW_IS_REFERENCED_2' && error?.sqlMessage.includes('bin_siding_sidingID_fk'))
+              return res.status(409).json({message: 'That siding is used and cannot be deleted'});
             res.status(500).json(error);
         });
 });
