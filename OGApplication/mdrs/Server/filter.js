@@ -1,10 +1,10 @@
 function filterById(bins, query) {
   if (query) {
-    return bins.filter((bin) => bin.status === "FULL");
+    return bins.filter((bin) => bin.full);
     
   }
   // Bins that have "null" instead of full or empty, list as empty in count?
-  return bins.filter((bin) => bin.status === "EMPTY");
+  return bins.filter((bin) => !bin.full);
 }
 
 function getMetrics(bins) {

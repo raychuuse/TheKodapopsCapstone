@@ -132,7 +132,7 @@ const SidingBreakdown = ({id}) => {
         getSidingBreakdown(id)
             .then(data => {
                 setData(data);
-                setFullBins(data.reduce((sum, bin) => sum + (bin.status === 'FULL' ? 1 : 0), 0));
+                setFullBins(data.reduce((sum, bin) => sum + bin.full ? 1 : 0, 0));
                 setError(null);
             })
             .catch(err => {

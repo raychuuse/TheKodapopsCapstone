@@ -5,63 +5,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const apiUrl = `${serverUrl}/bins`;
 
-// Original group attempted to transition to functions seemingly, switching to async funcs in api gets etc
-/** 
-export function getAllBins(){
-    return fetch(`${apiUrl}/bins`)
-        .then((body) => body.json())
-        .then((body) => {
-            //check for db error
-            if(body.Error){
-                console.log(body.Message)
-                throw Error(`${body.Message}`)
-            }
-            return body.data
-        })
-        .then((data) =>{
-            return data.map((bin) => ({
-                binsID: bin.binsID,
-                transactionTime: bin.transactionTime,
-                transactionNumber: bin.transactionNumber,
-                statusID: bin.statusID,
-                status: (Status[parseInt(bin.statusID)]),
-                sidingID: bin.sidingID,
-                locoID: bin.locoID,
-                harvesterID: bin.harvesterID,
-                sidingName: bin.sidingName,
-                harvesterName: bin.harvesterName,
-                locoName: bin.locoName,
-
-            }))
-        })
-}
-
-export function useAllBins(){
-    const [error, setError] = useState(null);
-    const [binData, setBinData] = useState([]);
-
-    useEffect(
-        () => {
-            getAllBins()
-                .then((bins) => {
-                    // console.log(bins)
-                    setBinData(bins);
-                    setError(null)
-                })
-                .catch((e) =>{
-                    setError(e)
-                })
-        },
-        []
-    );
-
-    return {
-        binData: binData,
-        error
-    };
-}
-*/
-
 export function getAllBins(){
     return handleFetch(fetch(`${apiUrl}`, getConfig()));
 }

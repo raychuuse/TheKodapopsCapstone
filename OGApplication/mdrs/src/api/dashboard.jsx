@@ -14,13 +14,6 @@ export async function getDashboard() {
     return body.data;
 }
 
-// Have had no version provided with these modifications
-/*
-export function filterByStatus(bins, query) {
-    return bins.filter(bin => bin.statusID === query)
-}
-*/
-
 export function filterByStatus(bins, isFull,) {
     if (isFull) {
         return bins.filter(bin => bin.full);

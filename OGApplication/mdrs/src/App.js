@@ -28,17 +28,6 @@ import UserPage from "./pages/User";
 import UserView from "./pages/UserView";
 
 
-function setToken(userToken) {
-  sessionStorage.setItem('token', JSON.stringify(userToken));
-}
-
-function getToken() {
-  const tokenString = sessionStorage.getItem('token');
-  const userToken = JSON.parse(tokenString);
-  return userToken?.token
-}
-
-
 export default function App() {
   return (
     <Router>

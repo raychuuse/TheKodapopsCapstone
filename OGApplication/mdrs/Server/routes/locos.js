@@ -82,7 +82,6 @@ router.get('/:locoId/load', verifyAuthorization, (req, res) => {
             loco.bins.push({
                 binID: bin.binID,
                 code: bin.code,
-                status: bin.status,
                 full: !!bin.full,
                 burnt: !!bin.burnt,
                 pickedUpInRun: !!bin.pickedUpInRun,

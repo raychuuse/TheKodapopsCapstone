@@ -13,7 +13,7 @@ router.get("/", (req, res) => {
     .select(
       "locomotive.locoID",
       "locomotive.locoName",
-      "bin.status",
+      "bin.full",
       "bin.binID"
     );
   const sidingData = req.db
@@ -22,7 +22,7 @@ router.get("/", (req, res) => {
     .select(
       "siding.sidingID",
       "siding.sidingName",
-      "bin.status",
+      "bin.full",
       "bin.binID"
     );
 
@@ -33,7 +33,7 @@ router.get("/", (req, res) => {
       "harvester.harvesterID",
       "harvester.harvesterName",
       "bin.binID",
-      "bin.status"
+      "bin.full"
     );
 
   locoData

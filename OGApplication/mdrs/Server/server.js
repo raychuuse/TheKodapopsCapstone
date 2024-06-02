@@ -3,10 +3,7 @@ const http = require("http");
 const express = require("express");
 const cors = require("cors");
 require('dotenv').config({path: __dirname + '/.env'});
-const port = 8080;
-
-
-
+const port = process.env.SERVER_PORT;
 
 // Websocket integration
 // i.e.

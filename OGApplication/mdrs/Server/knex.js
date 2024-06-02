@@ -1,10 +1,10 @@
 module.exports = {
   client: "mysql2",
   connection: {
-    host: "127.0.0.1",
-    port: 3306,
-    database: "sugarcane",
-    user: "root",
-    password: "root",
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_SCHEMA,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
   },
 };
