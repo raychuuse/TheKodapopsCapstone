@@ -123,7 +123,7 @@ const LogInPage = () => {
                 issueAlert(issue.message);
               }
               else {
-                issueAlert("Invalid login details.")
+                issueAlert("Invalid reset password details.")
               }
             });
           }
