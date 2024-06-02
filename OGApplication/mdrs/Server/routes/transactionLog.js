@@ -1,9 +1,11 @@
 const express = require("express");
 const {processQueryResult} = require("../utils");
+const { verify } = require('jsonwebtoken');
+const { verifyAuthorization } = require('../middleware/authorization');
 const router = express.Router();
 
 //GET all records from the transaction log
-router.get("/", function (req, res, next) {
+router.get("/", verifyAuthorization, function (req, res, next) {
   req.db.raw(`
       SELECT *
       FROM transactionlog t

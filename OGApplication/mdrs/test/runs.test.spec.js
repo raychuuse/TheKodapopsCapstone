@@ -1,15 +1,21 @@
 const createServer = require("../Server/server")
 const request = require('supertest');
 const expect = require('chai').expect;
-
-// Hardcoded auth data for testing
-const authdata = require('../testdata/authdata.json');
+require('dotenv').config({path: './Server/.env'})
+const jwt = require('jsonwebtoken');
 
 // See user test for general comments
 
 const app = createServer();
 
 const apiRoute = "/runs"
+
+if (global.testAuthToken == null) {
+	const expires_in = 60 * 4;
+	const exp = Date.now() / 1000 + expires_in;
+	global.testAuthToken = jwt.sign({ userID: 1, exp }, process.env.SECRET_KEY);
+}
+
 describe('Runs API tests', () => {
 
     it('should return run info on a specific date', (done) => {
@@ -19,7 +25,7 @@ describe('Runs API tests', () => {
 			.get(`${apiRoute}/${param[0]}/${param[1]}`)
 			.set('Accept', 'application/json')
 			.set('Content-Type', 'application/json')
-			.set('Authorization', authdata.Authorization)
+			.set('Authorization', `Bearer ${global.testAuthToken}`)
 			.end(function (err, res) {
 				expect(res.statusCode).to.be.equal(200);
 				expect(res.body.data).not.to.be.null;
@@ -39,7 +45,7 @@ describe('Runs API tests', () => {
             .query({type: typeChosen})
 			.set('Accept', 'application/json')
 			.set('Content-Type', 'application/json')
-			.set('Authorization', authdata.Authorization)
+			.set('Authorization', `Bearer ${global.testAuthToken}`)
 			.end(function (err, res) {
 				expect(res.statusCode).to.be.equal(204);
                 done();
@@ -52,10 +58,9 @@ describe('Runs API tests', () => {
 
 		request(app)
 			.post(`${apiRoute}/${param[0]}/complete-stop/${param[1]}/${param[2]}`)
-            .send(authdata)
 			.set('Accept', 'application/json')
 			.set('Content-Type', 'application/json')
-			.set('Authorization', authdata.Authorization)
+			.set('Authorization', `Bearer ${global.testAuthToken}`)
 			.end(function (err, res) {
 				expect(res.statusCode).to.be.equal(204);
                 done();

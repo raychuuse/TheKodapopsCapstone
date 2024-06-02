@@ -7,8 +7,9 @@ const verifyAuthorization = (req, res, next) => {
         const bearer = header.split(' ');
         if (bearer.length > 1) {
             const token = bearer[1];
-            jwt.verify(token, 'secret key', (err, auth) => {
+            jwt.verify(token, process.env.SECRET_KEY, (err, auth) => {
                 if (err) {
+                    console.error(err);
                     return res.status(403).json({message: 'Unauthorized'});
                 } else {
                     if (auth.userID != null)

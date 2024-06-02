@@ -1,15 +1,20 @@
 const createServer = require("../Server/server")
 const request = require('supertest');
 const chai = require('chai');
-
-// Hardcoded auth data for testing
-const authdata = require('../testdata/authdata.json');
+require('dotenv').config({path: './Server/.env'})
+const jwt = require('jsonwebtoken');
 
 // See user test for general comments
 
 const app = createServer();
 
 const apiRoute = "/bins";
+
+if (global.testAuthToken == null) {
+	const expires_in = 60 * 4;
+	const exp = Date.now() / 1000 + expires_in;
+	global.testAuthToken = jwt.sign({ userID: 1, exp }, process.env.SECRET_KEY);
+}
 
 describe('Bins API tests', () => {
 
@@ -20,7 +25,7 @@ describe('Bins API tests', () => {
             .send({binID: 1, full: false})
 			.set('Accept', 'application/json')
 			.set('Content-Type', 'application/json')
-			.set('Authorization', authdata.Authorization)
+			.set('Authorization', `Bearer ${global.testAuthToken}`)
 			.end(function (err, res) {
 				chai.expect(res.statusCode).to.be.equal(200);
                 done();

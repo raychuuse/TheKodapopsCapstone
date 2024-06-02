@@ -11,7 +11,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const hashKey = 8;
 
-const secretKey = "secret key";
+const secretKey = process.env.SECRET_KEY;
 const mailer = "sugarcaneconsignment@gmail.com";
 const mailPassword = "hhuh jtmg qhkg alqn";
 const harvesterRole = "Harvester";
@@ -51,10 +51,6 @@ const loginValidationRulesEmail = [
   body("email").notEmpty().withMessage("Please provide your password"),
   body("password").notEmpty().withMessage("Please provide your password"),
 ];
-
-function checkJWT(jwt) {
-  return jwt.verify(token, secretKey);
-}
 
 const sendCode = async (userEmail, resetCode, app) => {
   try {

@@ -2,6 +2,7 @@ const createError = require("http-errors");
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
+require('dotenv').config({path: './Server/.env'})
 const port = 8080;
 
 

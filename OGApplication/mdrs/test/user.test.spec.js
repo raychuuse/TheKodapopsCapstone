@@ -2,9 +2,7 @@ const createServer = require("../Server/server")
 const request = require('supertest');
 const expect = require('chai').expect;
 const generateRandomString = require('../Server/utils').generateRandomString;
-
-// Hardcoded auth data for testing
-const authdata = require('../testdata/authdata.json');
+const jwt = require('jsonwebtoken');
 
 // See user test for general comments
 
