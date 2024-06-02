@@ -313,11 +313,8 @@ router.post('/consign', verifyAuthorization, (req, res) => {
 });
 
 router.get("/dash", (req, res) => {
-    // uhhhh? triple siding left join?
   req.db.raw(`SELECT b.binID, b.status, b.locoID, l.locoName, h.harvesterName, s.sidingName 
       FROM bin b 
-          LEFT JOIN siding s ON b.sidingID = s.sidingID
-          LEFT JOIN siding s ON b.sidingID = s.sidingID
           LEFT JOIN siding s ON b.sidingID = s.sidingID
       `)
       .then(processQueryResult)
