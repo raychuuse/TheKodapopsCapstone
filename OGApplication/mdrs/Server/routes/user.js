@@ -48,7 +48,7 @@ const loginValidationRulesID = [
 // Add specific regex for email validation
 // Temporarily removed during testing
 const loginValidationRulesEmail = [
-  body("email").notEmpty().withMessage("Please provide your password"),
+  body("email").notEmpty().withMessage("Please provide your email"),
   body("password").notEmpty().withMessage("Please provide your password"),
 ];
 
@@ -69,7 +69,7 @@ const sendCode = async (userEmail, resetCode, app) => {
 router.post("/login", loginValidationRulesID, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json(validationErrorToError(errors));
   }
   const id = req.body.id;
   const password = req.body.password;
@@ -115,11 +115,10 @@ router.post("/login", loginValidationRulesID, (req, res) => {
     });
 });
 
-router.post("/har/login", (req, res) => {
-  console.info('hLlo');
+router.post("/har/login", loginValidationRulesEmail, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json(validationErrorToError(errors));
   }
 
   const email = req.body.email;
@@ -167,10 +166,10 @@ router.post("/har/login", (req, res) => {
     });
 });
 
-router.post("/loco/login", (req, res) => {
+router.post("/loco/login", loginValidationRulesEmail, (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json(validationErrorToError(errors));
   }
 
   const email = req.body.email;

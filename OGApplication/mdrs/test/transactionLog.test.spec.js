@@ -16,7 +16,6 @@ if (global.testAuthToken == null) {
 	global.testAuthToken = jwt.sign({ userID: 1, exp }, process.env.SECRET_KEY);
 }
 
-console.info(global.testAuthToken);
 
 describe('Transaction Log tests', () => {
 
