@@ -13,8 +13,6 @@
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-community/netinfo": "11.3.1",
     "@react-native-picker/picker": "2.7.5",
-    "@testing-library/jest-native": "5.4.3",
-    "@testing-library/react-native": "12.4.3",
     "expo": "^51.0.8",
     "expo-blur": "~13.0.2",
     "expo-camera": "~15.0.9",
@@ -39,12 +37,19 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.24.6",
+    "babel-jest": "^29.7.0",
     "@testing-library/jest-dom": "^6.4.5",
+    "@testing-library/jest-native": "5.4.3",
+    "@testing-library/react-native": "^12.4.3",
     "expo-atlas": "^0.3.0",
     "jest-expo": "~50.0.4"
   },
   "jest": {
     "preset": "jest-expo",
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
     "transformIgnorePatterns": [
       "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg|axios)"
     ]
