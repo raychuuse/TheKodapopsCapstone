@@ -27,7 +27,7 @@ export function getAll() {
     return handleFetch(fetch(`${apiUrl}/`, getConfig()), true);
 }
 export function getById(id) {
-    return handleFetch(fetch(`${apiUrl}/${id}`));
+    return handleFetch(fetch(`${apiUrl}/${id}`, getConfig()));
 }
 
 export function update(user) {

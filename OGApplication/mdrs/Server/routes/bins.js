@@ -4,7 +4,7 @@ const router = express.Router();
 const {processQueryResult, isValidId} = require("../utils");
 const { verifyAuthorization } = require('../middleware/authorization');
 
-router.get('/:binID', (req, res) => {
+router.get('/:binID', verifyAuthorization, (req, res) => {
   const binID = req.params.binID;
   if (!isValidId(binID, res)) return;
 
@@ -21,7 +21,7 @@ router.get('/:binID', (req, res) => {
       });
 });
 
-router.get("/", (req, res) => {
+router.get("/", verifyAuthorization, (req, res) => {
   req.db.raw(`SELECT *, s.sidingName, l.locoName FROM bin b
              LEFT JOIN siding s ON b.sidingID = s.sidingID
              LEFT JOIN locomotive l ON b.locoID = l.locoID`)
@@ -34,7 +34,7 @@ router.get("/", (req, res) => {
       });
 });
 
-router.post('/:binID/move-bin/:sidingID', (req, res) => {
+router.post('/:binID/move-bin/:sidingID', verifyAuthorization, (req, res) => {
   const binID = req.params.binID;
   if (!isValidId(binID, res))
     return;

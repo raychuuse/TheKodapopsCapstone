@@ -5,7 +5,7 @@ const {isValidId, processQueryResult} = require("../utils");
 const { verifyAuthorization } = require('../middleware/authorization');
 
 // Get all locomotives
-router.get("/", (req, res) => {
+router.get("/", verifyAuthorization, (req, res) => {
   req.db.raw("SELECT * FROM locomotive ORDER BY locoName")
       .then(processQueryResult)
       .then((locos) => {
@@ -33,7 +33,7 @@ router.get(`/locos-with-run`, verifyAuthorization, (req, res) => {
 
 // Returns the sidings the loco has visited in the last period, and how many bins have been picked up and dropped
 // off at each siding during that period.
-router.get("/:locoId/siding_breakdown", (req, res) => {
+router.get("/:locoId/siding_breakdown", verifyAuthorization, (req, res) => {
   const id = req.params.locoId;
   if (!isValidId(id)) return;
 
@@ -55,7 +55,7 @@ router.get("/:locoId/siding_breakdown", (req, res) => {
       });
 });
 
-router.get('/:locoId/load', (req, res) => {
+router.get('/:locoId/load', verifyAuthorization, (req, res) => {
   const id = req.params.locoId;
   if (!isValidId(id, res)) return;
 
@@ -97,7 +97,7 @@ router.get('/:locoId/load', (req, res) => {
       })
 });
 
-router.post('/', (req, res) => {
+router.post('/', verifyAuthorization, (req, res) => {
     req.db.insert({locoName: req.body.name}).into('locomotive')
         .then((result) => {
             res.status(201).send();
@@ -110,7 +110,7 @@ router.post('/', (req, res) => {
         });
 });
 
-router.put('/:id/:name', (req, res) => {
+router.put('/:id/:name', verifyAuthorization, (req, res) => {
     const id = req.params.id;
     if (!isValidId(id)) return;
     const name = req.params.name;
@@ -131,7 +131,7 @@ router.put('/:id/:name', (req, res) => {
     })
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyAuthorization, (req, res) => {
     const id = req.params.id;
     if (!isValidId(id, res)) return;
 

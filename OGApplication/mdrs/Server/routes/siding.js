@@ -21,7 +21,7 @@ router.get("/", verifyAuthorization, (req, res) => {
 // Returns the status of a siding, including how many, and which, bins are full and empty, as well as when the bin
 // was filled or dropped off, telling the user how long the bin has been sitting at the siding in its current state,
 // potentially pointing out data entry errors.
-router.get("/:sidingId/breakdown", (req, res) => {
+router.get("/:sidingId/breakdown", verifyAuthorization, (req, res) => {
   const id = req.params.sidingId;
   if (!isValidId(id, res)) return;
 
@@ -51,7 +51,7 @@ router.get("/:sidingId/breakdown", (req, res) => {
       });
 });
 
-router.get('/:sidingId/loco_breakdown', (req, res) => {
+router.get('/:sidingId/loco_breakdown', verifyAuthorization, (req, res) => {
   const sidingId = req.params.sidingId;
   if (!isValidId(sidingId)) return;
 
@@ -75,7 +75,7 @@ router.get('/:sidingId/loco_breakdown', (req, res) => {
 })
 
 // Return the harvesters that have filled a bin in this siding in the last month, and how many bins they filled.
-router.get("/:sidingId/harvester_breakdown", (req, res) => {
+router.get("/:sidingId/harvester_breakdown", verifyAuthorization, (req, res) => {
   const id = req.params.sidingId;
   if (!isValidId(id)) return;
 
@@ -107,7 +107,7 @@ router.post('/', (req, res) => {
       });
 });
 
-router.put('/:id/:name', (req, res) => {
+router.put('/:id/:name', verifyAuthorization, (req, res) => {
   const id = req.params.id;
   const name = req.params.name;
   if (!isValidId(id)) return;
@@ -127,7 +127,7 @@ router.put('/:id/:name', (req, res) => {
       })
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyAuthorization, (req, res) => {
   const id = req.params.id;
   if (!isValidId(id, res)) return;
 

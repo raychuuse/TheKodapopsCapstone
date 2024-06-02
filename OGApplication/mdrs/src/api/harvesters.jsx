@@ -1,28 +1,18 @@
-import {handleFetch, postConfig, putConfig, serverUrl} from "./utils"
+import { deleteConfig, getConfig, handleFetch, postConfig, putConfig, serverUrl } from './utils';
 
 const apiUrl = `${serverUrl}/harvesters`;
 
 
 export function getAllHarvesters() {
-    return fetch(`${apiUrl}`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}`, getConfig()));
 }
 
 export function getHarvester(id) {
-    return fetch(`${apiUrl}/${id}`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        })
+    return handleFetch(fetch(`${apiUrl}/${id}`, getConfig()));
 }
 
 export function getSidingBreakdown(id) {
-    return fetch(`${apiUrl}/${id}/siding_breakdown`)
+    return fetch(`${apiUrl}/${id}/siding_breakdown`, getConfig())
         .then((body) => body.json())
         .then((data) =>{
             // Data formatting
@@ -42,5 +32,5 @@ export function updateHarvester(id, name) {
 }
 
 export function deleteHarvester(id) {
-    return handleFetch(fetch(`${apiUrl}/${id}`, {method: 'DELETE'}), false);
+    return handleFetch(fetch(`${apiUrl}/${id}`, deleteConfig()), false);
 }

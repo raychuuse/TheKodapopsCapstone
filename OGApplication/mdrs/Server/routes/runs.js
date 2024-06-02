@@ -30,7 +30,7 @@ const createRuns = (rows) => {
     return run;
 };
 
-router.get('/:id', (req, res) => {
+router.get('/:id', verifyAuthorization, (req, res) => {
     if (isNaN(req.params.id)) {
         console.error('Invalid id');
         return res.status(400).json({message: 'Please provide a valid id'});
@@ -73,7 +73,7 @@ router.get('/:id', (req, res) => {
         });
 });
 
-router.get('/:locoID/:date', (req, res) => {
+router.get('/:locoID/:date', verifyAuthorization, (req, res) => {
     const locoID = req.params.locoID;
     if (isNaN(locoID)) {
         console.error('Invalid locoID');
@@ -114,7 +114,7 @@ router.get('/:locoID/:date', (req, res) => {
         });
 });
 
-router.post('/:locoID/stop-action/:stopID/:binID', (req, res) => {
+router.post('/:locoID/stop-action/:stopID/:binID', verifyAuthorization, (req, res) => {
     if (isNaN(req.params.binID))
         return res.status(400).json({message: 'Please provide a valid bin ID'});
     if (isNaN(req.params.stopID))

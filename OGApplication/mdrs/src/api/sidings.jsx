@@ -1,27 +1,17 @@
-import {serverUrl, postConfig, putConfig, fullConverter, handleFetch} from "./utils";
+import { serverUrl, postConfig, putConfig, fullConverter, handleFetch, getConfig, deleteConfig } from './utils';
 
 const apiUrl = `${serverUrl}/sidings`;
 
 export function getAllSidings() {
-    return fetch(`${apiUrl}`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}`, getConfig()));
 }
 
 export function getHarvesterBreakdown(id) {
-    return fetch(`${apiUrl}/${id}/harvester_breakdown`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/${id}/harvester_breakdown`, getConfig()));
 }
 
 export function getSidingBreakdown(sidingId) {
-    return fetch(`${apiUrl}/${sidingId}/breakdown`)
+    return fetch(`${apiUrl}/${sidingId}/breakdown`, getConfig())
         .then((body) => body.json())
         .then((data) =>{
             // Data formatting
@@ -34,12 +24,7 @@ export function getSidingBreakdown(sidingId) {
 }
 
 export function getLocoBreakdown(id) {
-    return fetch(`${apiUrl}/${id}/loco_breakdown`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/${id}/loco_breakdown`, getConfig()));
 }
 
 export function createSiding(sidingName) {
@@ -51,5 +36,5 @@ export function updateSiding(id, sidingName) {
 }
 
 export function deleteSiding(id) {
-    return handleFetch(fetch(`${apiUrl}/${id}`, {method: 'DELETE'}), false);
+    return handleFetch(fetch(`${apiUrl}/${id}`, deleteConfig()), false);
 }

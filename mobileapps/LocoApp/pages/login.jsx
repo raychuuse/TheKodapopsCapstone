@@ -164,15 +164,11 @@ const LogInPage = () => {
       if (res.ok) {
         try {
           const data = await res.json();
-          const parsedData = JSON.parse(data);
-          console.info(parsedData);
-          // Awaiting async vs cookies! needed for in loco func with zac merge
-          
           await AsyncStorage.setItem('isSignedIn', 'true');
-          await AsyncStorage.setItem('userID', toString(parsedData.user.userID));
+          await AsyncStorage.setItem('userID', toString(data.user.userID));
           await AsyncStorage.setItem('email', email);
-          setToken(parsedData.token);
-          const fullname = parsedData.user.firstName + " " + parsedData.user.lastName;
+          setToken(data.token);
+          const fullname = data.user.firstName + " " + data.user.lastName;
           await AsyncStorage.setItem('fullname', fullname);
         } catch (err) {
           generalAlert('Failed to login. Please enter an existing user.');
@@ -180,7 +176,7 @@ const LogInPage = () => {
           return;
         }
         router.navigate(setupPageRef);
-      } 
+      }
       else {
         res.json().then((issue) => {
           if (issue.message) {

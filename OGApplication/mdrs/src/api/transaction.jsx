@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {serverUrl, Status} from "./utils";
+import { getConfig, serverUrl, Status } from './utils';
 
 
 const translateStatus = (fill, sidingID, type) => {
@@ -32,7 +32,7 @@ const translateStatus = (fill, sidingID, type) => {
 }
 
 export function getAllTransactions(){
-    return fetch(`${serverUrl}/log`)
+    return fetch(`${serverUrl}/log`, getConfig())
         .then((body) => body.json())
         .then((data) =>{
             // Data formatted
@@ -52,28 +52,4 @@ export function getAllTransactions(){
                 locoName: transaction.locoName,
             }))
         })
-}
-
-export function useAllTransactions(){
-    const [error, setError] = useState(null);
-    const [transactionData, setTransactionData] = useState([]);
-
-    useEffect(
-        () => {
-            getAllTransactions()
-                .then((transactions) => {
-                    setTransactionData(transactions);
-                    setError(null)
-                })
-                .catch((e) =>{
-                    setError(e)
-                })
-        },
-        []
-    );
-
-    return {
-        binData: transactionData,
-        error
-    };
 }

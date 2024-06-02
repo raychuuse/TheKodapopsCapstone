@@ -1,47 +1,21 @@
-import {fullConverter, handleFetch, postConfig, putConfig, serverUrl} from "./utils";
+import { deleteConfig, fullConverter, getConfig, handleFetch, postConfig, putConfig, serverUrl } from './utils';
 
 const apiUrl = `${serverUrl}/locos`;
 
 export function getAllLocos() {
-    return fetch(`${apiUrl}`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            else {
-                response.json()
-                .then(issue => {
-                    throw new Error(issue.message);
-                })
-            }
-        })
-        .catch(err => {
-            throw new Error(err);
-        });
+    return handleFetch(fetch(`${apiUrl}`, getConfig()));
 }
 
 export function getLoco(id) {
-    return fetch(`${apiUrl}`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-                else {
-                    response.json()
-                .then(issue => {
-                    throw new Error(issue.message);
-                })
-            }
-        })
-        .catch(err => {
-            throw new Error(err);
-        });
+    return handleFetch(fetch(`${apiUrl}`, getConfig()));
 }
 
 export function getCurrentLoad(id) {
-    return handleFetch(fetch(`${apiUrl}/${id}/load`), true);
+    return handleFetch(fetch(`${apiUrl}/${id}/load`, getConfig()), true);
 }
 
 export function getSidingBreakdown(id) {
-    return fetch(`${apiUrl}/${id}/siding_breakdown`)
+    return fetch(`${apiUrl}/${id}/siding_breakdown`, getConfig())
         .then((body) => body.json())
         .then((data) =>{
             // Data formatting
@@ -62,5 +36,5 @@ export function updateLoco(id, name) {
 }
 
 export function deleteLoco(id) {
-    return handleFetch(fetch(`${apiUrl}/${id}`, {method: 'DELETE'}), false);
+    return handleFetch(fetch(`${apiUrl}/${id}`, deleteConfig()), false);
 }

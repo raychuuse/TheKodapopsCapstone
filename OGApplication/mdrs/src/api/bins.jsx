@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, ListInlineItem } from 'reactstrap';
-import {serverUrl, postConfig, putConfig, Status, handleFetch} from "./utils";
+import { serverUrl, postConfig, putConfig, Status, handleFetch, getConfig, deleteConfig } from './utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const apiUrl = `${serverUrl}/bins`;
@@ -63,12 +63,7 @@ export function useAllBins(){
 */
 
 export function getAllBins(){
-    return fetch(`${apiUrl}`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}`, getConfig()));
 }
 
 export function moveBin(binID, sidingID) {
@@ -76,16 +71,11 @@ export function moveBin(binID, sidingID) {
 }
 
 export function getDashBins(){
-    return fetch(`${apiUrl}/dash`)
-        .then(response => {
-            if (response.ok)
-                return response.json();
-            throw new Error();
-        });
+    return handleFetch(fetch(`${apiUrl}/dash`, getConfig()));
 }
 
 export function getSidingBreakdown(id) {
-    return fetch(`${apiUrl}/${id}/siding_breakdown`)
+    return fetch(`${apiUrl}/${id}/siding_breakdown`, getConfig())
         .then((body) => body.json())
         .then((data) =>{
             // Data formatting
@@ -97,7 +87,7 @@ export function getSidingBreakdown(id) {
 }
 
 export function getBin(binID) {
-    return handleFetch(fetch(`${apiUrl}/${binID}`), true);
+    return handleFetch(fetch(`${apiUrl}/${binID}`, getConfig()), true);
 }
 
 export function createBin(code) {
@@ -110,11 +100,11 @@ export function editBin(binID,code) {
 }
 
 export function deleteBin(binID) {
-    return handleFetch(fetch(`${apiUrl}/${binID}`, {method: 'DELETE'}), false);
+    return handleFetch(fetch(`${apiUrl}/${binID}`, deleteConfig()), false);
 }
 
 export function getMaintenanceBreakdown() {
-    return handleFetch(fetch(`${apiUrl}/maintenance_breakdown/stop-being-annoying`), true);
+    return handleFetch(fetch(`${apiUrl}/maintenance_breakdown/stop-being-annoying`, getConfig()), true);
 }
 
 export function resolveBin(id) {

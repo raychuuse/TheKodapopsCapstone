@@ -104,7 +104,7 @@ router.post("/login", loginValidationRulesID, (req, res) => {
         delete user.password;
 
         const expires_in = 60 * 60 * 24;
-        const exp = Date.now() + expires_in * 1000;
+        const exp = Date.now() / 1000 + expires_in;
         const token = jwt.sign({ userID, exp }, secretKey);
         res.status(200).json({ token: token, user: user });
       });
@@ -116,6 +116,7 @@ router.post("/login", loginValidationRulesID, (req, res) => {
 });
 
 router.post("/har/login", (req, res) => {
+  console.info('hLlo');
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -155,14 +156,14 @@ router.post("/har/login", (req, res) => {
         delete user.Permission;
 
         const expires_in = 60 * 60 * 24;
-        const exp = Date.now() + expires_in * 1000;
+        const exp = Date.now() / 1000 + expires_in;
         const token = jwt.sign({ userID, email, exp }, secretKey);
         return res.status(200).json({ token, user });
       });
     })
     .catch((err) => {
       console.error(err);
-      return res.status(520).json({ message: err.message });
+      return res.status(500).json({ message: err.message });
     });
 });
 
@@ -178,7 +179,7 @@ router.post("/loco/login", (req, res) => {
     .raw(
       `SELECT *
                 FROM users u
-                WHERE email = "${email}" AND userRole = "${locoRole}"`
+                WHERE email = ? AND userRole = "${locoRole}"`, [email]
     )
     .then(processQueryResult)
     .then((response) => {
@@ -204,9 +205,9 @@ router.post("/loco/login", (req, res) => {
 
         // Getting a day's worth of seconds once multiplied from milliseconds
         const expires_in = 60 * 60 * 24;
-        const exp = Date.now() + expires_in * 1000;
+        const exp = Date.now() / 1000 + expires_in;
         const token = jwt.sign({ userID, email, exp }, secretKey);
-        return res.status(200).json(JSON.stringify({ token: token, user: user }));
+        return res.status(200).json({ token: token, user: user });
       });
     })
     .catch((err) => {

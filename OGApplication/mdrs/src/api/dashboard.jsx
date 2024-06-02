@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {serverUrl} from "./utils";
+import { getConfig, serverUrl } from './utils';
 
 export async function getDashboard() {
-    const res = await fetch(`${serverUrl}/dashboard`);
+    const res = await fetch(`${serverUrl}/dashboard`, getConfig());
     const body = await res.json();
 
     //check for db error
@@ -23,15 +23,15 @@ export function filterByStatus(bins, query) {
 
 export function filterByStatus(bins, isFull,) {
     if (isFull) {
-        return bins.filter(bin => bin.status == "FULL");
+        return bins.filter(bin => bin.full);
     }
     else {
-        return bins.filter(bin => bin.status == "EMPTY");
+        return bins.filter(bin => !bin.full);
     }
 }
 
 export async function getDashboardMetrics() {
-    const res = await fetch(`${serverUrl}/bins`);
+    const res = await fetch(`${serverUrl}/bins`, getConfig());
     const body = res.json();
 
     //check for db error

@@ -39,6 +39,17 @@ export function getConfig() {
     }
 }
 
+export function deleteConfig() {
+    return {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + getToken(),
+        },
+    }
+}
+
 export function handleFetch(promise, hasJson=true) {
     return promise
         .then(response => {

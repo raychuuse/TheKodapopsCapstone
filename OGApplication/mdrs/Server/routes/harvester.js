@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const {isValidId, processQueryResult} = require("../utils");
+const { verifyAuthorization } = require('../middleware/authorization');
 
 // GET
-router.get("/", (req, res) => {
+router.get("/", verifyAuthorization, (req, res) => {
   req.db.raw(`SELECT *
               FROM harvester`)
       .then(processQueryResult)
@@ -18,7 +19,7 @@ router.get("/", (req, res) => {
 });
 
 //Harvester data grouped by sidings
-router.get("/:harvesterId/siding_breakdown", (req, res) => {
+router.get("/:harvesterId/siding_breakdown", verifyAuthorization, (req, res) => {
   const id = req.params.harvesterId;
   if (!isValidId(id)) return;
 
@@ -41,7 +42,7 @@ router.get("/:harvesterId/siding_breakdown", (req, res) => {
       })
 });
 
-router.post('/', (req, res) => {
+router.post('/', verifyAuthorization, (req, res) => {
     req.db.insert({harvesterName: req.body.name}).into('harvester')
         .then((response) => {
             res.status(201).send(response);
@@ -52,7 +53,7 @@ router.post('/', (req, res) => {
         });
 });
 
-router.put('/:id/:name', (req, res) => {
+router.put('/:id/:name', verifyAuthorization, (req, res) => {
     const id = req.params.id;
     const name = req.params.name;
     if (!isValidId(id)) return;
@@ -75,7 +76,7 @@ router.put('/:id/:name', (req, res) => {
     })
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyAuthorization, (req, res) => {
     const id = req.params.id;
     if (!isValidId(id, res)) return;
 

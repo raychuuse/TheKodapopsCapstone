@@ -2,7 +2,7 @@ const createError = require("http-errors");
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
-require('dotenv').config({path: './Server/.env'})
+require('dotenv').config({path: __dirname + '/.env'});
 const port = 8080;
 
 
@@ -65,10 +65,7 @@ function createServer() {
   });
 
   app.use(function (req, res, next) {
-    console.error('Not found', req.url);
-    var err = new Error("Not Found");
-    err.status = 404;
-    next(err);
+    return res.status(404).json({message: 'Page not found'});
   });
 
   // error handler
