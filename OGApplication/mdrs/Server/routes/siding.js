@@ -53,7 +53,7 @@ router.get("/:sidingId/breakdown", verifyAuthorization, (req, res) => {
 
 router.get('/:sidingId/loco_breakdown', verifyAuthorization, (req, res) => {
   const sidingId = req.params.sidingId;
-  if (!isValidId(sidingId)) return;
+  if (!isValidId(sidingId, res)) return;
 
   req.db.raw(`
       SELECT s.sidingID, s.sidingName, l.locoID, l.locoName, COUNT(*) as pickedUpBins
@@ -77,7 +77,7 @@ router.get('/:sidingId/loco_breakdown', verifyAuthorization, (req, res) => {
 // Return the harvesters that have filled a bin in this siding in the last month, and how many bins they filled.
 router.get("/:sidingId/harvester_breakdown", verifyAuthorization, (req, res) => {
   const id = req.params.sidingId;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
 
   req.db.raw(`SELECT s.sidingID, s.sidingName, h.harvesterID, h.harvesterName, COUNT(t.binID) as filledBins
               FROM transactionlog t
@@ -110,7 +110,7 @@ router.post('/', (req, res) => {
 router.put('/:id/:name', verifyAuthorization, (req, res) => {
   const id = req.params.id;
   const name = req.params.name;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
   req.db.raw(`select count(sidingName) AS count from siding WHERE sidingName = ?`, [name])
       .then(processQueryResult)
       .then(data => {

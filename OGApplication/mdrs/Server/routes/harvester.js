@@ -21,7 +21,7 @@ router.get("/", verifyAuthorization, (req, res) => {
 //Harvester data grouped by sidings
 router.get("/:harvesterId/siding_breakdown", verifyAuthorization, (req, res) => {
   const id = req.params.harvesterId;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
 
   req.db.raw(`
       SELECT h.harvesterID, h.harvesterName, s.sidingID, s.sidingName, COUNT(*) as binsFilled
@@ -56,7 +56,7 @@ router.post('/', verifyAuthorization, (req, res) => {
 router.put('/:id/:name', verifyAuthorization, (req, res) => {
     const id = req.params.id;
     const name = req.params.name;
-    if (!isValidId(id)) return;
+    if (!isValidId(id, res)) return;
     
     req.db.raw(`select count(harvesterName) AS count from harvester WHERE harvesterName = ?`, [name])
     .then(processQueryResult)

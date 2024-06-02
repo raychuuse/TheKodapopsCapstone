@@ -35,7 +35,7 @@ router.get(`/locos-with-run`, verifyAuthorization, (req, res) => {
 // off at each siding during that period.
 router.get("/:locoId/siding_breakdown", verifyAuthorization, (req, res) => {
   const id = req.params.locoId;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
 
   req.db.raw(`SELECT l.locoID, l.locoName, s.sidingID, s.sidingName, t.type, COUNT(t.type) as count
               FROM transactionlog t
@@ -112,7 +112,7 @@ router.post('/', verifyAuthorization, (req, res) => {
 
 router.put('/:id/:name', verifyAuthorization, (req, res) => {
     const id = req.params.id;
-    if (!isValidId(id)) return;
+    if (!isValidId(id, res)) return;
     const name = req.params.name;
       // Multiple locos existing?
     req.db.raw(`select count(locoName) AS count from locomotive WHERE locoName = ?`, [name])

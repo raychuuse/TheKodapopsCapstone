@@ -416,7 +416,7 @@ router.put('/:binID/:code', (req, res) => {
 
 router.delete('/:binID', (req, res) => {
   const id = req.params.binID;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
 
   req.db.raw(`DELETE FROM bin 
               WHERE binID = '${id}'`)
@@ -431,7 +431,7 @@ router.delete('/:binID', (req, res) => {
 
 router.post('/missing/:id'), (req, res) => {
   const id = req.params.id;
-  if (!isValidId(id)) return;
+  if (!isValidId(id, res)) return;
   req.db('bin').update({binData: req.body.data}).where({binID: req.params.id})
       .then(response => {
         res.json({Error: false, Message: 'Success'});
