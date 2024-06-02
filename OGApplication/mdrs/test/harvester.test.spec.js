@@ -59,7 +59,7 @@ describe('Harvester API tests', () => {
 
     it('should successfully update harvester name', (done) => {
         // Params are harvesterID and harvesterName
-        let params = [1, generateRandomString()]
+        let params = [20, generateRandomString()]
 		request(app)
 			.put(`${apiRoute}/${params[0]}/${params[1]}`)
 			.set('Authorization', `Bearer ${global.testAuthToken}`)
@@ -71,7 +71,7 @@ describe('Harvester API tests', () => {
 
     it('should successfully delete harvester', (done) => {
         // Params are harvesterID
-        let params = [10]
+        let params = [20]
 		request(app)
 			.delete(`${apiRoute}/${params[0]}`)
 			.set('Authorization', `Bearer ${global.testAuthToken}`)

@@ -74,7 +74,7 @@ describe('Loco API tests', () => {
 
     it('should successfully update locomotive name', (done) => {
         // Params are locoID and locoName
-        let params = [1, generateRandomString()]
+        let params = [9, generateRandomString()]
 		request(app)
 			.put(`${apiRoute}/${params[0]}/${params[1]}`)
 			.set('Authorization', `Bearer ${global.testAuthToken}`)
@@ -86,7 +86,7 @@ describe('Loco API tests', () => {
 
     it('should successfully delete locomotive', (done) => {
         // Params are locoID
-        let params = [8]
+        let params = [9]
 		request(app)
 			.delete(`${apiRoute}/${params[0]}`)
 			.set('Authorization', `Bearer ${global.testAuthToken}`)

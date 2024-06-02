@@ -91,7 +91,7 @@ describe('Sidings API tests', () => {
 
     it('should successfully update siding name', (done) => {
         // Params are harvesterID and harvesterName
-        let params = [1, generateRandomString()]
+        let params = [10, generateRandomString()]
 		request(app)
 			.put(`${apiRoute}/${params[0]}/${params[1]}`)
 			.set('Authorization', `Bearer ${global.testAuthToken}`)
@@ -103,7 +103,7 @@ describe('Sidings API tests', () => {
 
     it('should successfully delete siding', (done) => {
         // Params are harvesterID
-        let params = [12]
+        let params = [10]
 		request(app)
 			.delete(`${apiRoute}/${params[0]}`)
 			.set('Authorization', `Bearer ${global.testAuthToken}`)
