@@ -441,12 +441,20 @@ export const RunProvider = ({children}) => {
             return;
         }
 
+        // Check that the entered code is not already on the loco or at the stop
+        if (stop != null && stop.bins.findIndex(b => b.code === code) >= 0)
+            return;
+
+        if (stop == null && loco.bins.findIndex(b => b.code === code) >= 0)
+            return;
+
         findBin(code, stop != null ? stop.sidingID : null, stop == null ? locoID : null)
             .then(bin => {
                 if (stop != null) {
                     stop.bins.push(bin);
                     updateRun();
                 } else {
+                    if (loco.bins.find(b => b.code === code) >= 0) return;
                     loco.bins.push(bin);
                     updateLoco();
                 }

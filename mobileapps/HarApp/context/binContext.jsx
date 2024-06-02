@@ -365,6 +365,9 @@ export const BinProvider = ({ children }) => {
           return;
       }
 
+      // Check that the entered code is not already on the loco or at the stop
+      if (bins.findIndex(b => b.code === code) >= 0) return;
+
       findBin(code, selectedSiding.sidingID)
           .then(bin => {
               bins.push(bin);
