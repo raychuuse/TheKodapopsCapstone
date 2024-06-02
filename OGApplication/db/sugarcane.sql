@@ -15,12 +15,12 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+CREATE DATABASE IF NOT EXISTS sugarcane;
+USE sugarcane;
+
 --
 -- Table structure for table `bin`
 --
-
-USE sugarcane;
-
 
 DROP TABLE IF EXISTS `bin`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -28,7 +28,6 @@ DROP TABLE IF EXISTS `bin`;
 CREATE TABLE `bin` (
   `binID` int NOT NULL AUTO_INCREMENT,
   `code` char(4) NOT NULL,
-  `status` enum('EMPTY','FULL') NOT NULL,
   `sidingID` int DEFAULT NULL,
   `locoID` int DEFAULT NULL,
   `harvesterID` int DEFAULT NULL,
@@ -36,8 +35,8 @@ CREATE TABLE `bin` (
   `missing` tinyint(1) NOT NULL DEFAULT '0',
   `repair` tinyint NOT NULL DEFAULT '0',
   `full` tinyint(1) NOT NULL DEFAULT '0',
-  `droppedOffInRun` tinyint(1) DEFAULT NULL,
-  `pickedUpInRun` tinyint(1) DEFAULT NULL,
+  `droppedOffInRun` tinyint(1) NOT NULL DEFAULT '0',
+  `pickedUpInRun` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`binID`),
   UNIQUE KEY `binsID` (`binID`),
   UNIQUE KEY `bin_code_uindex` (`code`),
@@ -45,7 +44,7 @@ CREATE TABLE `bin` (
   KEY `bin_siding_sidingID_fk` (`sidingID`),
   CONSTRAINT `bin_locomotive_locoID_fk` FOREIGN KEY (`locoID`) REFERENCES `locomotive` (`locoID`),
   CONSTRAINT `bin_siding_sidingID_fk` FOREIGN KEY (`sidingID`) REFERENCES `siding` (`sidingID`)
-) ENGINE=InnoDB AUTO_INCREMENT=739 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=747 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -54,7 +53,7 @@ CREATE TABLE `bin` (
 
 LOCK TABLES `bin` WRITE;
 /*!40000 ALTER TABLE `bin` DISABLE KEYS */;
-INSERT INTO `bin` VALUES (1,'0001','EMPTY',3,NULL,NULL,1,0,0,1,1,0),(2,'0002','FULL',3,NULL,NULL,1,0,0,1,1,0),(3,'0003','FULL',NULL,1,NULL,0,0,0,1,0,1),(4,'0004','FULL',3,NULL,NULL,1,0,0,1,0,0),(5,'0005','FULL',7,NULL,NULL,0,0,0,0,1,0),(6,'0006','FULL',NULL,1,NULL,0,0,0,1,0,1),(8,'0008','FULL',11,NULL,NULL,0,1,0,1,0,0),(9,'0009','FULL',3,NULL,NULL,1,0,0,1,0,0),(11,'0011','FULL',7,NULL,NULL,0,0,0,0,0,0),(12,'0012','FULL',NULL,1,NULL,0,0,0,1,0,1),(13,'0013','FULL',NULL,1,NULL,1,0,1,0,0,1),(14,'0014','FULL',NULL,NULL,NULL,0,0,0,0,0,0),(15,'0015','FULL',NULL,NULL,NULL,1,0,0,0,0,0),(16,'0016','EMPTY',NULL,NULL,NULL,0,0,0,0,0,0),(17,'0017','EMPTY',NULL,NULL,NULL,0,0,0,0,0,0),(18,'0018','EMPTY',NULL,NULL,NULL,0,0,1,0,0,0),(19,'0019','EMPTY',NULL,NULL,NULL,0,0,0,0,0,0),(20,'0020','EMPTY',NULL,NULL,NULL,1,1,0,0,0,0),(21,'0021','EMPTY',NULL,NULL,NULL,1,0,0,1,0,0),(22,'0022','EMPTY',NULL,NULL,NULL,0,0,0,0,0,0),(23,'0023','EMPTY',NULL,NULL,NULL,0,0,0,0,0,0),(24,'0024','EMPTY',NULL,NULL,NULL,0,0,0,0,0,0),(25,'0025','EMPTY',NULL,NULL,NULL,0,0,0,0,0,0),(26,'0026','EMPTY',NULL,NULL,NULL,0,0,0,0,0,0),(27,'0127','EMPTY',7,NULL,NULL,1,0,0,1,1,0),(734,'0110','EMPTY',NULL,NULL,NULL,0,0,0,0,NULL,NULL);
+INSERT INTO `bin` VALUES (1,'0001',NULL,1,NULL,0,0,0,0,0,0),(2,'0002',NULL,1,NULL,0,0,0,0,0,0),(3,'0003',NULL,1,NULL,0,0,0,0,0,0),(4,'0004',NULL,1,NULL,0,0,0,0,0,0),(5,'0005',NULL,1,NULL,0,0,0,0,0,0),(6,'0006',NULL,1,NULL,0,0,0,0,0,0),(8,'0008',NULL,1,NULL,0,0,0,0,0,0),(9,'0009',NULL,1,NULL,0,0,0,0,0,0),(11,'0011',NULL,1,NULL,0,0,0,0,0,0),(12,'0012',NULL,1,NULL,0,0,0,0,0,0),(13,'0013',NULL,1,NULL,0,0,0,0,0,0),(14,'0014',NULL,1,NULL,0,0,0,0,0,0),(15,'0015',1,NULL,NULL,0,0,0,1,0,0),(16,'0016',1,NULL,NULL,0,0,0,1,0,0),(17,'0017',2,NULL,NULL,0,0,0,1,0,0),(18,'0018',2,NULL,NULL,0,0,0,1,0,0),(19,'0019',3,NULL,NULL,1,0,0,1,0,0),(20,'0020',3,NULL,NULL,0,0,0,1,0,0),(21,'0021',3,NULL,NULL,0,0,0,1,0,0),(22,'0022',3,NULL,NULL,0,0,0,1,0,0),(23,'0023',4,NULL,NULL,1,0,0,1,0,0),(24,'0024',4,NULL,NULL,0,0,0,1,0,0),(25,'0025',5,NULL,NULL,0,0,0,0,0,0),(26,'0026',5,NULL,NULL,0,0,0,1,0,0),(27,'0027',5,NULL,NULL,0,0,0,0,0,0),(28,'0028',5,NULL,NULL,1,0,0,1,0,0),(29,'0029',5,NULL,NULL,0,0,0,0,0,0),(30,'0030',5,NULL,NULL,0,0,0,0,0,0),(31,'0031',5,NULL,NULL,0,0,0,0,0,0);
 /*!40000 ALTER TABLE `bin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -116,10 +115,10 @@ DROP TABLE IF EXISTS `harvester`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `harvester` (
   `harvesterID` int NOT NULL AUTO_INCREMENT,
-  `harvesterName` varchar(255) DEFAULT NULL,
+  `harvesterName` varchar(255) NOT NULL,
   PRIMARY KEY (`harvesterID`),
   UNIQUE KEY `idHarvester_UNIQUE` (`harvesterID`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='List of Harvester';
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='List of Harvester';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -128,7 +127,7 @@ CREATE TABLE `harvester` (
 
 LOCK TABLES `harvester` WRITE;
 /*!40000 ALTER TABLE `harvester` DISABLE KEYS */;
-INSERT INTO `harvester` VALUES (1,'BB Harvesting'),(2,'North Hill Harvesting'),(3,'Connor Harvesting'),(4,'Harvest Moon'),(5,'John Deere'),(6,'Bingham Agriculture'),(7,'Total Harvesting'),(8,'Marty McMills Group'),(9,'Trevors Group Ltd'),(10,'Bundaberg Group'),(11,'AgriGroup QLD'),(12,'Farm Team QLD'),(13,'FNQ Harvest Group'),(14,'Franky Harvesters'),(16,'Carins Sugar Group'),(17,'Tool Group'),(18,'Henry QLD'),(19,'Jarrod FNQ Ltd'),(20,'Growers Group'),(21,'Moss Group');
+INSERT INTO `harvester` VALUES (1,'Mossman Group'),(2,'North Hill Harvesting'),(3,'Connor Harvesting'),(4,'Harvest Moon'),(5,'John Deere'),(6,'Bingham Agriculture'),(7,'Total Harvesting'),(8,'Marty McMills Group'),(9,'Trevors Group Ltd'),(11,'AgriGroup QLD'),(12,'Farm Team QLD'),(13,'FNQ Harvest Group'),(14,'Franky Harvesters'),(16,'Carins Sugar Group'),(17,'Tool Group'),(18,'Henry QLD'),(19,'Jarrod FNQ Ltd');
 /*!40000 ALTER TABLE `harvester` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -141,11 +140,11 @@ DROP TABLE IF EXISTS `locomotive`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `locomotive` (
   `locoID` int NOT NULL AUTO_INCREMENT,
-  `locoName` varchar(255) DEFAULT NULL,
+  `locoName` varchar(255) NOT NULL,
   PRIMARY KEY (`locoID`),
   UNIQUE KEY `idLocomotive_UNIQUE` (`locoID`),
   UNIQUE KEY `locomotive_locoName_uindex` (`locoName`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='list of locomotive';
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='list of locomotive';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,7 +153,7 @@ CREATE TABLE `locomotive` (
 
 LOCK TABLES `locomotive` WRITE;
 /*!40000 ALTER TABLE `locomotive` DISABLE KEYS */;
-INSERT INTO `locomotive` VALUES (1,'Loco 1'),(2,'Loco 2'),(3,'Loco 3'),(4,'Loco 4'),(5,'Loco 5'),(6,'Loco 6'),(7,'Loco 7'),(8,'Loco 8'),(9,'Loco 9');
+INSERT INTO `locomotive` VALUES (1,'Loco 1'),(2,'Loco 2'),(3,'Loco 3'),(4,'Loco 4'),(5,'Loco 5'),(6,'Loco 6'),(7,'Loco 7');
 /*!40000 ALTER TABLE `locomotive` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -187,7 +186,7 @@ CREATE TABLE `run_stops` (
 
 LOCK TABLES `run_stops` WRITE;
 /*!40000 ALTER TABLE `run_stops` DISABLE KEYS */;
-INSERT INTO `run_stops` VALUES (1,1,3,2,2,0,0),(2,1,7,2,3,0,0),(3,2,1,5,3,0,0),(4,2,9,1,6,0,0);
+INSERT INTO `run_stops` VALUES (1,1,1,2,2,0,0),(2,1,2,2,3,0,0),(3,1,3,4,3,0,0),(4,1,4,3,4,0,0);
 /*!40000 ALTER TABLE `run_stops` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -216,7 +215,6 @@ CREATE TABLE `runs` (
 LOCK TABLES `runs` WRITE;
 /*!40000 ALTER TABLE `runs` DISABLE KEYS */;
 INSERT INTO `runs` VALUES (1,CURDATE(),1,1);
-INSERT INTO `runs` VALUES (2,DATE_ADD(CURDATE(), INTERVAL 1 DAY),1,1);
 /*!40000 ALTER TABLE `runs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -232,7 +230,7 @@ CREATE TABLE `siding` (
   `sidingName` varchar(255) NOT NULL,
   PRIMARY KEY (`sidingID`),
   UNIQUE KEY `idSiding_UNIQUE` (`sidingID`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='list of Siding';
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='list of Siding';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -241,7 +239,7 @@ CREATE TABLE `siding` (
 
 LOCK TABLES `siding` WRITE;
 /*!40000 ALTER TABLE `siding` DISABLE KEYS */;
-INSERT INTO `siding` VALUES (1,'Mossman Line 1'),(2,'Mossman Line 2'),(3,'Mossman Line 3'),(4,'Mossman Line 4'),(7,'Mossman Line 5'),(8,'Mossman Line 6'),(9,'Mossman Line 7'),(10,'Mossman Line 8'),(11,'Mossman Line 9'),(12,'Mossman Line 10');
+INSERT INTO `siding` VALUES (1,'Mossman Line 1'),(2,'Mossman Line 2'),(3,'Mossman Line 3'),(4,'Mossman Line 4'),(5,'Mossman Line 5');
 /*!40000 ALTER TABLE `siding` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -302,7 +300,7 @@ CREATE TABLE `transactionlog` (
   CONSTRAINT `transactionlog_run_stops_stopID_fk` FOREIGN KEY (`stopID`) REFERENCES `run_stops` (`stopID`) ON DELETE CASCADE,
   CONSTRAINT `transactionlog_siding_sidingID_fk` FOREIGN KEY (`sidingID`) REFERENCES `siding` (`sidingID`) ON DELETE CASCADE,
   CONSTRAINT `transactionlog_users_userID_fk` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1013 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1131 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -311,25 +309,8 @@ CREATE TABLE `transactionlog` (
 
 LOCK TABLES `transactionlog` WRITE;
 /*!40000 ALTER TABLE `transactionlog` DISABLE KEYS */;
-INSERT INTO `transactionlog` VALUES (956,'2024-05-21 21:58:02',9,5,NULL,7,1,2,'DROPPED_OFF'),(958,'2024-05-21 21:58:02',9,1,NULL,3,1,1,'DROPPED_OFF'),(959,'2024-05-21 21:58:02',9,2,NULL,3,1,1,'DROPPED_OFF'),(961,'2024-05-21 21:58:02',9,3,NULL,3,1,1,'PICKED_UP'),(962,'2024-05-21 22:14:55',9,13,NULL,7,1,2,'PICKED_UP'),(964,'2024-05-21 22:14:55',9,6,NULL,7,1,2,'PICKED_UP'),(965,'2024-05-21 22:14:55',9,12,NULL,7,1,2,'PICKED_UP'),(978,'2024-05-21 23:14:55',1,12,NULL,NULL,NULL,NULL,'BURNT'),(980,'2024-05-21 23:17:03',1,8,1,7,NULL,NULL,'FILLED'),(982,'2024-05-21 23:38:27',1,4,1,3,NULL,NULL,'EMPTIED'),(983,'2024-05-21 23:38:27',1,9,1,3,NULL,NULL,'EMPTIED'),(984,'2024-05-21 23:38:27',1,2,1,3,NULL,NULL,'EMPTIED'),(986,'2024-05-21 23:38:27',1,1,NULL,NULL,NULL,NULL,'BURNT'),(987,'2024-05-21 23:39:56',1,1,1,3,NULL,NULL,'EMPTIED'),(989,'2024-05-21 23:42:13',1,2,1,3,NULL,NULL,'FILLED'),(991,'2024-05-21 23:42:13',1,1,NULL,NULL,NULL,NULL,'BURNT'),(992,'2024-05-21 23:42:13',1,2,NULL,NULL,NULL,NULL,'BURNT'),(994,'2024-05-21 23:47:12',1,9,1,3,NULL,NULL,'EMPTIED'),(997,'2024-05-22 00:20:05',1,9,NULL,NULL,NULL,NULL,'BURNT'),(1000,'2024-05-22 00:31:45',1,1,1,3,NULL,NULL,'FILLED'),(1001,'2024-05-22 00:33:16',1,4,1,3,NULL,NULL,'FILLED'),(1002,'2024-05-22 00:33:16',1,9,NULL,NULL,NULL,NULL,'BURNT'),(1003,'2024-05-22 00:36:48',1,9,1,3,NULL,NULL,'FILLED'),(1004,'2024-05-22 00:36:48',1,2,NULL,NULL,NULL,NULL,'REPAIR'),(1005,'2024-05-22 00:37:10',1,2,1,3,NULL,NULL,'FILLED'),(1006,'2024-05-22 00:37:10',1,4,1,3,NULL,NULL,'FILLED'),(1007,'2024-05-22 13:31:12',1,1,NULL,NULL,NULL,NULL,'REPAIR'),(1008,'2024-05-22 13:31:18',1,1,NULL,NULL,NULL,NULL,'REPAIR'),(1009,'2024-05-22 18:25:02',1,4,NULL,NULL,NULL,NULL,'RESOLVED'),(1010,'2024-05-22 18:25:18',1,15,NULL,NULL,NULL,NULL,'RESOLVED'),(1011,'2024-05-22 18:25:38',1,13,NULL,NULL,NULL,NULL,'RESOLVED'),(1012,'2024-05-22 18:25:39',1,12,NULL,NULL,NULL,NULL,'RESOLVED');
 /*!40000 ALTER TABLE `transactionlog` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `userTokens`
---
-
-DROP TABLE IF EXISTS `usertokens`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `usertokens` (
-  `email` varchar(255) NOT NULL,
-  `userRole` varchar(255) NOT NULL,
-  `resetToken` varchar(255) NOT NULL,
-  PRIMARY KEY (`email`, `userRole`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table for user reset tokens';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 
 --
 -- Table structure for table `users`
@@ -352,7 +333,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `email` (`email`),
   KEY `users_harvester_harvesterID_fk` (`harvesterID`),
   CONSTRAINT `users_harvester_harvesterID_fk` FOREIGN KEY (`harvesterID`) REFERENCES `harvester` (`harvesterID`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table for users of the program';
+) ENGINE=InnoDB AUTO_INCREMENT=66 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table for users of the program';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -361,8 +342,32 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'$2a$08$wkJZiX0D.FPOVbsCuDmiBe14L6UFWAKkaYfALcHlv9saXPztybcvm','mill@email.com','James','Smith','Mill',1,NULL),(2,'$2a$08$HgTEhro2.iteq26ORrQ6fekeD56OsqAbjYHPUj37TgHDHcX1vkLta','example2@gmail.com','Matthew','Satler','Locomotive',1,NULL),(3,'$2a$08$vuM7du751UzTRsJYY3ri2uH2LqdhCx24dG4s3dsD4mtB/tfXOjnwa','example3@gmail.com','Brad','Young','Harvester',1,NULL),(4,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','example4@gmail.com','Jarrod','Stout','Harvester',1,6),(5,'root','example5@gmail.com','Anthony','Pitt','Harvester',1,9),(6,'root','example6@gmail.com','Harry','Brown','Locomotive',1,NULL),(7,'root','example7@gmail.com','Jack','Smith','Locomotive',0,NULL),(8,'root','example8@gmail.com','Ron','Falcon','Locomotive',0,NULL),(9,'$2a$08$tHBAB7gxIY82RA0NUQ.WW.6JnDvU9JtY.afrchogUHVaHoucLAhNq','example9@gmail.com','James','Gill','Harvester',0,NULL),(10,'$2a$08$G/yln3BQYKKG0NrNZHbsVuXuQSRPON3fD2Jtc8oskM37sCivKm0Dy','example17@gmail.com','Trent','Lazerick','Locomotive',1,NULL),(11,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','example18@gmail.com','Thomas','Meek','Harvester',1,1),(12,'$2a$08$KgvtBPBDCiSAlrPIcBijMeeFLQH0lagvTLKyZSPnUh4VyuCv8Lp/a','example12@gmail.coma','Flynn','Harris','Mill',1,NULL), (13,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','harvester@email.com','Jack','Smith','Harvester',1,5),(14,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','loco@email.com','John','Smith','Locomotive',1,NULL);
+INSERT INTO `users` VALUES (1,'$2a$08$wkJZiX0D.FPOVbsCuDmiBe14L6UFWAKkaYfALcHlv9saXPztybcvm','mill@email.com','James2234234','Smith','Mill',1,NULL),(2,'$2a$08$HgTEhro2.iteq26ORrQ6fekeD56OsqAbjYHPUj37TgHDHcX1vkLta','example2@gmail.com','Matthew','Satler','Locomotive',1,NULL),(3,'$2a$08$vuM7du751UzTRsJYY3ri2uH2LqdhCx24dG4s3dsD4mtB/tfXOjnwa','example3@gmail.com','Brad','Young','Harvester',1,NULL),(4,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','example4@gmail.com','Jarrod','Stout','Harvester',1,6),(9,'$2a$08$tHBAB7gxIY82RA0NUQ.WW.6JnDvU9JtY.afrchogUHVaHoucLAhNq','example9@gmail.com','James','Gill','Harvester',0,NULL),(10,'$2a$08$G/yln3BQYKKG0NrNZHbsVuXuQSRPON3fD2Jtc8oskM37sCivKm0Dy','example17@gmail.com','Trent','Lazerick','Locomotive',1,NULL),(11,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','example18@gmail.com','Thomas','Meek','Harvester',1,1),(12,'$2a$08$KgvtBPBDCiSAlrPIcBijMeeFLQH0lagvTLKyZSPnUh4VyuCv8Lp/a','example12@gmail.coma','Flynn','Harris','Mill',1,NULL),(13,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','harvester@email.com','Florence','Vonzein','Harvester',1,1),(14,'$2a$08$GlE34snn/vPoBkNdcdAmeuAeNknc0BjJwiPalD6hODA.LcI.bxpXC','loco@email.com','Seinman','Euran','Locomotive',1,NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `usertokens`
+--
+
+DROP TABLE IF EXISTS `usertokens`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `usertokens` (
+  `email` varchar(255) NOT NULL,
+  `userRole` varchar(255) NOT NULL,
+  `resetToken` varchar(255) NOT NULL,
+  PRIMARY KEY (`email`,`userRole`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Table for user reset tokens';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `usertokens`
+--
+
+LOCK TABLES `usertokens` WRITE;
+/*!40000 ALTER TABLE `usertokens` DISABLE KEYS */;
+/*!40000 ALTER TABLE `usertokens` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -374,4 +379,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-05-22 18:27:09a
+-- Dump completed on 2024-06-02 18:08:48
